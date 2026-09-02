@@ -1,0 +1,164 @@
+---
+// ── /features/kerala-floods-2018 · the ramp, told in acts ───────────────────
+// The second story on the TerrainStage shell (see /features/wayanad-slide).
+// Same machinery, different data: lib/kerala-floods.ts.
+//
+// PROTOTYPE, NOT REPORTING. Coordinates and Malayalam names come from
+// OpenStreetMap and every elevation is sampled from the DEM the reader is
+// looking at — but the narration is placeholder and describes only the land.
+// See the header of src/lib/terrain.ts for the rule and why it matters here.
+//
+// Stacking: TerrainStage is `position: fixed` at z-index 0, so every other
+// block carries `relative z-10` and its own background.
+import Layout from '../../layouts/Layout.astro';
+import ImmersiveBar from '../../components/travel/ImmersiveBar.astro';
+import Footer from '../../components/Footer.astro';
+import PinMap from '../../components/map/PinMap.astro';
+import TerrainStage from '../../components/terrain/TerrainStage.astro';
+import BandHeading from '../../components/home4/BandHeading.astro';
+
+import { keralaFloods, places, archive } from '../../lib/kerala-floods';
+import { TERRAIN_ATTRIBUTION } from '../../lib/terrain';
+
+// PinMap is Leaflet and speaks [lat, lng]; the story data is MapLibre's
+// [lng, lat]. One flip, here, rather than two coordinate orders in the data.
+const locatorPins = places.map((p) => ({
+  id: p.id,
+  label: p.name,
+  labelML: p.nameML,
+  coords: [p.coords[1], p.coords[0]] as [number, number],
+  icon: 'ti-mountain',
+}));
+
+// Every figure is read off the DEM or measured on the OSM geometry in
+// lib/kerala-floods.ts — none is typed in by hand.
+const peak = places.find((p) => p.id === 'anamudi')!;
+const port = places.find((p) => p.id === 'kochi')!;
+const lake = places.find((p) => p.id === 'vembanad')!;
+
+const facts: [string, string, string][] = [
+  ['ആനമുടി', 'Anamudi', `${peak.elevation.toLocaleString('en-IN')} m`],
+  ['കൊച്ചി', 'Kochi', `${port.elevation} m`],
+  ['വേമ്പനാട്', 'Vembanad', `${lake.elevation} m`],
+  ['പെരിയാർ', 'Periyar', '≈192 km'],
+];
+---
+
+<Layout
+  title="കേരളം 2018 — ഭൂപ്രകൃതിയിലൂടെ | Kerala 2018, through the terrain | MediaOne"
+  description="A scroll-driven 3D terrain feature on the shape of Kerala. Design prototype."
+  topAd={false}
+  noindex
+>
+  <ImmersiveBar title="കേരളം 2018 — ഭൂപ്രകൃതിയിലൂടെ" backHref="/latest-news" backLabel="Latest" />
+
+  <main class="flex-1">
+    <!-- ══ HERO ═════════════════════════════════════════════════════════ -->
+    <section
+      data-immersive-hero
+      class="relative z-10 flex min-h-[100svh] flex-col justify-end bg-nav-bg"
+    >
+      <div class="mx-auto w-full max-w-[68rem] px-5 pb-16 sm:pb-20">
+        <p class="eyebrow text-white/55">ഭൂപ്രകൃതി · Kerala 2018</p>
+        <h1 class="mt-3 font-malayalam text-display font-bold text-white text-balance">
+          വെള്ളം പോകാൻ ഇടമില്ലാത്ത നാട്
+        </h1>
+        <p class="mt-1 text-title font-bold text-white/65">A land with nowhere for the water to go</p>
+        <p class="mt-5 max-w-2xl font-malayalam text-[1.0625rem] leading-[1.8] text-white/80 text-pretty">
+          രണ്ടായിരത്തിലധികം മീറ്റർ ഉയരത്തിൽ നിന്ന് സമുദ്രനിരപ്പിലേക്ക് നൂറ് കിലോമീറ്റർ.
+          ബാക്കി ദൂരം മുഴുവൻ ഏറെക്കുറെ പരന്നതാണ്.
+        </p>
+        <p class="mt-3 max-w-2xl body-small text-white/50 text-pretty">
+          A hundred kilometres from over two thousand metres down to sea level —
+          and almost all of the falling happens in the first half.
+        </p>
+
+        <p class="mt-8 inline-block border border-white/25 px-3 py-1.5 caption-text text-white/60">
+          Design prototype — real terrain and coordinates, placeholder narration.
+        </p>
+      </div>
+
+      <span
+        class="absolute inset-x-0 bottom-5 flex justify-center text-white/45 motion-safe:animate-bounce"
+        aria-hidden="true"
+      ><i class="ti ti-chevron-down text-2xl"></i></span>
+    </section>
+
+    <!-- ══ THE FACTS + LOCATOR ══════════════════════════════════════════ -->
+    <section class="relative z-10 bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto max-w-[68rem] px-5 py-14 sm:py-20">
+        <div class="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-start lg:gap-14">
+          <div>
+            <p class="eyebrow text-azure dark:text-azure-light">The shape of it</p>
+            <p class="mt-3 font-malayalam text-[1.1875rem] leading-[1.85] text-text-primary dark:text-ivory text-pretty">
+              പെരിയാർ 192 കിലോമീറ്റർ ഒഴുകുന്നു. അതിൽ പകുതി ദൂരം കൊണ്ട് തന്നെ
+              873 മീറ്ററിൽ നിന്ന് 109 മീറ്ററിലേക്ക് താഴുന്നു. ബാക്കിയുള്ള നൂറ് കിലോമീറ്ററിൽ
+              ഇറങ്ങാൻ ഏതാണ്ട് ഒന്നും ബാക്കിയില്ല.
+            </p>
+            <p class="mt-3 body-small text-text-muted dark:text-ivory/50 text-pretty">
+              The Periyar runs 192 km. It is down from 873 m to 109 m by roughly
+              halfway. Across the last hundred kilometres there is almost nothing
+              left to fall.
+            </p>
+
+            <dl class="mt-8 flex flex-wrap gap-x-8 gap-y-3 border-t border-rule pt-6 dark:border-ivory/10">
+              {facts.map(([ml, en, v]) => (
+                <div>
+                  <dt class="font-malayalam caption-text text-text-muted dark:text-ivory/45">
+                    {ml} <span class="text-text-light dark:text-ivory/25">{en}</span>
+                  </dt>
+                  <dd class="mt-0.5 article-title tabular-nums text-text-primary dark:text-ivory">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <PinMap
+            id="floods-locator"
+            pins={locatorPins}
+            center={[9.95, 76.65]}
+            zoom={8}
+            label="Locator map — the places named in this feature"
+            class="h-[20rem] sm:h-[24rem]"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ THE ACTS ═════════════════════════════════════════════════════ -->
+    <TerrainStage story={keralaFloods} />
+
+    <!-- ══ ARCHIVE ══════════════════════════════════════════════════════ -->
+    <section class="relative z-10 bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto max-w-[68rem] px-5 py-16 sm:py-20">
+        <BandHeading label="From the archive" href="/latest-news" viewAllHref="/latest-news" class="mb-6" />
+        <ul class="grid gap-x-6 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
+          {archive.map((s) => (
+            <li class="border-t border-rule pt-3 dark:border-ivory/12">
+              <a href={s.href} class="group block">
+                <p class="eyebrow text-azure dark:text-azure-light">{s.kicker}</p>
+                <h3 class="mt-1.5 font-malayalam article-title text-text-primary transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light text-balance">
+                  {s.titleML}
+                </h3>
+                <p class="mt-1 caption-text text-text-muted dark:text-ivory/45">{s.title}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <p class="mt-12 border-t border-rule pt-4 caption-text text-text-light dark:border-ivory/10 dark:text-ivory/35">
+          Elevation data: <Fragment set:html={TERRAIN_ATTRIBUTION} />, sampled at zoom 12
+          (≈38 m per pixel). Place names, coordinates and the Periyar's course:
+          © OpenStreetMap contributors. Basemap © OpenStreetMap contributors, © CARTO.
+          Event reference: <a
+            class="underline hover:text-azure dark:hover:text-azure-light"
+            href="https://en.wikipedia.org/wiki/2018_Kerala_floods"
+            rel="noopener">2018 Kerala floods</a>. The blue line is the river as OSM maps
+          it — no flood extent is drawn, because none is available here to cite.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="relative z-10"><Footer /></div>
+</Layout>

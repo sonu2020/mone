@@ -1,0 +1,39 @@
+{
+  "breakpoint": {
+    "$type": "dimension",
+    "sm": { "$value": "640px" },
+    "md": { "$value": "768px" },
+    "lg": { "$value": "1024px" },
+    "xl": { "$value": "1280px" },
+    "2xl": { "$value": "1536px" }
+  },
+
+  "width": {
+    "$type": "dimension",
+    "site": { "$value": "80rem" },
+    "prose": { "$value": "65ch" },
+    "xs": { "$value": "20rem" },
+    "sm": { "$value": "24rem" },
+    "md": { "$value": "28rem" },
+    "lg": { "$value": "32rem" },
+    "xl": { "$value": "36rem" },
+    "2xl": { "$value": "42rem" },
+    "3xl": { "$value": "48rem" }
+  },
+
+  "container": {
+    "$type": "dimension",
+    "xs": { "$value": "20rem" },
+    "sm": { "$value": "24rem" },
+    "md": { "$value": "28rem" },
+    "lg": { "$value": "32rem" },
+    "xl": { "$value": "36rem" },
+    "2xl": { "$value": "42rem" },
+    "3xl": { "$value": "48rem" },
+    "prose": { "$value": "65ch" },
+    "site": { "$value": "80rem" },
+    "mobile": { "$value": "390px" },
+    "tablet": { "$value": "768px" },
+    "desktop": { "$value": "1024px" }
+  }
+}

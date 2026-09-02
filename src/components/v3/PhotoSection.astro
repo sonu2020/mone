@@ -1,0 +1,19 @@
+---
+// SECTION · PhotoSection — the image of the day. A horizontal scroll on mobile,
+// a 5-up grid on desktop. The page's one purely visual breather before the tail.
+import SectionHeading from '../ui/SectionHeading.astro';
+import PhotoGallery from '../PhotoGallery.astro';
+
+export interface Props {
+  items?: { alt?: string }[];
+  title?: string;
+  titleEn?: string;
+  viewAllHref?: string;
+  class?: string;
+}
+const { items, title = 'ചിത്രങ്ങൾ', titleEn = 'Photo Story', viewAllHref = '/', class: className = '' } = Astro.props;
+---
+<section class:list={['mc', 'py-7 lg:py-10 border-t border-rule', className]}>
+  <SectionHeading title={title} titleEn={titleEn} viewAllHref={viewAllHref} />
+  <PhotoGallery items={items} />
+</section>

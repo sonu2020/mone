@@ -1,0 +1,50 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "noto sans devanagari",
+        "files": [
+          "src/components/ads/ContentGridAd.astro"
+        ],
+        "createdAt": "2026-08-26T11:23:40.878Z",
+        "reason": "user asked for reset fonts (not site fonts) on this ad slot, since MGID content is third-party and often Hindi"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "11px",
+        "files": [
+          "src/components/ads/ContentGridAd.astro"
+        ],
+        "createdAt": "2026-08-26T11:23:40.922Z",
+        "reason": "reset font stack for third-party ad slot content, intentionally off the site type ramp"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "15px",
+        "files": [
+          "src/components/ads/ContentGridAd.astro"
+        ],
+        "createdAt": "2026-08-26T11:23:40.961Z",
+        "reason": "reset font stack for third-party ad slot content, intentionally off the site type ramp"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.9375rem",
+        "files": [
+          "src/components/channels/ChannelRail.astro"
+        ],
+        "createdAt": "2026-08-26T12:34:43.933Z",
+        "reason": "matches DeskRail.astro's own HEADLINE row style for rail-row consistency"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "eq-bounce",
+        "createdAt": "2026-08-26T22:30:26.741Z",
+        "reason": "audio-equalizer bar visualization (live TV indicator), ease-in-out timing not literal bounce/elastic — animation name triggered the heuristic, not the easing curve"
+      }
+    ]
+  }
+}

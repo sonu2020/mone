@@ -1,0 +1,94 @@
+---
+// COMPONENT · SignupModal — the "follow a topic" dialog. Any trigger carrying
+// `data-signup-open` opens it; add `data-signup-topic="<label>"` on the same
+// trigger to name that topic in the heading. One instance per page, mounted
+// near the root the way VideoModal is.
+---
+
+<div
+  id="signup-modal"
+  class:list={['mc', 'fixed inset-0 z-[100] opacity-0 invisible pointer-events-none transition-opacity duration-200 data-[open]:opacity-100 data-[open]:visible data-[open]:pointer-events-auto']}
+  role="dialog"
+  aria-modal="true"
+  aria-label="Follow this topic"
+  aria-hidden="true"
+>
+  <div class="absolute inset-0 bg-ink/60 dark:bg-black/70 backdrop-blur-sm" data-close></div>
+
+  <div class="relative h-full w-full flex items-center justify-center p-4">
+    <div class="relative w-full max-w-sm bg-bg-card dark:bg-brand-elevated border border-rule dark:border-ivory/15 shadow-2xl p-6">
+      <button
+        type="button"
+        data-close
+        class="absolute top-3 right-3 size-8 inline-flex items-center justify-center text-text-muted hover:text-text-primary transition-colors"
+        aria-label="Close"
+      >
+        <i class="ti ti-x text-lg" aria-hidden="true"></i>
+      </button>
+
+      <p class="eyebrow text-azure">Stay updated</p>
+      <h2 id="signup-modal-title" class="mt-1 text-title font-bold text-text-primary dark:text-ivory">
+        Follow this topic
+      </h2>
+      <p class="mt-2 body-small text-text-secondary dark:text-ivory/65">
+        Get an email whenever we publish something new here.
+      </p>
+
+      <form class="mt-5 flex flex-col gap-3" data-signup-form>
+        <input
+          type="email"
+          required
+          placeholder="you@example.com"
+          class="w-full border border-rule dark:border-ivory/20 bg-bg-page dark:bg-brand-dark px-3 py-2.5 text-text-primary dark:text-ivory placeholder:text-text-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure"
+        />
+        <button
+          type="submit"
+          class="w-full bg-azure text-white font-semibold py-2.5 hover:bg-azure-dark transition-colors"
+        >
+          Notify me
+        </button>
+      </form>
+      <p data-signup-success class="hidden mt-4 body-small text-azure">You're subscribed. Thanks for following.</p>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var modal = document.getElementById('signup-modal');
+    if (!modal) return;
+    var titleEl = document.getElementById('signup-modal-title');
+    var form = modal.querySelector('[data-signup-form]');
+    var success = modal.querySelector('[data-signup-success]');
+
+    function openModal(topic) {
+      titleEl.textContent = topic ? 'Follow ' + topic : 'Follow this topic';
+      form.hidden = false;
+      success.classList.add('hidden');
+      form.reset();
+      modal.setAttribute('data-open', '');
+      modal.setAttribute('aria-hidden', 'false');
+      document.documentElement.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      modal.removeAttribute('data-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.documentElement.style.overflow = '';
+    }
+
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('[data-signup-open]');
+      if (trigger) { e.preventDefault(); openModal(trigger.getAttribute('data-signup-topic')); return; }
+      if (e.target.closest('[data-close]') && e.target.closest('#signup-modal')) closeModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.hasAttribute('data-open')) closeModal();
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      form.hidden = true;
+      success.classList.remove('hidden');
+    });
+  })();
+</script>

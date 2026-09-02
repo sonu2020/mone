@@ -1,0 +1,86 @@
+---
+// LAYOUT · Immersive — the picture-led case.
+//
+// The art goes full-bleed and carries the lockup, so the page opens on the
+// photograph rather than on a headline with a photograph under it. That only
+// works when the image is strong, which is why it is a variant and not the
+// default: a weak picture at this size is worse than no picture at all.
+// Under the fold the page returns to the narrow measure with a sponsor rail.
+import ArticleBreadcrumb from '../ArticleBreadcrumb.astro';
+import ArticleHeadline from '../ArticleHeadline.astro';
+import ArticleByline from '../ArticleByline.astro';
+import ArticleBody from '../ArticleBody.astro';
+import ArticleRail from '../ArticleRail.astro';
+import TopicChips from '../TopicChips.astro';
+import SponsoredCard from '../SponsoredCard.astro';
+import ReadMoreList from '../ReadMoreList.astro';
+import AdDisclaimer from '../AdDisclaimer.astro';
+import { readingTime, type ArticleDoc } from '../../../lib/article-data';
+
+export interface Props { doc: ArticleDoc }
+const { doc } = Astro.props;
+const minutes = readingTime(doc);
+---
+<div class="mc bg-bg-card">
+  <!-- Full-bleed opener -->
+  <header class="relative isolate bg-ink min-h-[60vh] lg:min-h-[76vh] flex items-end">
+    <!-- A plain img, not the Media atom: the art here is a background that must
+         fill whatever height the lockup asks for, and Media's aspect-ratio frame
+         would fight that. -->
+    <img
+      src={doc.image}
+      alt=""
+      class="absolute inset-0 w-full h-full object-cover"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/25"></div>
+
+    <div class="relative w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10 lg:pt-40 lg:pb-14">
+      <div class="max-w-3xl">
+        <ArticleBreadcrumb section={doc.section} sectionHref={doc.sectionHref} class="[&_a]:text-white/60 [&_span]:text-white/60" />
+        <ArticleHeadline
+          kicker={doc.section}
+          badge={doc.badge}
+          title={doc.title}
+          dek={doc.dek}
+          size="display"
+          tone="onDark"
+          class="mt-5"
+        />
+        <ArticleByline
+          author={doc.author}
+          published={doc.published}
+          updated={doc.updated}
+          readingTime={minutes}
+          tone="onDark"
+          class="mt-7 border-b-0"
+        />
+      </div>
+    </div>
+  </header>
+
+  <p class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 pt-3 caption-text text-text-muted">{doc.caption}</p>
+
+  <!-- Body: prose beside the rail, no left tool gutter — the opener already
+       spent the width, and a third column here would read as clutter. -->
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-10 pt-10">
+      <div class="lg:col-span-8 lg:col-start-1 min-w-0 max-w-3xl">
+        <ArticleBody blocks={doc.blocks} />
+        <TopicChips topics={doc.tags} class="mt-8 pt-6 border-t border-rule dark:border-ivory/10" />
+        <SponsoredCard item={doc.sponsored} class="mt-8" />
+      </div>
+      <ArticleRail doc={doc} class="lg:col-span-4 min-w-0 mt-10 lg:mt-0" />
+    </div>
+
+    <ReadMoreList
+      items={doc.readMore}
+      title="Read More"
+      variant="grid"
+      limit={4}
+      class="mt-14 pt-10 border-t border-rule dark:border-ivory/10"
+    />
+    <AdDisclaimer text={doc.disclaimer} class="mt-14 pb-14" />
+  </div>
+</div>

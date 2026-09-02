@@ -1,0 +1,111 @@
+---
+// BLOCK · ImmersiveBar — the only chrome an immersive feature carries.
+//
+// The standard masthead is a navigation instrument: eleven desks, a sub-nav, a
+// trending band. None of that belongs over a photograph that is meant to be the
+// first thing a reader meets. So a feature gets this instead — a hairline of
+// reading progress, a way back, and the mark.
+//
+// It rides transparent over the hero on a scrim, then takes the masthead navy
+// once the hero is behind you. The title only appears at that point: while the
+// hero is on screen the title is already the largest thing on it, and printing
+// it twice is how a feature starts looking like a page.
+import Logo from '../Logo.astro';
+
+export interface Props {
+  /** Shown in the bar once the hero has scrolled past. */
+  title: string;
+  backHref: string;
+  backLabel: string;
+}
+const { title, backHref, backLabel } = Astro.props;
+---
+
+<div
+  id="immersive-bar"
+  class:list={['mc', 'fixed inset-x-0 top-0 z-50 transition-colors duration-300']}
+  data-immersive-bar
+>
+  <!-- Reading progress — the whole document, not just the hero. -->
+  <div class="h-[3px] bg-white/15">
+    <span data-immersive-progress class="block h-full w-0 bg-accent-red"></span>
+  </div>
+
+  <!-- Scrim, so white controls stay legible over any photograph. -->
+  <span
+    data-immersive-scrim
+    class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/55 to-transparent transition-opacity duration-300"
+  ></span>
+
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-3 h-12">
+      <a
+        href={backHref}
+        class="inline-flex items-center gap-1.5 shrink-0 text-white/85 hover:text-white transition-colors"
+      >
+        <i class="ti ti-arrow-left text-base" aria-hidden="true"></i>
+        <span class="caption-text font-semibold whitespace-nowrap">{backLabel}</span>
+      </a>
+
+      <!-- Title fades in only once the hero is gone. -->
+      <p
+        data-immersive-title
+        class="min-w-0 flex-1 text-center truncate nav-text text-white opacity-0 transition-opacity duration-300"
+      >{title}</p>
+
+      <a href="/" class="shrink-0" aria-label="MediaOne — home">
+        <Logo class="h-5 w-auto text-white" />
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Over the hero: nothing but the scrim. Past it: the masthead navy. */
+  [data-immersive-bar].is-solid {
+    background-color: var(--color-nav-bg);
+    box-shadow: 0 1px 12px rgb(0 0 0 / 0.18);
+  }
+  [data-immersive-bar].is-solid [data-immersive-scrim] { opacity: 0; }
+  [data-immersive-bar].is-solid [data-immersive-title] { opacity: 1; }
+</style>
+
+<script is:inline>
+  (function () {
+    var bar = document.getElementById('immersive-bar');
+    var fill = document.querySelector('[data-immersive-progress]');
+    var hero = document.querySelector('[data-immersive-hero]');
+    if (!bar) return;
+
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      var doc = document.documentElement;
+      var scrollable = doc.scrollHeight - window.innerHeight;
+      var pct = scrollable > 0 ? Math.min(Math.max(window.scrollY / scrollable, 0), 1) : 0;
+      if (fill) fill.style.width = (pct * 100).toFixed(2) + '%';
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }, { passive: true });
+
+    window.addEventListener('resize', update, { passive: true });
+    update();
+
+    // The bar solidifies when the hero is no longer behind it. An observer
+    // rather than a scroll threshold, so it stays correct at any hero height.
+    if (hero && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          bar.classList.toggle('is-solid', !e.isIntersecting);
+        });
+      }, { rootMargin: '-48px 0px 0px 0px', threshold: 0 }).observe(hero);
+    } else {
+      bar.classList.add('is-solid');
+    }
+  })();
+</script>

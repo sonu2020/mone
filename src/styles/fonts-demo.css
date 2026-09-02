@@ -1,0 +1,187 @@
+/* ============================================================================
+   Malayalam & Latin font playground — the faces behind /demo/fonts.
+
+   Loaded only by /demo/fonts, never by the main site.
+   Bundled faces (Malini, Nupuram, Manjari, Rachana, Chilanka) are SIL OFL 1.1.
+   Google Fonts are loaded via <link> tags in the head slot of the page.
+   ========================================================================= */
+
+/* ── Malini · variable · wght, wdth, slnt, opsz ───────────────────────────── */
+@font-face {
+  font-family: "Malini";
+  src: url("/fonts/malini/Malini-VF.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-style: oblique 0deg 12deg;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MaliniML";
+  src: url("/fonts/malini/Malini-VF.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-style: oblique 0deg 12deg;
+  font-display: swap;
+  unicode-range: U+0D00-0D7F, U+200C-200D, U+0964-0965;
+}
+
+/* ── Nupuram · variable · wght, wdth, slnt (negative) ─────────────────────── */
+@font-face {
+  font-family: "Nupuram";
+  src: url("/fonts/nupuram/Nupuram-VF.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-style: oblique 0deg -15deg;
+  font-display: swap;
+}
+@font-face {
+  font-family: "NupuramML";
+  src: url("/fonts/nupuram/Nupuram-VF.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-style: oblique 0deg -15deg;
+  font-display: swap;
+  unicode-range: U+0D00-0D7F, U+200C-200D, U+0964-0965;
+}
+
+/* ── Manjari · static · Regular + Bold ────────────────────────────────────── */
+@font-face {
+  font-family: "Manjari";
+  src: url("/fonts/manjari/Manjari-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Manjari";
+  src: url("/fonts/manjari/Manjari-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ManjariML";
+  src: url("/fonts/manjari/Manjari-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0D00-0D7F, U+200C-200D, U+0964-0965;
+}
+@font-face {
+  font-family: "ManjariML";
+  src: url("/fonts/manjari/Manjari-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0D00-0D7F, U+200C-200D, U+0964-0965;
+}
+
+/* ── Rachana · static · Regular + Bold ────────────────────────────────────── */
+@font-face {
+  font-family: "Rachana";
+  src: url("/fonts/rachana/Rachana-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Rachana";
+  src: url("/fonts/rachana/Rachana-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "RachanaML";
+  src: url("/fonts/rachana/Rachana-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0D00-0D7F, U+200C-200D, U+0964-0965;
+}
+@font-face {
+  font-family: "RachanaML";
+  src: url("/fonts/rachana/Rachana-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0D00-0D7F, U+200C-200D, U+0964-0965;
+}
+
+/* ── Chilanka · static · Regular only ─────────────────────────────────────── */
+@font-face {
+  font-family: "Chilanka";
+  src: url("/fonts/chilanka/Chilanka-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ChilankaML";
+  src: url("/fonts/chilanka/Chilanka-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0D00-0D7F, U+200C-200D, U+0964-0965;
+}
+
+/* ── Scope definition ────────────────────────────────────────────────────── */
+.fonts-scope,
+.malini-scope {
+  --trial-stack: "Malini", "Anek Malayalam", system-ui, sans-serif;
+  --trial-wght: 500;
+  --trial-wdth: 100;
+  --trial-slnt: 0;
+
+  --font-malayalam: var(--trial-stack);
+  --font-malayalam-alt: var(--trial-stack);
+}
+
+.fonts-scope .font-malayalam,
+.fonts-scope [class*="headline"],
+.fonts-scope .article-title,
+.fonts-scope .article-title-lg,
+.fonts-scope .section-header,
+.fonts-scope .category-label,
+.fonts-scope h1,
+.fonts-scope h2,
+.fonts-scope h3,
+.fonts-scope article p,
+.fonts-scope .article-body,
+.fonts-scope p,
+.malini-scope .font-malayalam,
+.malini-scope [class*="headline"],
+.malini-scope .article-title,
+.malini-scope .article-title-lg,
+.malini-scope .section-header,
+.malini-scope .category-label,
+.malini-scope h1,
+.malini-scope h2,
+.malini-scope h3,
+.malini-scope article p,
+.malini-scope .article-body,
+.malini-scope p {
+  font-family: var(--trial-stack);
+  font-variation-settings:
+    "wght" var(--trial-wght),
+    "wdth" var(--trial-wdth),
+    "slnt" var(--trial-slnt);
+  font-optical-sizing: auto;
+}
+
+.fonts-scope[data-variable="false"] .font-malayalam,
+.fonts-scope[data-variable="false"] [class*="headline"],
+.fonts-scope[data-variable="false"] .article-title,
+.fonts-scope[data-variable="false"] .article-title-lg,
+.fonts-scope[data-variable="false"] .section-header,
+.fonts-scope[data-variable="false"] .category-label,
+.fonts-scope[data-variable="false"] h1,
+.fonts-scope[data-variable="false"] h2,
+.fonts-scope[data-variable="false"] h3,
+.fonts-scope[data-variable="false"] article p,
+.fonts-scope[data-variable="false"] .article-body,
+.fonts-scope[data-variable="false"] p,
+.malini-scope[data-variable="false"] .font-malayalam,
+.malini-scope[data-variable="false"] [class*="headline"],
+.malini-scope[data-variable="false"] .article-title,
+.malini-scope[data-variable="false"] .article-title-lg,
+.malini-scope[data-variable="false"] .section-header,
+.malini-scope[data-variable="false"] .category-label,
+.malini-scope[data-variable="false"] h1,
+.malini-scope[data-variable="false"] h2,
+.malini-scope[data-variable="false"] h3,
+.malini-scope[data-variable="false"] article p,
+.malini-scope[data-variable="false"] .article-body,
+.malini-scope[data-variable="false"] p {
+  font-variation-settings: normal;
+}

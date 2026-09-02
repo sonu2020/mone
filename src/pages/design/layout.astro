@@ -1,0 +1,583 @@
+---
+// DESIGN · Layout & Composition — the handbook for building a MediaOne page.
+//
+// Documents the frame, the column vocabulary every band draws from, the two
+// page shells, the composition techniques, and the scroll behaviours. Written
+// against the shipping code: every number here is read from a token, a
+// component or a script in this repo, not chosen for the page.
+//
+// Keep it that way. If a value moves in the code, move it here in the same
+// commit — a handbook that disagrees with the build is worse than none.
+import DesignShell from '../../components/design/DesignShell.astro';
+import Rule from '../../components/design/handbook/Rule.astro';
+import Split from '../../components/design/handbook/Split.astro';
+import Blueprint from '../../components/design/handbook/Blueprint.astro';
+import BandBlueprint from '../../components/design/handbook/BandBlueprint.astro';
+import SkCell from '../../components/design/handbook/SkCell.astro';
+import type { Cell } from '../../components/design/handbook/types';
+
+const BREAKPOINTS = [
+  { name: 'sm', px: '640px', use: 'Two-up cards; list bands split in half.' },
+  { name: 'md', px: '768px', use: 'The lead package pairs its stack and rail.' },
+  { name: 'lg', px: '1024px', use: 'The 12-column grid engages. Rails, rules and sticky behaviour begin here.' },
+  { name: 'xl', px: '1280px', use: 'Rails narrow from 4 to 3 columns, giving the main column a ninth.' },
+  { name: '2xl', px: '1536px', use: 'No layout change — the frame is already at its 80rem ceiling.' },
+];
+
+// Every split in the band set, read off the components.
+const SPLITS = [
+  { cols: [5, 4, 3], name: 'Lead package', where: 'LeadPackage', note: 'Lead card, thumbed stack, live rail. The topics strip spans the last two (7) above them.' },
+  { cols: [8, 4], name: 'Main + rail', where: 'ShelfBand, SplitBand', note: 'Widens to 9 / 3 at xl. The workhorse.' },
+  { cols: [8, 4], name: 'Main + wide rail', where: 'DeskPage', note: 'Holds 8 / 4 at xl rather than widening. The rail carries Videos, Latest and Trending, so a quarter column starved all three.' },
+  { cols: [7, 5], name: 'Feature + playlist', where: 'ProgramBand', note: 'Widens to 8 / 4 at xl.' },
+  { cols: [5, 3, 4], name: 'Feature + stack + rail', where: 'FeatureBand', note: 'A feature that needs two companions rather than one column of them.' },
+  { cols: [12], name: 'Full width', where: 'SplitBand (no rail)', note: 'Falls back to this when a band is handed no rail.' },
+];
+
+const BANDS = [
+  { name: 'LeadPackage', grid: '12 · 5 / 4 / 3', at: 'md: 2-up', use: 'Opens a page. Lead card, four thumbed rows, live rail.' },
+  { name: 'ListBand', grid: '2-up from sm', at: '—', use: 'A flat run of headlines. No 12-column phase.' },
+  { name: 'ShelfBand', grid: '12 · 8 / 4 (xl 9 / 3)', at: 'lg', use: 'Lead, card row, rail. Takes an ad slot in the rail.' },
+  { name: 'SplitBand', grid: '12 · 8 / 4 (xl 9 / 3)', at: 'lg', use: 'Lead + card grid; drops to 12 when given no rail.' },
+  { name: 'FeatureBand', grid: '12 · 5 / 3 / 4', at: 'md: 2-up', use: 'One feature, a stack, a rail.' },
+  { name: 'OpinionBand', grid: '4-up from lg', at: 'sm: 2-up', use: 'Columnists — equal weight, no lead.' },
+  { name: 'ProgramBand', grid: '12 · 7 / 5 (xl 8 / 4)', at: 'lg', use: 'One programme: latest episode, numbered playlist.' },
+  { name: 'VideoBand', grid: 'Full-bleed navy', at: 'sm/md', use: '4-up leads, 3-up compact row, switchable show strip.' },
+];
+
+// Each band as cells on the 12-column grid — the same numbers the components
+// carry, so the drawings are the spec rather than an impression of it.
+const BAND_PLANS: { name: string; cells: Cell[]; bleed?: boolean; note: string }[] = [
+  {
+    name: 'LeadPackage · 5 / 4 / 3',
+    note: 'Opens a page. The lead spans two rows when a topics strip takes the first.',
+    cells: [
+      { span: 5, kind: 'card', label: 'lead' },
+      { span: 4, kind: 'rows', label: 'stack' },
+      { span: 3, kind: 'rail', label: 'live rail' },
+    ],
+  },
+  {
+    name: 'ShelfBand · 8 / 4',
+    note: 'Lead and card row against a rail that can carry an ad. Widens to 9 / 3 at xl.',
+    cells: [
+      { span: 8, kind: 'grid', label: 'lead + cards' },
+      { span: 4, kind: 'rail', label: 'rail' },
+    ],
+  },
+  {
+    name: 'FeatureBand · 5 / 3 / 4',
+    note: 'One feature with a stack and a rail, rather than a single column of companions.',
+    cells: [
+      { span: 5, kind: 'card', label: 'feature' },
+      { span: 3, kind: 'rows', label: 'stack' },
+      { span: 4, kind: 'rail', label: 'rail' },
+    ],
+  },
+  {
+    name: 'ProgramBand · 7 / 5',
+    note: 'A programme: latest episode, then the run as a numbered playlist. 8 / 4 at xl.',
+    cells: [
+      { span: 7, kind: 'card', label: 'latest episode' },
+      { span: 5, kind: 'list', label: 'playlist' },
+    ],
+  },
+  {
+    name: 'VideoBand · full-bleed',
+    note: 'Leaves the frame, re-centres its own content inside it, and returns.',
+    bleed: true,
+    cells: [{ span: 12, kind: 'bleed' }],
+  },
+];
+
+const SCROLL = [
+  {
+    name: 'The header is the floating menu',
+    where: 'HeaderBar',
+    trigger: 'scrollY > 120px',
+    detail: 'The whole header is one short sticky bar, so hiding it is a single transform — there is no cloned floating bar to keep in step. It withdraws on the way down and returns on the way up, and never hides while the reader is still near the top. A 4px delta guard absorbs trackpad jitter, scrollY is clamped at 0 for iOS overscroll, and a `focusin` listener brings it back if focus lands inside it while withdrawn.',
+    tuning: 'transform 200ms · rAF-throttled · passive listener',
+  },
+  {
+    name: 'Sticky desk rail',
+    where: 'DeskRail',
+    trigger: 'lg and up',
+    detail: '`lg:sticky lg:top-16 lg:self-start`. The rail stays with the reader down a long list instead of scrolling away after the first screen. Below lg it is a normal block after the main column.',
+    tuning: 'top-16 clears the floating bar',
+  },
+  {
+    name: 'Anchor offset',
+    where: 'app.css → html',
+    trigger: 'any in-page anchor',
+    detail: '`scroll-padding-top` clears the sticky header so a jump target never lands underneath it — 6rem by default (the 56px bar plus its 36px desk row), tightening to 4.5rem at lg where the desks move inline.',
+    tuning: '6rem · 4.5rem from lg'
+  },
+  {
+    name: 'Deferred ads',
+    where: 'Layout + .ad-lazy',
+    trigger: 'after first paint',
+    detail: 'Slots render at their final height, then fade in — `requestIdleCallback` with a 3000ms timeout, or a 1500ms `setTimeout` where it is unsupported. Reserving the box first is what keeps ads out of CLS.',
+    tuning: 'opacity + max-height, 400ms',
+  },
+  {
+    name: 'Image priority',
+    where: 'Art / Media',
+    trigger: 'position on the page',
+    detail: 'The opening lead loads `eager` with `fetchpriority="high"`; everything below it stays lazy. One image per page gets the fast path — giving it to two costs both.',
+    tuning: 'ratio + w are required, so the box is reserved before load',
+  },
+  {
+    name: 'Horizontal rails',
+    where: 'Section bar, trending, EPG track',
+    trigger: 'overflow',
+    detail: 'Rails scroll on the x axis with `overflow-x-auto scrollbar-none` rather than wrapping or hiding. The schedule track parks its live cell at the head on first fill by setting `scrollLeft`; the same line sets `scrollTop`, so one assignment serves both layouts.',
+    tuning: 'scrollbar-none is a utility in app.css',
+  },
+  {
+    name: 'Reduced motion',
+    where: 'app.css',
+    trigger: 'prefers-reduced-motion',
+    detail: 'A global override drops every animation and transition to 0.01ms and forces `scroll-behavior: auto`. Components do not need their own guard — the heartbeat, the EPG, the floating bar and the panels are all covered by it.',
+    tuning: 'set once, applies to *, ::before, ::after',
+  },
+];
+---
+
+<DesignShell
+  title="Layout & Composition — MediaOne Design System"
+  description="The frame, the column vocabulary, the page shells and the scroll behaviours behind mediaoneonline.com."
+  eyebrow="Handbook"
+  heading="Layout & Composition"
+  lede="How a MediaOne page is built: one frame, a small set of column splits, two page shells, and the scroll behaviours that hold them together. Every number here is read from the shipping code."
+  active="layout"
+>
+  <div class="max-w-none">
+    <!-- 01 · THE FRAME -->
+    <section id="frame" class="scroll-mt-24">
+      <Rule
+        n="01"
+        title="The frame"
+        lede="Every page sits in the same box. Nothing on the site is wider than this, and nothing sets its own gutters."
+      />
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {[
+          { k: 'max-w-site', v: '80rem', d: 'The page ceiling — 1280px. From --container-site, so Tailwind resolves max-w-site natively.' },
+          { k: 'px-4 sm:px-6 lg:px-8', v: '16 / 24 / 32px', d: 'The only gutters on the site. Bands never add their own horizontal padding.' },
+          { k: 'grid-cols-12', v: 'from lg', d: 'Below lg a band is one column, or two where it says so. The 12-column grid engages at 1024px.' },
+        ].map((t) => (
+          <div class="border border-rule dark:border-ivory/10 p-5 bg-bg-card dark:bg-brand-dark">
+            <p class="font-mono text-[0.8125rem] text-azure dark:text-azure-light">{t.k}</p>
+            <p class="mt-1 article-title text-ink dark:text-ivory tabular-nums">{t.v}</p>
+            <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">{t.d}</p>
+          </div>
+        ))}
+      </div>
+
+      <Blueprint
+        class="mt-7"
+        label="The frame"
+        caption="Hatched edges are the gutters — content never crosses them, ads do."
+        gutters
+      >
+        <div class="flex flex-col gap-3">
+          <div class="rounded-xs border border-dashed border-azure/30 px-3 py-2 text-center font-mono text-[0.5625rem] uppercase tracking-wider text-azure/70">
+            max-w-site · 80rem
+          </div>
+          <BandBlueprint
+            cells={[
+              { span: 8, kind: 'grid', label: 'main' },
+              { span: 4, kind: 'rail', label: 'rail' },
+            ]}
+          />
+        </div>
+      </Blueprint>
+
+      <p class="mt-6 body-small text-text-secondary dark:text-ivory/60 max-w-prose">
+        A page body is therefore always this, and a band receives no padding of its own:
+      </p>
+      <pre class="mt-3 overflow-x-auto border border-rule dark:border-ivory/10 bg-ivory dark:bg-brand-dark p-4 font-mono text-[0.8125rem] leading-relaxed text-ink dark:text-ivory"><code>&lt;main class="flex-1 bg-bg-page"&gt;
+  &lt;div class="w-full max-w-site mx-auto bg-bg-card"&gt;
+    &lt;div class="px-4 sm:px-6 lg:px-8"&gt;
+      &lt;!-- bands --&gt;
+    &lt;/div&gt;
+    &lt;AdSlot /&gt;              &lt;!-- outside the gutters: ads span the frame --&gt;
+  &lt;/div&gt;
+&lt;/main&gt;</code></pre>
+
+      <h3 class="mt-8 mb-3 eyebrow text-text-muted dark:text-ivory/40">Breakpoints, and what changes at each</h3>
+      <div class="overflow-x-auto border border-rule dark:border-ivory/10">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-ivory dark:bg-brand-dark">
+            <tr>
+              <th class="p-3 eyebrow text-text-muted dark:text-ivory/40">Token</th>
+              <th class="p-3 eyebrow text-text-muted dark:text-ivory/40">Width</th>
+              <th class="p-3 eyebrow text-text-muted dark:text-ivory/40">What engages</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-rule dark:divide-ivory/10">
+            {BREAKPOINTS.map((b) => (
+              <tr class="bg-bg-card dark:bg-brand-dark/40">
+                <td class="p-3 font-mono text-[0.8125rem] text-azure dark:text-azure-light">{b.name}</td>
+                <td class="p-3 caption-text tabular-nums text-ink dark:text-ivory">{b.px}</td>
+                <td class="p-3 body-small text-text-secondary dark:text-ivory/60">{b.use}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 02 · COLUMN VOCABULARY -->
+    <section id="columns" class="scroll-mt-24 mt-16">
+      <Rule
+        n="02"
+        title="Column vocabulary"
+        lede="Five splits cover every band on the site. Reuse one before inventing a sixth — the repetition is what makes different pages feel like the same paper."
+      />
+
+      <div class="flex flex-col gap-7">
+        {SPLITS.map((s) => (
+          <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_18rem] gap-5 items-start">
+            <Split cols={s.cols} label={s.cols.join(' / ')} />
+            <div>
+              <p class="article-title text-ink dark:text-ivory">{s.name}</p>
+              <p class="mt-0.5 font-mono text-[0.75rem] text-azure dark:text-azure-light">{s.where}</p>
+              <p class="mt-1.5 body-small text-text-secondary dark:text-ivory/60">{s.note}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-7 border-l-2 border-azure pl-4">
+        <p class="body-small text-text-secondary dark:text-ivory/60 max-w-prose">
+          Columns are divided by a hairline, not by whitespace. A column that has a neighbour to its
+          right carries <code class="font-mono text-azure dark:text-azure-light">lg:border-r border-rule lg:pr-6</code>
+          — the rule sits in the gutter, and the padding keeps text off it. Rails on desk pages mirror
+          it with <code class="font-mono text-azure dark:text-azure-light">lg:border-l ... lg:pl-8</code>.
+        </p>
+      </div>
+    </section>
+
+    <!-- 03 · BAND SET -->
+    <section id="bands" class="scroll-mt-24 mt-16">
+      <Rule
+        n="03"
+        title="The band set"
+        lede="A front page is a stack of bands. Each is a self-contained section with its own heading, its own split and its own rules — they compose in any order."
+      />
+
+      <div class="overflow-x-auto border border-rule dark:border-ivory/10">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-ivory dark:bg-brand-dark">
+            <tr>
+              <th class="p-3 eyebrow text-text-muted dark:text-ivory/40">Band</th>
+              <th class="p-3 eyebrow text-text-muted dark:text-ivory/40">Grid</th>
+              <th class="p-3 eyebrow text-text-muted dark:text-ivory/40">Below lg</th>
+              <th class="p-3 eyebrow text-text-muted dark:text-ivory/40">What it is for</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-rule dark:divide-ivory/10">
+            {BANDS.map((b) => (
+              <tr class="bg-bg-card dark:bg-brand-dark/40">
+                <td class="p-3 font-mono text-[0.8125rem] text-azure dark:text-azure-light whitespace-nowrap">{b.name}</td>
+                <td class="p-3 caption-text tabular-nums text-ink dark:text-ivory whitespace-nowrap">{b.grid}</td>
+                <td class="p-3 caption-text text-text-muted dark:text-ivory/45 whitespace-nowrap">{b.at}</td>
+                <td class="p-3 body-small text-text-secondary dark:text-ivory/60">{b.use}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-8 flex flex-col gap-8">
+        {BAND_PLANS.map((b) => (
+          <Blueprint label={b.name} caption={b.note}>
+            <BandBlueprint cells={b.cells} bleed={b.bleed} />
+          </Blueprint>
+        ))}
+      </div>
+
+      <p class="mt-6 body-small text-text-secondary dark:text-ivory/60 max-w-prose">
+        Every band takes the same three props for its heading —
+        <code class="font-mono text-azure dark:text-azure-light">label</code>,
+        <code class="font-mono text-azure dark:text-azure-light">href</code>,
+        <code class="font-mono text-azure dark:text-azure-light">viewAllHref</code> —
+        and renders it through <code class="font-mono text-azure dark:text-azure-light">BandHeading</code>.
+        Rendered live in the <a href="/design/kitchen#bands" class="text-azure dark:text-azure-light hover:underline underline-offset-2">Gallery</a>.
+      </p>
+    </section>
+
+    <!-- 04 · PAGE SHELLS -->
+    <section id="shells" class="scroll-mt-24 mt-16">
+      <Rule
+        n="04"
+        title="Two page shells"
+        lede="A front page and a desk page are composed on opposite principles. Using the wrong one is the most expensive mistake available here."
+      />
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Front page -->
+        <div class="border border-rule dark:border-ivory/10 bg-bg-card dark:bg-brand-dark p-5">
+          <p class="eyebrow text-azure dark:text-azure-light">Front page</p>
+          <p class="mt-1 article-title text-ink dark:text-ivory">A stack of full-width bands</p>
+          <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">
+            Eleven desks share one page, so each band changes shape to stay distinguishable from its
+            neighbours. There is no page-level rail — each band carries its own.
+          </p>
+          <Blueprint class="mt-4" caption="Scroll order. Shape changes band to band; no page-level rail.">
+            <div class="flex flex-col gap-4">
+              <BandBlueprint cells={[
+                { span: 5, kind: 'card', label: 'lead' },
+                { span: 4, kind: 'rows' },
+                { span: 3, kind: 'rail' },
+              ]} />
+              <SkCell kind="ad" />
+              <BandBlueprint cells={[
+                { span: 8, kind: 'grid', label: 'shelf' },
+                { span: 4, kind: 'rail' },
+              ]} />
+              <SkCell kind="bleed" label="video · full-bleed" />
+              <BandBlueprint cells={[
+                { span: 5, kind: 'card', label: 'feature' },
+                { span: 3, kind: 'rows' },
+                { span: 4, kind: 'rail' },
+              ]} />
+              <SkCell kind="ad" />
+            </div>
+          </Blueprint>
+          <p class="mt-3 caption-text text-text-muted dark:text-ivory/45">
+            Full-bleed bands break out of <code class="font-mono">max-w-site</code> by sitting
+            outside the container and re-centring their own content inside it.
+          </p>
+        </div>
+
+        <!-- Desk page -->
+        <div class="border border-rule dark:border-ivory/10 bg-bg-card dark:bg-brand-dark p-5">
+          <p class="eyebrow text-azure dark:text-azure-light">Desk page</p>
+          <p class="mt-1 article-title text-ink dark:text-ivory">One column beside a standing rail</p>
+          <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">
+            One desk all the way down. Alternating band shapes read as churn here, so the main column
+            holds steady and the rail does the cross-selling.
+          </p>
+          <Blueprint class="mt-4" caption="One column, one rail. The rail sticks; the column pages.">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              <div class="lg:col-span-8 min-w-0 lg:border-r lg:border-dashed lg:border-azure/30 lg:pr-3 flex flex-col gap-3">
+                <span class="block h-1.5 w-24 rounded-full bg-azure/40"></span>
+                <SkCell kind="card" label="hero" />
+                <SkCell kind="grid" label="featured 3-up" />
+                <SkCell kind="rows" label="thumbed × 5" />
+                <SkCell kind="list" label="latest × PER_PAGE" />
+                <div class="flex items-center gap-2 pt-1">
+                  <span class="block h-5 w-16 rounded-xs border border-dashed border-azure/40"></span>
+                  <span class="block h-1.5 w-14 rounded-full bg-ink/15 dark:bg-ivory/15"></span>
+                  <span class="ml-auto block h-5 w-16 rounded-xs border border-dashed border-azure/40"></span>
+                </div>
+              </div>
+              <div class="lg:col-span-4 min-w-0 flex flex-col gap-3">
+                <span class="block h-5 w-24 rounded-xs bg-accent-red/70"></span>
+                <SkCell kind="rail" label="videos" />
+                <SkCell kind="list" label="trending" />
+                <SkCell kind="ad" />
+              </div>
+            </div>
+          </Blueprint>
+          <p class="mt-3 caption-text text-text-muted dark:text-ivory/45">
+            Composed by <code class="font-mono">src/lib/desk.ts</code>. Page 1 shows the top block;
+            later pages are list-only.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-6 border border-rule dark:border-ivory/10 bg-bg-card dark:bg-brand-dark p-5">
+        <p class="eyebrow text-text-muted dark:text-ivory/40 mb-3">Desk constants</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[
+            ['HERO', '1', 'Opens page 1'],
+            ['FEATURED', '3', 'Three-up row'],
+            ['THUMBED', '5', 'Thumbed rows'],
+            ['TOP', '9', 'Page 1 only'],
+            ['PER_PAGE', '8', 'Latest per page'],
+            ['SUB_MIN / MAX', '2 / 4', 'Sub-section block'],
+          ].map(([k, v, d]) => (
+            <div>
+              <p class="font-mono text-[0.6875rem] text-azure dark:text-azure-light">{k}</p>
+              <p class="article-title tabular-nums text-ink dark:text-ivory">{v}</p>
+              <p class="caption-text text-text-muted dark:text-ivory/45">{d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 · COMPOSITION TECHNIQUES -->
+    <section id="techniques" class="scroll-mt-24 mt-16">
+      <Rule
+        n="05"
+        title="Composition techniques"
+        lede="The handful of moves that recur. Each exists because the obvious alternative broke something."
+      />
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {[
+          {
+            t: 'Row-span pairing',
+            c: 'lg:row-span-2',
+            d: 'The lead card spans both rows of the pair beside it, so a strip can occupy the first row across columns 2+3 while the lead keeps its full height. Make the span conditional on that strip existing — without it the grid leaves an empty row under the lead.',
+          },
+          {
+            t: 'Cursor slicing',
+            c: 'take(n)',
+            d: 'Bands draw from one running cursor rather than hand-picked indices, so a page consumes its material exactly once: nothing repeats, nothing is stranded, and a band never slices past the end of the array.',
+          },
+          {
+            t: 'Flush top',
+            c: 'flushTop',
+            d: 'Swaps py-6 for pt-0 pb-6 on the opening band so it sits directly under the header. Do it with a prop, not by layering pt-0 over py-6 — which wins then depends on Tailwind emission order.',
+          },
+          {
+            t: 'Two cuts, one pool',
+            c: 'subsectionBlocks()',
+            d: 'Sub-section blocks deliberately overlap the chronological list below them: same material, two ways in. Only the hero is held back, because repeating that one story a screen later reads as a bug rather than a route.',
+          },
+          {
+            t: 'Rule-divided columns',
+            c: 'border-r + pr-6',
+            d: 'Columns are separated by a hairline in the gutter rather than by extra space. Grid items stretch by default, so the rule runs the full height of the band without being drawn.',
+          },
+          {
+            t: 'Reserve before load',
+            c: 'ratio + w',
+            d: 'Every still declares its aspect ratio and width, so the box exists before the image arrives. This — not the loading attribute — is what keeps layout shift at zero.',
+          },
+        ].map((x) => (
+          <div class="border border-rule dark:border-ivory/10 bg-bg-card dark:bg-brand-dark p-5">
+            <div class="flex items-baseline gap-2 flex-wrap">
+              <p class="article-title text-ink dark:text-ivory">{x.t}</p>
+              <code class="font-mono text-[0.75rem] text-azure dark:text-azure-light">{x.c}</code>
+            </div>
+            <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">{x.d}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 06 · SCROLL COMPOSITION -->
+    <section id="scroll" class="scroll-mt-24 mt-16">
+      <Rule
+        n="06"
+        title="Scroll composition"
+        lede="What the page does as it moves. All of it is transform, opacity or a reserved box — nothing here reflows mid-scroll."
+      />
+
+      <Blueprint
+        class="mb-8"
+        label="Sticky header — the three states"
+        caption="Nothing reflows: the bar is sticky and only its transform changes."
+      >
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { t: 'Near the top', d: 'y ≤ 120px', bar: false, head: true },
+            { t: 'Scrolling down', d: 'delta > +4px', bar: false, head: false },
+            { t: 'Scrolling up', d: 'delta < −4px', bar: true, head: false },
+          ].map((s) => (
+            <div>
+              <div class="relative h-28 overflow-hidden rounded-xs border border-dashed border-azure/30 bg-bg-card dark:bg-brand-dark">
+                {s.head && (
+                  <div class="h-9 bg-nav-bg flex items-center px-2 gap-1.5">
+                    <span class="block h-1.5 w-8 rounded-full bg-white/70"></span>
+                    <span class="ml-auto block h-1.5 w-10 rounded-full bg-white/30"></span>
+                  </div>
+                )}
+                {s.bar && (
+                  <div class="absolute inset-x-0 top-0 h-6 bg-nav-bg/95 border-b border-black/25 shadow flex items-center px-2 gap-1.5">
+                    <span class="block h-1 w-6 rounded-full bg-white/70"></span>
+                    <span class="ml-auto block h-1 w-8 rounded-full bg-white/30"></span>
+                  </div>
+                )}
+                <div class:list={['flex flex-col gap-1.5 p-2', s.head ? 'pt-2' : s.bar ? 'pt-8' : 'pt-2']}>
+                  {[0, 1, 2, 3, 4].map(() => (
+                    <span class="block h-1.5 w-full rounded-full bg-ink/10 dark:bg-ivory/10"></span>
+                  ))}
+                </div>
+                {!s.head && (
+                  <span class="absolute right-1.5 top-1.5 font-mono text-[0.5rem] uppercase text-azure/60">
+                    {s.bar ? 'shown' : 'withdrawn'}
+                  </span>
+                )}
+              </div>
+              <p class="mt-1.5 article-title text-ink dark:text-ivory">{s.t}</p>
+              <p class="caption-text tabular-nums text-text-muted dark:text-ivory/45">{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </Blueprint>
+
+      <div class="flex flex-col gap-4">
+        {SCROLL.map((s) => (
+          <div class="border border-rule dark:border-ivory/10 bg-bg-card dark:bg-brand-dark p-5">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <p class="article-title text-ink dark:text-ivory">{s.name}</p>
+              <code class="font-mono text-[0.75rem] text-azure dark:text-azure-light">{s.where}</code>
+              <span class="ml-auto caption-text text-text-muted dark:text-ivory/45 tabular-nums">{s.tuning}</span>
+            </div>
+            <p class="mt-1.5 caption-text text-accent-red">Trigger · {s.trigger}</p>
+            <p class="mt-2 body-small text-text-secondary dark:text-ivory/60 max-w-prose">{s.detail}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-6 border-l-2 border-accent-red pl-4">
+        <p class="eyebrow text-accent-red mb-1">Rules for anything new</p>
+        <ul class="body-small text-text-secondary dark:text-ivory/60 max-w-prose list-disc pl-5 space-y-1">
+          <li>Throttle scroll work through <code class="font-mono">requestAnimationFrame</code> and register the listener <code class="font-mono">passive</code>.</li>
+          <li>Animate <code class="font-mono">transform</code> and <code class="font-mono">opacity</code> only — never height, top or width.</li>
+          <li>Give any hide/show a delta guard. Without one, trackpad jitter and iOS overscroll flicker it.</li>
+          <li>Anything visually hidden but still in the DOM takes <code class="font-mono">inert</code>, or it stays in the tab order.</li>
+          <li>Reserve the box before the content lands. A late image or ad must not move what is already read.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 07 · BUILDING A NEW PAGE -->
+    <section id="recipe" class="scroll-mt-24 mt-16">
+      <Rule
+        n="07"
+        title="Building a new page"
+        lede="The order that keeps a new page inside the system rather than beside it."
+      />
+
+      <ol class="flex flex-col gap-4">
+        {[
+          ['Pick a shell', 'Front page or desk page. If the page is one subject all the way down, it is a desk page — take the desk shell even if it is not a section.'],
+          ['Take the standard chrome', 'A header variant + SectionSubNav + Footer, and VideoModal if anything on the page plays. Three mastheads share one prop shape — swap the import, do not compose a fourth.'],
+          ['Compose from the band set', 'Reach for an existing split before inventing one. A new band earns its place by being reused twice.'],
+          ['Slice with a cursor', 'Feed bands from one running cursor so the page consumes its material exactly once.'],
+          ['Reserve every box', 'ratio + w on stills, a sized AdSlot, a fixed height on anything that fills in from script.'],
+          ['Check the seams', 'One lead image eager, the rest lazy. One h1. Rails scroll rather than wrap. Hidden-but-present controls are inert.'],
+        ].map(([t, d], i) => (
+          <li class="flex gap-4">
+            <span class="shrink-0 size-7 grid place-items-center rounded-full bg-azure/10 border border-azure/30 caption-text tabular-nums font-bold text-azure dark:text-azure-light">
+              {i + 1}
+            </span>
+            <div class="min-w-0">
+              <p class="article-title text-ink dark:text-ivory">{t}</p>
+              <p class="mt-0.5 body-small text-text-secondary dark:text-ivory/60 max-w-prose">{d}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div class="mt-8 border border-rule dark:border-ivory/10 bg-ivory dark:bg-brand-dark p-5">
+        <p class="eyebrow text-text-muted dark:text-ivory/40 mb-2">Porting a desk</p>
+        <p class="body-small text-text-secondary dark:text-ivory/60 max-w-prose">
+          Desk pages are already standardised — a desk moves onto the shell by adding its id to
+          <code class="font-mono text-azure dark:text-azure-light"> PORTED_DESKS</code> in
+          <code class="font-mono"> src/lib/desk.ts</code>. The route switches layout and its
+          paginated pages start being generated. Nothing else needs touching, and the design it
+          leaves stays reachable at <code class="font-mono">/old-section/&lt;id&gt;</code>.
+        </p>
+      </div>
+    </section>
+  </div>
+</DesignShell>

@@ -1,0 +1,46 @@
+---
+// BLUEPRINT · Blueprint — the canvas a wireframe sits on.
+//
+// Dashed edges and a cool ground so a diagram is never mistaken for a rendered
+// component; the Gallery is where things are shown working. `gutters` draws the
+// page's own padding as visible margins, which is the one thing a flat diagram
+// of a grid otherwise hides.
+export interface Props {
+  label?: string;
+  caption?: string;
+  /** Shade the page gutters so the drawing shows where content actually starts. */
+  gutters?: boolean;
+  class?: string;
+}
+const { label, caption, gutters = false, class: className = '' } = Astro.props;
+---
+
+<figure class:list={['mc', 'min-w-0', className]}>
+  {label && (
+    <figcaption class="mb-2 flex items-baseline gap-2">
+      <span class="font-mono text-[0.6875rem] uppercase tracking-wider text-azure dark:text-azure-light">{label}</span>
+      {caption && <span class="caption-text text-text-muted dark:text-ivory/45">{caption}</span>}
+    </figcaption>
+  )}
+
+  <div
+    class:list={[
+      'rounded-sm border border-dashed border-azure/35 bg-azure/[0.03] dark:bg-azure/[0.06]',
+      gutters ? 'p-0' : 'p-3 sm:p-4',
+    ]}
+  >
+    {gutters ? (
+      <div class="flex">
+        <span class="w-4 sm:w-6 shrink-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(19,107,192,0.14)_4px,rgba(19,107,192,0.14)_5px)]" aria-hidden="true"></span>
+        <div class="min-w-0 flex-1 py-3 sm:py-4"><slot /></div>
+        <span class="w-4 sm:w-6 shrink-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(19,107,192,0.14)_4px,rgba(19,107,192,0.14)_5px)]" aria-hidden="true"></span>
+      </div>
+    ) : (
+      <slot />
+    )}
+  </div>
+
+  {caption && !label && (
+    <p class="mt-2 caption-text text-text-muted dark:text-ivory/45">{caption}</p>
+  )}
+</figure>

@@ -1,0 +1,36 @@
+---
+// ── /old-section/<id> · the previous desk design ─────────────────────────────
+// The baseline every desk is measured against while they are ported to the
+// standard layout one at a time (see PORTED_DESKS in src/lib/desk.ts).
+//
+// Renders for every desk, not just the ported ones — /old-section/sports is the
+// same page /sports still serves today, which is what makes it a baseline. It
+// shares LegacyDeskPage with the live route rather than keeping its own copy,
+// so the archive can't drift from what it is archiving.
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/OldHeader.astro';
+import Footer from '../../components/Footer.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import LegacyDeskPage from '../../components/desk/LegacyDeskPage.astro';
+import { sections } from '../../lib/sections';
+
+export async function getStaticPaths() {
+  return sections.map((s) => ({
+    params: { section: s.id },
+    props: { section: s },
+  }));
+}
+
+const { section } = Astro.props;
+---
+
+<Layout
+  title={`${section.nameML} | ${section.name} — MediaOne (previous design)`}
+  description={section.description}
+  noindex
+>
+  <Header />
+  <SectionSubNav pathname={`/${section.id}`} />
+  <LegacyDeskPage section={section} />
+  <Footer />
+</Layout>

@@ -1,0 +1,62 @@
+---
+// COMPONENT · ShelfCollection — a collection, laid out for its material.
+//
+// Pulled out of /shelf's index so a single collection (the category page,
+// e.g. /shelf/analysis) gets the exact same layout as it does inside the
+// contents page, rather than a second, generic grid that drifts from it. The
+// five rules live here once; both callers hand it a section and stay out of
+// the way. Callers own the heading — this renders the body only.
+import type { ShelfSection } from '../../lib/shelf';
+import ShelfFigure from './ShelfFigure.astro';
+import ShelfIndexRow from './ShelfIndexRow.astro';
+import ShelfNarrative from './ShelfNarrative.astro';
+
+export interface Props {
+  section: ShelfSection;
+  class?: string;
+}
+
+const { section, class: className = '' } = Astro.props;
+---
+
+{section.id === 'analysis' && (() => {
+  const [lead, ...rest] = section.articles;
+  return (
+    <div class:list={['grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8', className]}>
+      <div class="lg:col-span-6"><ShelfFigure article={lead} scale="plate" /></div>
+      <div class="lg:col-span-5 lg:col-start-8 self-center">
+        {rest.map((a) => <ShelfIndexRow article={a} />)}
+      </div>
+    </div>
+  );
+})()}
+
+{section.id === 'interview' && (
+  <div class:list={['grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8', className]}>
+    {section.articles.map((a) => <ShelfFigure article={a} scale="portrait" />)}
+  </div>
+)}
+
+{section.id === 'column' && (
+  <div class:list={['grid grid-cols-1 lg:grid-cols-2 gap-x-10 xl:gap-x-14', className]}>
+    {section.articles.map((a) => <ShelfIndexRow article={a} size="lg" />)}
+  </div>
+)}
+
+{section.id === 'art-and-literature' && (
+  <div class:list={['grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10', className]}>
+    {section.articles.map((a) => <ShelfFigure article={a} scale="plate" />)}
+  </div>
+)}
+
+{section.id === 'life-story' && (
+  <div class:list={['flex flex-col gap-8 lg:gap-10', className]}>
+    {section.articles.map((a, i) => <ShelfNarrative article={a} flip={i % 2 === 1} />)}
+  </div>
+)}
+
+{!['analysis', 'interview', 'column', 'art-and-literature', 'life-story'].includes(section.id) && (
+  <div class:list={['grid grid-cols-1 lg:grid-cols-2 gap-x-10', className]}>
+    {section.articles.map((a) => <ShelfIndexRow article={a} size="lg" showCategory />)}
+  </div>
+)}

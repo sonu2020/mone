@@ -1,0 +1,34 @@
+---
+// ── /old-home · the previous MediaOne homepage ───────────────────────────────
+// Archived when the band composition took over / (see src/pages/index.astro).
+// Kept whole and routable so the two can be compared side by side; nothing is
+// deleted here to make room for the next direction.
+//
+// It renders a single swappable layout component, same pattern as the
+// /home/<variant> lab (src/pages/home/[variant].astro) — every candidate design
+// stays registered in src/lib/home-layouts.ts and browsable at /home/<id>.
+//
+// Layout: HomeModular — NYT (rule-divided text-forward columns) + BBC 3-Col
+// (asymmetric hero, parallel section-strip columns) + Sky (timestamp rail)
+// synthesis. Dense/packed by design: headlines capped at `lg` (30px max),
+// never `hero`/`display`. Its own predecessor is at HomeMagazine.astro
+// (browsable at /home/magazine).
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/OldHeader.astro';
+import Footer from '../components/Footer.astro';
+import HomeModular from '../components/home/HomeModular.astro';
+---
+
+<Layout
+  title="MediaOne | Malayalam News (previous homepage)"
+  description="Archived copy of the previous MediaOne homepage layout, kept for comparison."
+  noindex
+>
+  <Header isBreaking={false} />
+
+  <main class="flex-1 bg-bg-page">
+    <HomeModular />
+  </main>
+
+  <Footer />
+</Layout>

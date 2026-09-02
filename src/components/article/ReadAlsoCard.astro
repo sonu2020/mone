@@ -1,0 +1,32 @@
+---
+// BLOCK · ReadAlsoCard — the wireframe's inline crosslink: an azure spine, a
+// square thumb, and the headline set in the link colour. It interrupts the
+// prose deliberately, so it takes the page surface, not the card surface.
+import Placeholder from '../Placeholder.astro';
+export interface Props {
+  title: string;
+  href: string;
+  image?: string;
+  label?: string;
+  class?: string;
+}
+const { title, href, image, label = 'Read Also', class: className = '' } = Astro.props;
+---
+<aside
+  class:list={[
+    'mc my-7 border-l-2 border-azure bg-bg-page/60 dark:bg-brand-elevated',
+    className,
+  ]}
+>
+  <a href={href} class="group flex items-start gap-4 p-4">
+    {image !== undefined && (
+      <Placeholder class="w-20 sm:w-24 shrink-0 aspect-[4/3]" src={image} alt="" />
+    )}
+    <span class="min-w-0">
+      <span class="block eyebrow text-text-muted">{label}</span>
+      <span class="mt-1.5 block article-title text-azure dark:text-azure-light group-hover:text-azure-dark dark:group-hover:text-white transition-colors">
+        {title}
+      </span>
+    </span>
+  </a>
+</aside>

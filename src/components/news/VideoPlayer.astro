@@ -1,0 +1,53 @@
+---
+// BLOCK · VideoPlayer — a clean HTML5 player. Native <video> controls stay,
+// but a still + azure play affordance covers it until first play (no layout
+// shift, preload="none"). Square framing, hairline, system motion.
+import DummyImage from '../DummyImage.astro';
+import PlayButton from '../ui/PlayButton.astro';
+export interface Props {
+  src?: string;
+  poster?: string;
+  title?: string;
+  ratio?: string;
+  seed?: string;
+  class?: string;
+}
+const {
+  src = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+  poster,
+  title,
+  ratio = '16/9',
+  seed = 'video',
+  class: className = '',
+} = Astro.props;
+---
+<figure class:list={['mc', 'relative overflow-hidden bg-ink select-none', className]} style={`aspect-ratio:${ratio}`}>
+  <video class="vp-video w-full h-full object-cover" preload="none" playsinline controls poster={poster}>
+    <source src={src} type="video/mp4" />
+  </video>
+
+  <button type="button" class="vp-cover group absolute inset-0 w-full h-full cursor-pointer" aria-label="Play video">
+    {!poster && <DummyImage seed={seed} class="w-full h-full" />}
+    <span class="absolute inset-0 bg-ink/25 group-hover:bg-ink/35 transition-colors"></span>
+    <span class="absolute inset-0 grid place-items-center"><PlayButton size="md" variant="solid" /></span>
+    {title && (
+      <span class="absolute inset-x-0 bottom-0 p-4 text-left bg-gradient-to-t from-ink/80 to-transparent">
+        <span class="nav-text font-semibold text-white line-clamp-2">{title}</span>
+      </span>
+    )}
+  </button>
+</figure>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('.vp-cover').forEach(function (cover) {
+      cover.addEventListener('click', function () {
+        var video = cover.parentElement.querySelector('.vp-video');
+        if (!video) return;
+        cover.style.display = 'none';
+        var p = video.play();
+        if (p && p.catch) p.catch(function () { cover.style.display = ''; });
+      });
+    });
+  })();
+</script>

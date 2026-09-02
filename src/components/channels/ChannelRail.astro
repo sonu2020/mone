@@ -1,0 +1,88 @@
+---
+// BLOCK · ChannelRail — ChannelBand's vertical variant, for the top of a
+// desk's sidebar rather than a full-width band. Three videos, one row rhythm
+// (matches DeskRail's own rows), and a "More" link that opens the video
+// modal on this channel's shelf — the upsell into the video browser that
+// ChannelBand's "View all" does full-width, shrunk to rail width.
+import { channelForDesk, channelVideos } from '../../lib/channels';
+import { programEpisodeId, channelSlug } from '../../lib/video-modal';
+
+export interface Props {
+  desk: string;
+  limit?: number;
+  class?: string;
+}
+
+const { desk, limit = 3, class: className = '' } = Astro.props;
+
+const channel = channelForDesk(desk);
+const videos = channelVideos(desk, limit);
+const shelf = channelSlug(desk);
+---
+
+{channel && videos.length > 0 && (
+  <section class:list={['mc', className]} aria-labelledby={`channel-rail-${desk}`}>
+    <div class="flex items-center gap-2.5 pb-3 border-b-1 border-ink dark:border-ivory/30">
+      {channel.avatar && (
+        <img
+          src={channel.avatar}
+          alt=""
+          width="36"
+          height="36"
+          loading="lazy"
+          class="size-9 shrink-0 rounded-full object-cover bg-placeholder"
+        />
+      )}
+      <div class="min-w-0 flex-1">
+        <h2 id={`channel-rail-${desk}`} class="eyebrow text-text-primary dark:text-ivory truncate">{channel.label}</h2>
+        <p class="caption-text text-text-muted truncate">{channel.handle}</p>
+      </div>
+    </div>
+
+    <ul class="mt-3 divide-y divide-rule/60 dark:divide-ivory/[0.07]">
+      {videos.map(({ video, duration }) => (
+        <li>
+          <a
+            href={video.href}
+            rel="noopener"
+            data-video-open={programEpisodeId(video.youtubeId)}
+            class="group flex items-start gap-3 py-3"
+          >
+            <span class="relative w-28 shrink-0 aspect-video overflow-hidden bg-black/10 dark:bg-black/40">
+              <img
+                src={video.thumbnail.small}
+                alt=""
+                width="320"
+                height="180"
+                loading="lazy"
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              {duration && (
+                <span class="absolute left-0 bottom-0 bg-ink/85 px-1 py-0.5 caption-text tabular-nums text-ivory">
+                  {duration}
+                </span>
+              )}
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-malayalam text-[0.9375rem] leading-[1.35] text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light line-clamp-3 transition-colors">
+                {video.title}
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- The upsell: real channel URL as the no-JS fallback, intercepted by
+         the modal (already carrying this channel — see modalShows) when JS
+         is on, landing the reader straight in its shelf. -->
+    <a
+      href={channel.channelUrl}
+      rel="noopener"
+      data-video-shows={shelf}
+      class="mt-3 inline-flex items-center gap-1 eyebrow text-azure dark:text-azure-light hover:text-azure-dark transition-colors"
+    >
+      More videos <i class="ti ti-arrow-right text-base" aria-hidden="true"></i>
+    </a>
+  </section>
+)}

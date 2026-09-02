@@ -1,0 +1,69 @@
+---
+// BLOCK · OpinionBand — Magazine image-card section.
+import BandHeading from "./BandHeading.astro";
+import Kicker from "../ui/Kicker.astro";
+import type { LiveStory as Story } from "../../lib/home4-data";
+
+export interface Props {
+  label: string;
+  href?: string;
+  viewAllHref?: string;
+  stories: Story[];
+  class?: string;
+}
+
+const {
+  label,
+  href,
+  viewAllHref,
+  stories,
+  class: className = "",
+} = Astro.props;
+
+// Show four Magazine cards.
+const visibleStories = stories.slice(0, 4);
+---
+
+<section class:list={["mc", "py-12", className]}>
+  <BandHeading
+    label={label}
+    href={href}
+    viewAllHref={viewAllHref}
+    class="mb-6"
+  />
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+    {
+      visibleStories.map((story) => (
+        <article class="mc h-full overflow-hidden border border-rule bg-bg-card dark:border-ivory/15">
+          <a
+            href={story.href}
+            class="group flex h-full flex-col text-inherit no-underline"
+          >
+            {story.image && (
+              <div class="aspect-[16/9] w-full overflow-hidden bg-ivory-dark">
+                <img
+                  src={story.image}
+                  alt={story.title}
+                  loading="lazy"
+                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                />
+              </div>
+            )}
+
+            <div class="flex flex-1 flex-col p-4">
+              <h3 class="headline-feature text-text-navy-deep transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light">
+                {story.title}
+              </h3>
+
+              <Kicker
+                text={story.category ?? label}
+                class="mt-auto block pt-5"
+              />
+            </div>
+          </a>
+        </article>
+      ))
+    }
+  </div>
+</section>

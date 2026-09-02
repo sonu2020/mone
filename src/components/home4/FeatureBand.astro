@@ -1,0 +1,134 @@
+---
+// FeatureBand — one large feature, two center cards and a news rail.
+import Art from "./Art.astro";
+import Kicker from "../ui/Kicker.astro";
+import BandHeading from "./BandHeading.astro";
+import ThumbRow from "./ThumbRow.astro";
+import type { LiveStory as Story } from "../../lib/home4-data";
+
+export interface Props {
+  label: string;
+  href?: string;
+  viewAllHref?: string;
+  feature: Story;
+  stack: Story[];
+  rail: Story[];
+  class?: string;
+}
+
+const {
+  label,
+  href,
+  viewAllHref,
+  feature,
+  stack,
+  rail,
+  class: className = "",
+} = Astro.props;
+
+const sectionName = label.trim().toLowerCase();
+
+const showPreviewBody = sectionName === "sports" || sectionName === "national";
+
+const existingBody = feature.excerpt?.trim() ?? "";
+
+// Temporary design-preview text, not an actual news summary.
+// Replace with each story's real excerpt before publishing.
+const previewBody =
+  "ഡിസൈൻ പ്രിവ്യൂ: വാർത്തയുടെ സംഗ്രഹം ഇവിടെ ചേർക്കുക. തലക്കെട്ടിന് താഴെയുള്ള വിവരണത്തിന്റെ അക്ഷരവലുപ്പവും വരിയിടവും പരിശോധിക്കുന്നതിനുള്ള മാതൃകാ വാചകമാണിത്.";
+
+const bodyText = existingBody || (showPreviewBody ? previewBody : "");
+---
+
+<section class:list={["mc", " py-12", className]}>
+  <!-- Section heading -->
+  <BandHeading
+    label={label}
+    href={href}
+    viewAllHref={viewAllHref}
+    class="mb-6"
+  />
+
+  <!-- Main layout -->
+  <div
+    class="grid grid-cols-1 items-start gap-8 md:grid-cols-2 lg:grid-cols-12"
+  >
+    <!-- Complete large feature card -->
+    <article
+      class="mc self-start bg-light-gray lg:col-span-5 dark:bg-brand-elevated"
+    >
+      <a
+        href={feature.href}
+        class="group flex flex-col text-inherit no-underline"
+      >
+        <Art story={feature} ratio="8/5" w={800} zoom />
+
+        <div class="flex flex-col gap-2.5 px-6 py-5">
+          {feature.category && <Kicker text={feature.category} />}
+
+          <h3
+            class="headline-feature text-balance text-text-navy-deep transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light"
+          >
+            {feature.title}
+          </h3>
+
+          <!-- Real excerpt, or Sports/National preview text -->
+          {
+            bodyText && (
+              <p
+                class:list={[
+                  "font-malayalam-alt text-text-secondary dark:text-ivory/70",
+                  showPreviewBody
+                    ? "text-sm leading-tight line-clamp-5"
+                    : "text-[0.9375rem] leading-[1.53] line-clamp-4",
+                ]}
+              >
+                {bodyText}
+              </p>
+            )
+          }
+
+          {
+            feature.date && (
+              <p class="caption-text pt-3 text-text-muted tabular-nums dark:text-ivory/45">
+                {feature.date}
+              </p>
+            )
+          }
+        </div>
+      </a>
+    </article>
+
+    <!-- Two separate center cards -->
+    <div class="flex flex-col gap-6 self-start lg:col-span-3">
+      {
+        stack.slice(0, 2).map((story) => (
+          <article class="mc self-start">
+            <a href={story.href} class="group block text-inherit no-underline">
+              <Art story={story} ratio="16/9" w={640} zoom />
+
+              <div class="flex flex-col gap-1 pt-2">
+                {story.category && <Kicker text={story.category} />}
+
+                <h3 class="headline-deck line-clamp-3 text-text-primary transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light">
+                  {story.title}
+                </h3>
+
+                {story.date && (
+                  <p class="caption-text text-text-muted tabular-nums dark:text-ivory/45">
+                    {story.date}
+                  </p>
+                )}
+              </div>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+
+    <!-- Right-side news rail -->
+    <aside class="flex flex-col gap-6 self-start md:col-span-2 lg:col-span-4">
+      {rail.slice(0, 5).map((story) => <ThumbRow story={story} />)}
+    </aside>
+  </div>
+</section>

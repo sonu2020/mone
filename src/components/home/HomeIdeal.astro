@@ -1,0 +1,88 @@
+---
+// ── Editorial (the synthesis / recommended direction) ──────────────────────
+// Now composed entirely from the design-system blocks. No bespoke markup —
+// every part is an atom or block from /system. This file is pure composition:
+// the proof that the system carries a full homepage.
+import { hero, topStories, latest, mostRead, cluster } from '../../lib/home-data';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Pulse from '../ui/Pulse.astro';
+import OverlayStory from '../news/OverlayStory.astro';
+import StoryCard from '../news/StoryCard.astro';
+import StoryList from '../news/StoryList.astro';
+import PromoGrid from '../news/PromoGrid.astro';
+import NumberedList from '../news/NumberedList.astro';
+import Timeline from '../news/Timeline.astro';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+const sports = cluster('sports');
+const gulf = cluster('gulf');
+
+const heroSecondaries = [latest[1], india.lead, gulf.lead];
+const moreNews = [latest[0], kerala.items[0], india.items[0], sports.lead, gulf.items[0], latest[3]];
+const latestFeed = [
+  { time: '21:14', ...topStories[0] },
+  { time: '20:40', ...latest[1] },
+  { time: '20:12', ...kerala.items[0] },
+  { time: '19:47', ...india.items[0] },
+  { time: '19:20', ...topStories[2] },
+];
+---
+
+<div class:list={['mc', 'bg-bg-card']}>
+  <div class="w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- ░░ LEAD: image-led hero + top-stories rail ░░ -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-7 lg:py-10">
+      <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+        <OverlayStory story={hero} ratio="16/9" size="hero" />
+        <p class="mt-4 lead-text text-text-secondary max-w-prose">{hero.excerpt}</p>
+        <p class="mt-2 caption-text text-text-muted tabular-nums">{hero.date}</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-7 pt-7 border-t border-rule">
+          {heroSecondaries.map((s) => <StoryCard story={s} ratio="16/10" />)}
+        </div>
+      </div>
+
+      <aside class="lg:col-span-4 mt-9 lg:mt-0">
+        <h2 class="section-header text-ink pb-2.5 mb-4 border-b-2 border-ink">ടോപ് സ്റ്റോറീസ്</h2>
+        <StoryCard story={topStories[0]} ratio="16/9" size="lg" class="mb-4 pb-4 border-b border-rule" />
+        <StoryList items={topStories.slice(1)} />
+      </aside>
+    </section>
+
+    <!-- ░░ KERALA: featured band ░░ -->
+    <section class="py-7 lg:py-10 border-t border-rule">
+      <SectionHeading title={kerala.name} titleEn={kerala.nameEn} href={kerala.href} viewAllHref={kerala.href} />
+      <div class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
+        <div class="lg:col-span-7 lg:border-r border-rule lg:pr-8">
+          <StoryCard story={kerala.lead} ratio="16/9" size="lg" showExcerpt />
+        </div>
+        <StoryList items={kerala.items.slice(0, 4)} class="lg:col-span-5 mt-6 lg:mt-0" />
+      </div>
+    </section>
+
+    <!-- ░░ MORE NEWS: modular promo grid ░░ -->
+    <section class="py-7 lg:py-10 border-t border-rule">
+      <SectionHeading title="കൂടുതൽ വാർത്തകൾ" titleEn="More" />
+      <PromoGrid items={moreNews} cols={3} showExcerpt />
+    </section>
+
+    <!-- ░░ MOST READ + LATEST timeline ░░ -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-7 lg:py-10 border-t border-rule">
+      <div class="lg:col-span-7 lg:border-r border-rule lg:pr-8">
+        <SectionHeading title="ഏറ്റവും വായിച്ചത്" titleEn="Most read" />
+        <NumberedList items={mostRead} columns={2} />
+      </div>
+      <aside class="lg:col-span-5 mt-9 lg:mt-0">
+        <div class="flex items-center gap-2 pb-2.5 mb-5 border-b-2 border-ink">
+          <Pulse />
+          <h2 class="section-header text-ink">തത്സമയം</h2>
+          <span class="eyebrow text-text-muted">Latest</span>
+        </div>
+        <Timeline items={latestFeed} />
+      </aside>
+    </section>
+
+  </div>
+</div>

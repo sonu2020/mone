@@ -1,0 +1,36 @@
+{
+  "font": {
+    "$type": "fontFamily",
+    "sans": { "$value": "\"Anek Latin\", \"Anek Malayalam\", system-ui, -apple-system, \"Segoe UI\", sans-serif" },
+    "malayalam": { "$value": "\"Anek Malayalam\", \"Anek Latin\", system-ui, sans-serif" },
+    "malayalam-alt": { "$value": "\"Noto Sans Malayalam\", \"Anek Malayalam\", system-ui, sans-serif" },
+    "serif": { "$value": "\"Anek Malayalam\", \"Anek Latin\", Georgia, serif" },
+    "mono": { "$value": "ui-monospace, \"SF Mono\", \"Cascadia Code\", Menlo, monospace" }
+  },
+
+  "text": {
+    "$type": "fluidText",
+
+    "display": { "$value": { "min": "2rem", "mid": "1.636rem + 1.87vw", "max": "3.5rem", "lineHeight": "1.06", "fontWeight": "700" } },
+    "hero": { "$value": { "min": "1.5rem", "mid": "1.227rem + 1.4vw", "max": "2.75rem", "lineHeight": "1.12", "fontWeight": "700" } },
+    "title": { "$value": { "min": "1.3125rem", "mid": "1.17rem + 0.58vw", "max": "1.875rem", "lineHeight": "1.2", "fontWeight": "700" } },
+    "section": { "$value": { "min": "1.1875rem", "mid": "1.11rem + 0.33vw", "max": "1.5rem", "lineHeight": "1.27", "fontWeight": "600" } },
+    "headline": { "$value": { "min": "0.875rem", "mid": "0.81rem + 0.27vw", "max": "1.125rem", "lineHeight": "1.34", "fontWeight": "600" } },
+    "lead": { "$value": { "min": "0.9375rem", "mid": "0.88rem + 0.24vw", "max": "1.1875rem", "lineHeight": "1.62", "fontWeight": "400" } },
+    "body": { "$value": { "min": "0.875rem", "mid": "0.84rem + 0.15vw", "max": "1.0625rem", "lineHeight": "1.72", "fontWeight": "400" } },
+    "meta": { "$value": { "min": "0.75rem", "mid": "0.73rem + 0.09vw", "max": "0.8125rem", "lineHeight": "1.5", "fontWeight": "500" } },
+    "nav": { "$value": { "min": "0.9375rem", "mid": "0.9rem + 0.1vw", "max": "1.0625rem", "lineHeight": "1.3", "fontWeight": "600" } },
+    "eyebrow": { "$value": { "min": "0.6875rem", "mid": "0.67rem + 0.07vw", "max": "0.75rem", "lineHeight": "1.3", "fontWeight": "700" } },
+    "caption": { "$value": { "min": "0.6875rem", "mid": "0.67rem + 0.07vw", "max": "0.75rem", "lineHeight": "1.45", "fontWeight": "400" } },
+    "category": { "$value": { "min": "1.75rem", "mid": "1.52rem + 1.02vw", "max": "2.5rem", "lineHeight": "0.9", "fontWeight": "700" } },
+    "body-small": { "$value": { "min": "0.75rem", "mid": "0.73rem + 0.09vw", "max": "0.8125rem", "lineHeight": "1.4", "fontWeight": "500" } },
+
+    "micro": { "$value": { "min": "0.625rem", "mid": "0.625rem", "max": "0.625rem", "lineHeight": "1.2", "fontWeight": "400" } },
+    "icon": { "$value": { "min": "1.0625rem", "mid": "1.0625rem", "max": "1.0625rem", "lineHeight": "1", "fontWeight": "400" } },
+
+    "deck": { "$value": { "min": "0.9375rem", "mid": "0.905rem + 0.14vw", "max": "1.03125rem", "lineHeight": "1.28", "fontWeight": "550" } },
+    "feature": { "$value": { "min": "1.1875rem", "mid": "1.1rem + 0.33vw", "max": "1.375rem", "lineHeight": "1.23", "fontWeight": "600" } },
+    "lead-story": { "$value": { "min": "1.3125rem", "mid": "1.21rem + 0.44vw", "max": "1.5625rem", "lineHeight": "1.28", "fontWeight": "550" } },
+    "band": { "$value": { "min": "1.125rem", "mid": "1.02rem + 0.44vw", "max": "1.375rem", "lineHeight": "1.14", "fontWeight": "800" } }
+  }
+}

@@ -1,0 +1,100 @@
+---
+// NAV · MegaPanel — the drop-down for one top-level desk. Columns render as
+// hairline-separated boxes; an optional feature rail closes the panel on the
+// right. Positioned by the parent <li>, which owns the open state.
+//
+// Two sizes off one component, because the difference is width and padding
+// rather than structure. 'mega' is the full-width panel under the section bar
+// on Header.astro. 'mini' is the compact one the flat HeaderBar hangs off
+// More — narrower columns, tighter rows, a smaller feature — so it reads as a
+// menu rather than as a section takeover on a 64px rail.
+import type { NavItem } from '../../lib/mega-nav';
+
+export interface Props {
+  item: NavItem;
+  id: string;
+  align?: 'start' | 'end';   // anchor right for the last items so wide panels stay on screen
+  size?: 'mega' | 'mini';
+}
+const { item, id, align = 'start', size = 'mega' } = Astro.props;
+const cols = item.columns ?? [];
+const mini = size === 'mini';
+
+const s = {
+  width: mini
+    ? 'min-w-[15rem] max-w-[min(34rem,calc(100vw-2rem))]'
+    : 'min-w-[18rem] max-w-[min(46rem,calc(100vw-2rem))]',
+  col: mini ? 'min-w-[10.5rem] flex-1 p-3' : 'min-w-[15rem] flex-1 p-4',
+  link: mini ? 'block px-2 py-1 transition-colors' : 'block px-2 py-1.5 transition-colors',
+  linkText: mini ? 'nav-text' : 'headline-deck',
+  feature: mini ? 'w-44 shrink-0 p-3 gap-2' : 'w-56 shrink-0 p-4 gap-3',
+  featureText: mini ? 'article-title' : 'headline-feature',
+  foot: mini ? 'px-3 py-2' : 'px-4 py-2.5',
+};
+---
+
+<div
+  id={id}
+  data-panel
+  class:list={[
+    'mc',
+    'invisible opacity-0 absolute top-full z-50 border border-rule dark:border-ivory/10 border-t-0 bg-bg-card shadow-[0_12px_28px_-18px_color-mix(in_oklch,var(--color-text-primary)_45%,transparent)] transition-[opacity,visibility] duration-150',
+    s.width,
+    align === 'end' ? 'right-0' : 'left-0',
+  ]}
+>
+  <div class="flex">
+    <!-- Link columns -->
+    <div class="flex flex-1 divide-x divide-rule dark:divide-ivory/10">
+      {cols.map((col) => (
+        <div class={s.col}>
+          {col.title && (
+            <p class="eyebrow text-text-muted dark:text-ivory/40 mb-2.5 px-2">{col.title}</p>
+          )}
+          <ul>
+            {col.links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class:list={['group/link hover:bg-bg-page dark:hover:bg-brand-elevated', s.link]}
+                >
+                  <span class:list={['block text-text-primary dark:text-ivory group-hover/link:text-azure dark:group-hover/link:text-azure-light transition-colors', s.linkText]}>
+                    {link.label}
+                  </span>
+                  {link.note && (
+                    <span class="block caption-text text-text-muted dark:text-ivory/40">{link.note}</span>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <!-- Feature rail -->
+    {item.feature && (
+      <a
+        href={item.feature.href}
+        class:list={['group/feature hidden lg:flex flex-col justify-between border-l border-rule dark:border-ivory/10 bg-bg-page dark:bg-brand-dark hover:bg-ivory-dark dark:hover:bg-brand-elevated transition-colors', s.feature]}
+      >
+        <span class="eyebrow text-accent-red">{item.feature.kicker}</span>
+        <span class:list={['text-text-navy-deep dark:text-ivory group-hover/feature:text-azure transition-colors', s.featureText]}>
+          {item.feature.title}
+        </span>
+        <span class="eyebrow text-azure">{item.feature.cta ?? 'Watch'} →</span>
+      </a>
+    )}
+  </div>
+
+  <!-- Section landing, when the desk has one. 'More' does not: it is a menu
+       over desks that share no index, so there is nothing to send you to. -->
+  {item.href && (
+    <a
+      href={item.href}
+      class:list={['flex items-center justify-between border-t border-rule dark:border-ivory/10 hover:bg-bg-page dark:hover:bg-brand-elevated transition-colors', s.foot]}
+    >
+      <span class="eyebrow text-text-muted dark:text-ivory/40">All {item.label}</span>
+      <span class="eyebrow text-azure">→</span>
+    </a>
+  )}

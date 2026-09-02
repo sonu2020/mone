@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Investor Care — MediaOne" description="Investor information for Madhyamam Broadcasting Limited">
+  <Header />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto px-4 sm:px-6 md:px-8 py-10">
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">Investor Care</span>
+      </nav>
+
+      <h1 class="text-hero font-bold text-text-primary text-balance">Investor Care</h1>
+
+      <div class="mt-8 max-w-prose space-y-5 text-body text-text-primary">
+        <p>
+          Madhyamam Broadcasting Limited is committed to transparency and good corporate governance. This section provides information for investors, shareholders, and analysts.
+        </p>
+        <p>
+          For investor queries, financial reports, or corporate disclosures, please contact our company secretary at investors@mediaoneonline.com.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

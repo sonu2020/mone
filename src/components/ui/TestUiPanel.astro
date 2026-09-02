@@ -1,0 +1,162 @@
+---
+// UI · TestUiPanel — the floating test toolbar on the homepage: a tabbed panel
+// (Type scale | Spacing) hosting the two live switches, plus the ✕ that hides
+// the whole test UI and every inspection visual.
+//
+// Hiding kills all inspection visuals because they are gated on the
+// .mc-outline class on <html> (McInspector's toolbar, the .mc outlines, the
+// lead-package inspection) — the script drops that class, hides this panel and
+// every switch, and offers a restore button in the same corner. Both the panel
+// tab, the switches' choices and the hidden state persist in localStorage.
+import TypeScaleSwitch from './TypeScaleSwitch.astro';
+import SpacingSwitch from './SpacingSwitch.astro';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={['mc', className]}
+  data-test-ui-panel
+  data-test-ui-tabs
+>
+  <!-- Tab bar -->
+  <div class="flex items-stretch border-b border-rule dark:border-ivory/15" role="tablist" aria-label="Test tools">
+    <button
+      type="button"
+      role="tab"
+      data-test-tab="type"
+      aria-selected="true"
+      aria-controls="test-panel-type"
+      class="test-tab px-2.5 py-1.5 caption-text font-semibold text-ink-muted transition-colors hover:text-azure dark:text-ivory/60 dark:hover:text-azure-light"
+    >Type</button>
+    <button
+      type="button"
+      role="tab"
+      data-test-tab="spacing"
+      aria-selected="false"
+      aria-controls="test-panel-spacing"
+      class="test-tab px-2.5 py-1.5 caption-text font-semibold text-ink-muted transition-colors hover:text-azure dark:text-ivory/60 dark:hover:text-azure-light"
+    >Space</button>
+    <span class="mx-1 my-1.5 w-px bg-rule dark:bg-ivory/15" aria-hidden="true"></span>
+    <button
+      type="button"
+      data-test-ui-hide
+      class="ml-auto px-2 py-1.5 text-ink-muted transition-colors hover:text-accent-red dark:text-ivory/60 dark:hover:text-accent-red"
+      title="Hide test toolbar and inspection visuals"
+      aria-label="Hide test toolbar and inspection visuals"
+    >
+      <i class="ti ti-x text-sm" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- Tab panels -->
+  <div role="tabpanel" id="test-panel-type" data-test-panel="type" class="p-1">
+    <TypeScaleSwitch />
+  </div>
+  <div role="tabpanel" id="test-panel-spacing" data-test-panel="spacing" class="p-1" hidden>
+    <SpacingSwitch />
+  </div>
+</div>
+
+<button
+  type="button"
+  data-test-ui-restore
+  class="fixed bottom-4 left-4 z-50 hidden items-center gap-1.5 border border-rule bg-bg-card px-2 py-1.5 caption-text font-semibold text-ink-muted transition-colors hover:border-azure hover:text-azure dark:bg-brand-dark dark:text-ivory/60 dark:hover:text-azure-light"
+  title="Show test toolbar and inspection visuals again"
+>
+  <i class="ti ti-adjustments-horizontal text-sm" aria-hidden="true"></i>
+  Show test UI
+</button>
+
+<script>
+  (function () {
+    if (window.__testUiInit) return;
+    window.__testUiInit = true;
+
+    var HIDE_KEY = 'mone-test-ui-hidden';
+    var TAB_KEY = 'mone-test-tab';
+
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[data-test-tab]'));
+    var panels = Array.prototype.slice.call(document.querySelectorAll('[data-test-panel]'));
+    var hideBtn = document.querySelector('[data-test-ui-hide]');
+    var restoreBtn = document.querySelector('[data-test-ui-restore]');
+
+    // Tabs — flip aria-selected and the hidden panel; persist the choice.
+    var savedTab = null;
+    try { savedTab = localStorage.getItem(TAB_KEY); } catch (e) {}
+    function showTab(id) {
+      tabs.forEach(function (t) {
+        t.setAttribute('aria-selected', t.getAttribute('data-test-tab') === id ? 'true' : 'false');
+      });
+      panels.forEach(function (p) {
+        p.hidden = p.getAttribute('data-test-panel') !== id;
+      });
+      try { localStorage.setItem(TAB_KEY, id); } catch (e) {}
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () { showTab(t.getAttribute('data-test-tab')); });
+    });
+
+    // Hide the test UI: every inspection visual (McInspector's toolbar, the
+    // .mc outlines, the lead-package inspection) is gated on .mc-outline on
+    // <html> — dropping the class kills them all, this panel hides too.
+    function syncHidden() {
+      var hidden = false;
+      try { hidden = localStorage.getItem(HIDE_KEY) === '1'; } catch (e) {}
+      document.documentElement.classList.toggle('test-ui-hidden', hidden);
+      if (hidden) {
+        if (document.documentElement.classList.contains('mc-outline')) {
+          document.documentElement.setAttribute('data-mc-outline-was', '1');
+          document.documentElement.classList.remove('mc-outline');
+        }
+        if (restoreBtn) restoreBtn.classList.remove('hidden');
+      }
+    }
+    if (hideBtn) {
+      hideBtn.addEventListener('click', function () {
+        try { localStorage.setItem(HIDE_KEY, '1'); } catch (e) {}
+        syncHidden();
+      });
+    }
+    if (restoreBtn) {
+      restoreBtn.addEventListener('click', function () {
+        if (document.documentElement.getAttribute('data-mc-outline-was') === '1') {
+          document.documentElement.classList.add('mc-outline');
+        }
+        try { localStorage.removeItem(HIDE_KEY); } catch (e) {}
+        location.reload();
+      });
+    }
+
+    showTab(savedTab === 'spacing' ? 'spacing' : 'type');
+    syncHidden();
+  })();
+</script>
+
+<style>
+  /* Active tab — state rides on aria-selected. */
+  [data-test-ui-tabs] [aria-selected='true'] {
+    border-color: var(--color-azure);
+    color: var(--color-azure);
+    box-shadow: inset 0 -2px 0 0 var(--color-azure);
+  }
+  /* :global on the html class — Astro scopes the leftmost compound too, which
+     would demand the component hash on <html> and never match. Escaping it
+     hides every switch and this panel when the test UI is dismissed. */
+  :global(.test-ui-hidden) [data-test-ui-panel],
+  :global(.test-ui-hidden) [data-scale-switch],
+  :global(.test-ui-hidden) [data-spacing-switch] {
+    display: none;
+  }
+  /* Dropping .mc-outline kills the gating CSS, but the McInspector toolbar is
+     mounted DOM — hide it and any lingering scale highlights too. */
+  :global(.test-ui-hidden #mci-root) {
+    display: none !important;
+  }
+  :global(.test-ui-hidden) .mci-type-hl {
+    outline: none !important;
+  }
+</style>

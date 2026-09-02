@@ -1,0 +1,29 @@
+---
+// BLUEPRINT · SkImg — a still, as a wireframe. Hatched rather than filled so it
+// never reads as a real image, and ratio-locked so a blueprint has the same
+// proportions the band will actually produce.
+export interface Props {
+  ratio?: '16/9' | '5/3' | '2/1' | '1/1' | '4/3';
+  class?: string;
+}
+const { ratio = '16/9', class: className = '' } = Astro.props;
+
+const aspect = {
+  '16/9': 'aspect-[16/9]',
+  '5/3': 'aspect-[5/3]',
+  '2/1': 'aspect-[2/1]',
+  '1/1': 'aspect-square',
+  '4/3': 'aspect-[4/3]',
+}[ratio];
+---
+
+<div
+  class:list={[
+    'mc',
+    aspect,
+    'w-full rounded-xs border border-azure/25',
+    'bg-[repeating-linear-gradient(45deg,transparent,transparent_5px,rgba(19,107,192,0.10)_5px,rgba(19,107,192,0.10)_6px)]',
+    className,
+  ]}
+  aria-hidden="true"
+></div>

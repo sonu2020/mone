@@ -1,0 +1,14 @@
+---
+// BLOCK · StoryList — a hairline-divided stack of StoryRows.
+import StoryRow from './StoryRow.astro';
+import type { Story } from '../../lib/home-data';
+export interface Props {
+  items: Story[];
+  size?: 'base' | 'lg';
+  class?: string;
+}
+const { items, size = 'base', class: className = '' } = Astro.props;
+---
+<div class:list={['mc', 'divide-y divide-rule', className]}>
+  {items.map((s) => <StoryRow story={s} size={size} />)}
+</div>

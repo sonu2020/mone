@@ -1,0 +1,72 @@
+---
+// COMPONENT · ShelfNav — Shelf's own header, standing in for the site's.
+//
+// Every other inner page runs HeaderBar (the full desk rail — News, Politics,
+// Business, Watch Live, breaking, trending) plus a SubNavBar underneath for
+// its own children. Shelf drops HeaderBar entirely instead of stacking a
+// second bar under it: Shelf is the one calm, well-edited section of the
+// site (see PRODUCT.md), and the fast-moving news rail — live TV, breaking,
+// trending — belongs to that other pace, not this one. A reader inside
+// Shelf sees Shelf's own taxonomy as the primary nav, with a small mark back
+// to the main site rather than the full rail.
+//
+// One bar, one height, no drawer: eight flat links fit a horizontally
+// scrolling row at any width, so there is nothing here a hamburger would earn
+// its keep hiding.
+import Logo from '../Logo.astro';
+import SearchOverlay from '../nav/SearchOverlay.astro';
+import { shelfNav } from '../../lib/site-sections';
+
+export interface Props {
+  pathname?: string;
+}
+const { pathname = Astro.url.pathname } = Astro.props;
+
+const path = pathname.replace(/\/+$/, '') || '/';
+const activeHref = shelfNav
+  .map((l) => l.href)
+  .filter((h) => path === h || path.startsWith(`${h}/`))
+  .sort((a, b) => b.length - a.length)[0];
+---
+
+<header class="sticky top-0 z-40 bg-bg-page dark:bg-brand-dark border-b border-ink dark:border-ivory/30">
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-3 sm:gap-4 h-12 lg:h-14">
+      <a href="/" class="shrink-0 opacity-50 hover:opacity-100 transition-opacity" aria-label="MediaOne — home">
+        <Logo class="h-4 lg:h-[18px] w-auto text-text-primary" />
+      </a>
+
+      <span class="h-4 w-px bg-rule dark:bg-ivory/20 shrink-0" aria-hidden="true"></span>
+
+      <a href="/shelf" class="shrink-0 eyebrow text-text-primary tracking-[0.14em]">Shelf</a>
+
+      <nav aria-label="Shelf categories" class="min-w-0 flex-1">
+        <ul class="flex items-stretch gap-1 h-12 lg:h-14 overflow-x-auto scrollbar-none">
+          {shelfNav.map((l) => (
+            <li class="shrink-0">
+              <a
+                href={l.href}
+                aria-current={activeHref === l.href ? 'page' : undefined}
+                class="inline-flex items-center h-full px-2.5 nav-text text-text-secondary dark:text-ivory/60 hover:text-azure dark:hover:text-azure-light aria-[current=page]:text-azure dark:aria-[current=page]:text-azure-light transition-colors"
+              >{l.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <button
+        type="button"
+        data-search-open
+        class="shrink-0 size-9 inline-flex items-center justify-center text-text-secondary dark:text-ivory/60 hover:text-azure dark:hover:text-azure-light transition-colors"
+        aria-label="Search"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="site-search"
+      >
+        <i class="ti ti-search text-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<SearchOverlay />

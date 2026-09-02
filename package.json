@@ -1,0 +1,39 @@
+{
+  "name": "mone",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "astro": "^6.4.6",
+    "style-dictionary": "^5.5.2",
+    "tailwindcss": "^4.0.0",
+    "topojson-client": "^3.1.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0",
+    "wrangler": "^4.100.0"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "tokens:build": "node scripts/build-tokens.mjs",
+    "predev": "bun run tokens:build",
+    "prebuild": "bun run tokens:build",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cf:login": "wrangler login",
+    "cf:deploy": "astro build && wrangler pages deploy dist/ --project-name=mone",
+    "cf:deploy:preview": "astro build && wrangler pages deploy dist/ --project-name=mone --branch=preview"
+  },
+  "dependencies": {
+    "@tabler/icons": "^3.44.0",
+    "@tabler/icons-webfont": "^3.44.0",
+    "@videojs/html": "10.0.0-beta.25",
+    "maplibre-gl": "^6.1.0",
+    "terrain-journey": "*",
+    "three": "^0.185.1"
+  }
+}

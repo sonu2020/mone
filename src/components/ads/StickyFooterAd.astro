@@ -1,0 +1,166 @@
+---
+// COMPONENT · StickyFooterAd — the anchored unit that rides the bottom of the
+// viewport on long detail pages.
+//
+// The ad itself is the house <AdSlot> placeholder, not a Google tag: this build
+// renders dummy creative everywhere, and a sticky unit is no reason to make one
+// surface behave differently from the rest. When real inventory arrives it goes
+// into AdSlot once and every placement inherits it, this one included.
+//
+// Four things a sticky ad has to get right, and does here:
+//   • It is not there at the top of the page. The reader gets the headline and
+//     the opening lines to themselves; the unit slides up only once they have
+//     committed to reading (REVEAL_AT below).
+//   • It is the size of the ad and no wider. A full-bleed bar pins a rule
+//     across the whole viewport and reads as furniture; a centred card the
+//     width of the creative reads as an ad, which is what it is.
+//   • It is dismissible, and stays dismissed for the session. An anchored unit
+//     you cannot close is the reason readers hate them.
+//   • It gets out of the way at the end — of the footer, and of the video
+//     modal — instead of sitting on top of them.
+//
+// No spacer in the flow: the unit is narrower than the measure and retires
+// before the footer arrives, so there is nothing to reserve height for, and a
+// spacer that appeared mid-scroll would shift the page under the reader.
+//
+// House standard for the surface: solid card, hairline border, square corners,
+// no drop shadow — the rule is the elevation.
+import AdSlot from "../AdSlot.astro";
+
+export interface Props {
+  slot?: string;
+  /** Scroll depth, in px, before the unit appears. Roughly the headline, the
+   *  lead and the first lines of body — far enough in that the reader is
+   *  reading, close enough that the unit is still on a screen they will see. */
+  revealAt?: number;
+  class?: string;
+}
+
+const {
+  slot = "sticky-footer",
+  revealAt = 480,
+  class: className = "",
+} = Astro.props;
+---
+
+<!-- The fixed layer spans the viewport only so its child can be centred in it;
+     it takes no clicks and paints nothing. The bar itself — the only thing the
+     reader can see or hit — is the width of the creative. -->
+<div
+  data-sticky-ad-layer
+  class="mc fixed inset-x-0 bottom-0 z-40 flex justify-center pointer-events-none print:hidden"
+  data-reveal-at={revealAt}
+>
+  <div
+    id="sticky-footer-ad"
+    data-sticky-ad
+    class:list={[
+      "relative pointer-events-auto",
+      "bg-bg-card dark:bg-brand-dark border border-b-0 border-rule dark:border-ivory/10",
+      "transition-transform duration-300 ease-out will-change-transform",
+      // Off-screen until the reader has scrolled. The class is the no-JS state
+      // too: without script the unit simply never appears, which is the safe
+      // way round for an ad.
+      "translate-y-full",
+      className,
+    ]}
+  >
+    <!-- Wrappers carry the breakpoint rather than a class on AdSlot: AdSlot
+         sets `flex` on its own root, and `hidden` alongside it is a coin toss
+         over which display utility the stylesheet emits last.
+         Each wrapper also gets an explicit (non-percentage) width: this bar
+         is a `flex justify-center` row with no width of its own, so AdSlot's
+         internal `w-full` has no definite containing block to size against
+         and collapses to shrink-to-fit around the "Advertisement" label. A
+         fixed width here gives the percentage sizing something real to
+         resolve against. -->
+    <div class="px-3">
+      <div class="lg:hidden flex justify-center">
+        <div class="w-[320px] max-w-full">
+          <AdSlot slot={slot} format="mobile-banner" lazy={false} />
+        </div>
+      </div>
+      <div class="hidden lg:flex justify-center">
+        <div class="w-[970px] max-w-full">
+          <AdSlot slot={slot} format="leaderboard-lg" lazy={false} />
+        </div>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      data-sticky-ad-close
+      class="absolute top-1 right-1 inline-flex size-7 items-center justify-center border border-rule dark:border-ivory/20 bg-bg-card dark:bg-brand-dark text-text-muted hover:text-text-primary hover:border-azure transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2"
+      aria-label="Close advertisement"
+      aria-controls="sticky-footer-ad"
+    >
+      <i class="ti ti-x text-base" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var layer = document.querySelector("[data-sticky-ad-layer]");
+    var bar = document.getElementById("sticky-footer-ad");
+    if (!layer || !bar) return;
+
+    var revealAt = parseInt(layer.getAttribute("data-reveal-at"), 10) || 480;
+    var atFooter = false;
+
+    function shown(on) {
+      bar.classList.toggle("translate-y-full", !on);
+    }
+
+    // Scroll gate. Symmetric: scroll back up to the top and the unit retires,
+    // so the top of the page stays as clean on the way back as on the way in.
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        shown(!atFooter && window.scrollY > revealAt);
+        ticking = false;
+      });
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    // The footer is the end of the page and gets it to itself — an anchored ad
+    // sitting over the last links is the one place a reader is trying to click.
+    var footer = document.querySelector("footer");
+    if (footer && window.IntersectionObserver) {
+      new IntersectionObserver(
+        function (entries) {
+          atFooter = entries[0].isIntersecting;
+          onScroll();
+        },
+        { rootMargin: "0px 0px -20% 0px" },
+      ).observe(footer);
+    }
+
+    // Closing just hides it — no persisted dismissal for now, so it comes
+    // back on the next scroll event that meets the reveal condition.
+    var close = bar.querySelector("[data-sticky-ad-close]");
+    if (close) {
+      close.addEventListener("click", function () {
+        shown(false);
+      });
+    }
+
+    // Step aside for the video modal — a theatre view should not have an ad
+    // bar pinned across the bottom of it.
+    var modal = document.getElementById("video-modal");
+    if (modal && window.MutationObserver) {
+      var sync = function () {
+        if (modal.hasAttribute("data-open")) shown(false);
+        else onScroll();
+      };
+      new MutationObserver(sync).observe(modal, {
+        attributes: true,
+        attributeFilter: ["data-open"],
+      });
+      sync();
+    }
+  })();
+</script>

@@ -1,0 +1,32 @@
+---
+// SECTION · ShelfSection — a thin wrapper around the EditorialShelf block so the
+// page can drop a premium "in depth" band with one tag. Keeps the page a table of
+// contents, not a markup document.
+import EditorialShelf from '../news/EditorialShelf.astro';
+import type { Story } from '../../lib/home-data';
+
+export interface Props {
+  title: string;
+  titleEn?: string;
+  viewAllHref?: string;
+  heroStory: Story;
+  gridStories: Story[];
+  gridVariant?: 'columns' | 'lists';
+  heroBgClass?: string;
+  class?: string;
+}
+const { title, titleEn, viewAllHref, heroStory, gridStories, gridVariant = 'columns', heroBgClass, class: className = '' } = Astro.props;
+---
+<div class:list={['mc', 'border-t border-rule dark:border-ivory/10', className]}>
+  <div class="px-4 sm:px-6 lg:px-8">
+    <EditorialShelf
+      title={title}
+      titleEn={titleEn}
+      viewAllHref={viewAllHref}
+      heroStory={heroStory}
+      gridStories={gridStories}
+      gridVariant={gridVariant}
+      heroBgClass={heroBgClass}
+    />
+  </div>
+</div>

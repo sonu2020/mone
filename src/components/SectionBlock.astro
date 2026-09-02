@@ -1,0 +1,71 @@
+---
+import SectionHeader from './SectionHeader.astro';
+
+export interface Props {
+  title: string;
+  titleEn?: string;
+  href?: string;
+  viewAllHref?: string;
+  variant?: 'default' | 'gradient' | 'minimal';
+  sticky?: boolean;
+  class?: string;
+}
+
+const {
+  title,
+  titleEn,
+  href = '#',
+  viewAllHref,
+  variant = 'default',
+  sticky = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<section
+  class:list={[
+    'mc',
+    'group/section',
+    sticky && 'lg:sticky lg:top-16 lg:z-20',
+    'transition-all duration-200 ease-out',
+    className,
+  ]}
+  data-sticky={sticky}
+  data-section-block
+>
+  <SectionHeader
+    title={title}
+    titleEn={titleEn}
+    href={href}
+    viewAllHref={viewAllHref}
+    variant={variant}
+    sticky={sticky}
+  />
+  <div class="mt-5 md:mt-6">
+    <slot />
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var blocks = document.querySelectorAll('[data-section-block][data-sticky="true"]');
+    if (!blocks.length) return;
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.target.getBoundingClientRect().top <= 1) {
+            entry.target.classList.add('is-stuck');
+          } else {
+            entry.target.classList.remove('is-stuck');
+          }
+        });
+      },
+      { threshold: [0, 1], rootMargin: '-1px 0px 0px 0px' }
+    );
+
+    blocks.forEach(function (block) {
+      observer.observe(block);
+    });
+  })();
+</script>

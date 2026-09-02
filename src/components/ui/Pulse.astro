@@ -1,0 +1,20 @@
+---
+// ATOM · Pulse — a live-status dot. Used by breaking bars and timelines.
+// `beat` swaps the flat opacity pulse for a double-thump heartbeat with an
+// expanding ring — the stronger signal, reserved for a genuine live feed.
+export interface Props {
+  tone?: 'azure' | 'red' | 'white';
+  beat?: boolean;
+  class?: string;
+}
+const { tone = 'azure', beat = false, class: className = '' } = Astro.props;
+const bg = { azure: 'bg-azure', red: 'bg-accent-red', white: 'bg-white' }[tone];
+---
+{beat ? (
+  <span class:list={['mc', 'relative inline-flex size-2 items-center justify-center', className]} aria-hidden="true">
+    <span class:list={['absolute inset-0 rounded-full opacity-70 heartbeat-ring', bg]}></span>
+    <span class:list={['relative size-2 rounded-full heartbeat', bg]}></span>
+  </span>
+) : (
+  <span class:list={['mc', 'inline-block size-2 rounded-full animate-pulse', bg, className]} aria-hidden="true"></span>
+)}

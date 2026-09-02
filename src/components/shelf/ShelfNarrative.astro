@@ -1,0 +1,44 @@
+---
+// COMPONENT · ShelfNarrative — one life story as a spread.
+//
+// Picture on one side, type on the other, and the sides swap down the run. A
+// life story is a sequence, so the collection is built as a sequence of spreads
+// rather than a grid of equal tiles: the alternation is what makes it read as
+// one after another instead of four at once.
+//
+// Each spread gets a full row to itself, which is the most generous use of
+// space on the page and the reason this collection closes it.
+import type { ShelfArticle } from '../../lib/shelf';
+
+export interface Props {
+  article: ShelfArticle;
+  /** Odd-indexed spreads flip, so the eye crosses the page as it descends. */
+  flip?: boolean;
+  class?: string;
+}
+
+const { article, flip = false, class: className = '' } = Astro.props;
+---
+
+<article class:list={['mc', className]}>
+  <a href={`/shelf/${article.slug}`} class="group grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-8 items-center">
+    <div class:list={['relative aspect-[3/2] overflow-hidden bg-placeholder', flip && 'md:order-2']}>
+      <img
+        src={article.image}
+        alt=""
+        width="500"
+        height="300"
+        loading="lazy"
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+      />
+    </div>
+
+    <div class:list={[flip && 'md:order-1']}>
+      <span class="eyebrow text-azure dark:text-azure-light">{article.author}</span>
+      <h3 class="mt-2.5 article-title-lg sm:text-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance max-w-[26ch]">
+        {article.title}
+      </h3>
+      <p class="mt-3 caption-text tabular-nums text-text-muted">{article.date}</p>
+    </div>
+  </a>
+</article>

@@ -1,0 +1,27 @@
+---
+// ATOM · Headline — the one heading primitive. `size` maps to exactly one type
+// token; never set headline type ad hoc. Expects a `group` ancestor (usually
+// the wrapping <a>) so the hover colour applies. `onDark` for overlays.
+export interface Props {
+  as?: 'h1' | 'h2' | 'h3';
+  size?: 'hero' | 'lg' | 'base' | 'section';
+  tone?: 'default' | 'onDark';
+  clamp?: 0 | 2 | 3;
+  text: string;
+  class?: string;
+}
+const { as = 'h3', size = 'base', tone = 'default', clamp = 0, text, class: className = '' } = Astro.props;
+const Tag = as;
+const sizeCls = {
+  hero: 'text-hero font-bold leading-[1.08]',
+  sm: 'text-sm ',
+  lg: 'article-title-lg leading-snug',
+  base: 'article-title leading-snug',
+  section: 'section-header',
+}[size];
+const toneCls = tone === 'onDark'
+  ? 'text-white group-hover:text-azure-light'
+  : 'text-text-primary group-hover:text-azure';
+const clampCls = clamp === 2 ? 'line-clamp-2' : clamp === 3 ? 'line-clamp-3' : '';
+---
+<Tag class:list={['mc', sizeCls, toneCls, clampCls, 'transition-colors', className]}>{text}</Tag>

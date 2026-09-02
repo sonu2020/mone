@@ -1,0 +1,252 @@
+---
+// DeskRail — section boundaries and complete story boundaries.
+import Media from "../ui/Media.astro";
+import AdSlot from "../AdSlot.astro";
+import BandHeading from "../home4/BandHeading.astro";
+import ChannelRail from "../channels/ChannelRail.astro";
+import type { LiveStory } from "../../lib/home4-data";
+import type { Video } from "../../lib/videos";
+
+export interface Props {
+  videos: Video[];
+  trending: LiveStory[];
+  latest?: LiveStory[];
+  channelDesk?: string;
+  adSlot?: string;
+  class?: string;
+}
+
+const {
+  videos,
+  trending,
+  latest = [],
+  channelDesk,
+  adSlot = "desk-rail",
+  class: className = "",
+} = Astro.props;
+
+const [featured, ...more] = videos;
+
+const ROW = "group flex items-start gap-3 py-3";
+
+const THUMB =
+  "relative w-28 shrink-0 aspect-video overflow-hidden bg-black/10 dark:bg-black/40";
+
+const HEADLINE =
+  "block font-malayalam text-[0.9375rem] leading-[1.35] [font-variation-settings:'wdth'_95,'wght'_580] " +
+  "text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light " +
+  "line-clamp-3 transition-colors";
+
+const META =
+  "mt-1 block caption-text tabular-nums text-text-muted dark:text-ivory/40";
+
+const LIST = "divide-y divide-rule/60 dark:divide-ivory/[0.07]";
+---
+
+<!-- Layout wrapper: no extra boundary around the entire sidebar -->
+<aside
+  class:list={[
+    "desk-rail",
+    "lg:sticky lg:top-16 lg:self-start flex flex-col gap-6",
+    className,
+  ]}
+  aria-label="More from MediaOne"
+>
+  <!-- Existing channel component -->
+  {channelDesk && <ChannelRail desk={channelDesk} limit={3} />}
+
+  <!-- Complete Trending section -->
+  {
+    trending.length > 0 && (
+      <section class="mc" aria-label="Trending">
+        <div class="rail-heading-content">
+          <BandHeading
+            label="Trending"
+            href="/latest-news"
+            viewAllHref="/latest-news"
+            class="mb-2"
+          />
+        </div>
+
+        <ol class={LIST}>
+          {trending.slice(0, 5).map((story, i) => (
+            <li class="mc rail-story-boundary">
+              <a href={story.href} class={ROW}>
+                <span class="w-5 shrink-0 pt-0.5 article-title-lg leading-none tabular-nums text-text-light dark:text-ivory/25">
+                  {i + 1}
+                </span>
+
+                <span class="min-w-0 flex-1">
+                  <span class={HEADLINE}>{story.title}</span>
+
+                  {story.category && (
+                    <span class="mt-1 block eyebrow text-text-muted dark:text-ivory/40">
+                      {story.category}
+                    </span>
+                  )}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+  }
+
+  <!-- Advertisement remains separate from Trending -->
+  <AdSlot slot={`${adSlot}-top`} format="rectangle" lazy />
+
+  <!-- Complete Videos section -->
+  {
+    featured && (
+      <section class="mc" aria-label="Videos">
+        <div class="rail-heading-content">
+          <BandHeading
+            label="Videos"
+            href="/videos"
+            viewAllHref="/videos"
+            class="mb-3"
+          />
+        </div>
+
+        <!-- Complete featured video -->
+        <a
+          href="/videos"
+          data-video-open={featured.slug}
+          class="mc rail-story-boundary group block"
+        >
+          <div class="relative aspect-video overflow-hidden bg-black/10 dark:bg-black/40">
+            <Media
+              seed={featured.thumbnail}
+              src={featured.thumbnailUrl}
+              ratio="16/9"
+              w={480}
+              class="w-full h-full object-cover"
+              zoom
+            />
+
+            <span class="absolute inset-0 grid place-items-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="grid size-9 place-items-center bg-azure text-ivory">
+                <i
+                  class="ti ti-player-play text-lg"
+                  aria-hidden="true"
+                ></i>
+              </span>
+            </span>
+
+            {featured.duration && (
+              <span class="absolute left-0 bottom-0 bg-ink/85 px-1.5 py-0.5 eyebrow tabular-nums text-ivory">
+                {featured.duration}
+              </span>
+            )}
+          </div>
+
+          <h3 class="mt-2 headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light line-clamp-2 transition-colors">
+            {featured.title}
+          </h3>
+        </a>
+
+        {more.length > 0 && (
+          <>
+            <p class="mt-4 mb-1.5 eyebrow text-text-muted dark:text-ivory/40">
+              Trending videos
+            </p>
+
+            <ul class={LIST}>
+              {more.slice(0, 4).map((video) => (
+                <li class="mc rail-story-boundary">
+                  <a
+                    href="/videos"
+                    data-video-open={video.slug}
+                    class={ROW}
+                  >
+                    <span class={THUMB}>
+                      <Media
+                        seed={video.thumbnail}
+                        src={video.thumbnailUrl}
+                        ratio="16/9"
+                        w={320}
+                        class="w-full h-full object-cover"
+                        zoom
+                      />
+
+                      {video.duration && (
+                        <span class="absolute left-0 bottom-0 bg-ink/85 px-1 py-0.5 caption-text tabular-nums text-ivory">
+                          {video.duration}
+                        </span>
+                      )}
+                    </span>
+
+                    <span class="min-w-0 flex-1">
+                      <span class={HEADLINE}>{video.title}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    )
+  }
+
+  <!-- Complete Latest section -->
+  {
+    latest.length > 0 && (
+      <section class="mc" aria-label="Latest">
+        <div class="rail-heading-content">
+          <BandHeading
+            label="Latest"
+            href="/latest-news"
+            viewAllHref="/latest-news"
+            class="mb-2"
+          />
+        </div>
+
+        <ul class={LIST}>
+          {latest.slice(0, 6).map((story) => (
+            <li class="mc rail-story-boundary">
+              <a href={story.href} class={ROW}>
+                <span
+                  class="mt-2 size-1.5 shrink-0 rounded-full bg-azure/50 dark:bg-azure-light/50"
+                  aria-hidden="true"
+                ></span>
+
+                <span class="min-w-0 flex-1">
+                  <span class={HEADLINE}>{story.title}</span>
+
+                  {story.date && (
+                    <span class={META}>{story.date}</span>
+                  )}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <AdSlot slot={adSlot} format="rectangle" lazy />
+</aside>
+
+<style>
+  /*
+   * Keep the complete story boundary.
+   * Hide nested component outlines on images and other story contents.
+   * Preserve keyboard-focus outlines.
+   */
+  :global(.mc-outline) .desk-rail
+    :global(.rail-story-boundary .mc:not(:focus-visible)) {
+    outline: none !important;
+  }
+
+  /*
+   * The section already has a boundary.
+   * Its heading does not need a separate component outline.
+   */
+  :global(.mc-outline) .desk-rail
+    :global(.rail-heading-content .mc:not(:focus-visible)) {
+    outline: none !important;
+  }
+</style>

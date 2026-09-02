@@ -1,0 +1,127 @@
+---
+// BLUEPRINT · SkCell — one column of a band, drawn as the thing it holds.
+//
+// The vocabulary is deliberately small: a band is only ever a lead card, a run
+// of thumbed rows, a rail, a card grid, a flat list, an ad, or a full-bleed
+// strip. If a new band needs a seventh kind, that is worth noticing.
+import SkImg from './SkImg.astro';
+import SkText from './SkText.astro';
+import type { CellKind } from './types';
+
+export interface Props {
+  kind: CellKind;
+  label?: string;
+  /** Draws the hairline a column carries when it has a neighbour to its right. */
+  rule?: boolean;
+  class?: string;
+}
+const { kind, label, rule = false, class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={[
+    'mc',
+    'min-w-0',
+    rule && 'border-r border-dashed border-azure/30 pr-3',
+    className,
+  ]}
+>
+  {label && (
+    <p class="mb-1.5 font-mono text-[0.5625rem] uppercase tracking-wider text-azure/70">{label}</p>
+  )}
+
+  {kind === 'card' && (
+    <div class="flex flex-col gap-2">
+      <SkImg ratio="5/3" />
+      <SkText tone="meta" lines={1} />
+      <SkText lines={2} />
+      <SkText tone="body" lines={2} />
+    </div>
+  )}
+
+  {kind === 'rows' && (
+    <div class="flex flex-col gap-2.5">
+      {[0, 1, 2].map(() => (
+        <div class="flex gap-2 items-start">
+          <span class="w-10 shrink-0"><SkImg ratio="1/1" /></span>
+          <span class="min-w-0 flex-1"><SkText lines={2} /></span>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {kind === 'rail' && (
+    <div class="flex flex-col gap-2">
+      <SkImg ratio="2/1" />
+      <div class="flex flex-col gap-2 pt-1">
+        {[0, 1, 2].map(() => (
+          <div class="flex gap-2 items-baseline">
+            <span class="block h-1.5 w-6 shrink-0 rounded-full bg-azure/40"></span>
+            <span class="min-w-0 flex-1"><SkText tone="body" lines={1} /></span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {kind === 'grid' && (
+    <div class="grid grid-cols-3 gap-2">
+      {[0, 1, 2].map(() => (
+        <div class="flex flex-col gap-1.5">
+          <SkImg ratio="16/9" />
+          <SkText lines={2} />
+        </div>
+      ))}
+    </div>
+  )}
+
+  {kind === 'list' && (
+    <div class="flex flex-col divide-y divide-dashed divide-azure/20">
+      {[0, 1, 2, 3].map(() => (
+        <div class="flex gap-2 items-start py-2 first:pt-0 last:pb-0">
+          <span class="w-14 shrink-0"><SkImg ratio="16/9" /></span>
+          <span class="min-w-0 flex-1 flex flex-col gap-1.5">
+            <SkText tone="meta" lines={1} />
+            <SkText lines={1} />
+          </span>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {kind === 'video' && (
+    <div class="grid grid-cols-4 gap-2">
+      {[0, 1, 2, 3].map(() => (
+        <div class="flex flex-col gap-1.5">
+          <SkImg ratio="16/9" />
+          <SkText lines={1} />
+        </div>
+      ))}
+    </div>
+  )}
+
+  {kind === 'ad' && (
+    <div
+      class="h-10 rounded-xs border border-dashed border-ink/25 dark:border-ivory/25 grid place-items-center bg-ad-surface dark:bg-ad-surface-dark"
+    >
+      <span class="font-mono text-[0.5625rem] uppercase tracking-wider text-ink/45 dark:text-ivory/45">Ad</span>
+    </div>
+  )}
+
+  {kind === 'bleed' && (
+    <div class="rounded-xs bg-nav-bg p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="block h-1.5 w-12 rounded-full bg-white/60"></span>
+        <span class="ml-auto block h-1.5 w-16 rounded-full bg-white/25"></span>
+      </div>
+      <div class="grid grid-cols-4 gap-2">
+        {[0, 1, 2, 3].map(() => (
+          <div class="flex flex-col gap-1.5">
+            <div class="aspect-[16/9] rounded-xs bg-white/15"></div>
+            <span class="block h-1.5 w-full rounded-full bg-white/25"></span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>

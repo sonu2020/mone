@@ -1,0 +1,92 @@
+---
+// COMPONENT · VideoEmbed — a lightweight YouTube "facade". Renders a thumbnail
+// + play button (no iframe cost on load, no CLS); the real YouTube iframe is
+// injected only on click. Used as the shared video "viewer" across the videos
+// section (watch pages, program show-viewers) so every embed behaves the same.
+//
+// Progressive: without JS the button is inert but the poster still shows. A
+// single delegated script (bottom) activates any [data-yt-facade] on the page.
+import DummyImage from './DummyImage.astro';
+
+export interface Props {
+  youtubeId: string;
+  title?: string;
+  seed?: string;         // DummyImage poster seed (defaults to youtubeId)
+  poster?: string;       // real poster image URL — used instead of DummyImage when set
+  category?: string;
+  duration?: string;
+  id?: string;           // DOM id, so other scripts (playlists) can target it
+  class?: string;
+}
+
+const {
+  youtubeId,
+  title = '',
+  seed,
+  poster,
+  category,
+  duration,
+  id,
+  class: className = '',
+} = Astro.props;
+---
+
+<div
+  id={id}
+  data-yt-facade
+  data-yt-id={youtubeId}
+  class:list={['mc', 'relative aspect-video overflow-hidden bg-black border border-rule dark:border-ivory/10 shadow-sm', className]}
+>
+  <button type="button" data-yt-play class="group absolute inset-0 w-full h-full cursor-pointer" aria-label={title ? `Play: ${title}` : 'Play video'}>
+    {poster ? (
+      <img src={poster} alt={title} loading="lazy" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
+    ) : (
+      <DummyImage class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300" w={1280} h={720} seed={seed || youtubeId} />
+    )}
+    <span class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></span>
+
+    <!-- Play affordance -->
+    <span class="absolute inset-0 flex items-center justify-center">
+      <span class="size-16 rounded-full bg-azure text-white flex items-center justify-center border border-white/20 shadow-md group-hover:bg-azure-dark group-hover:scale-105 transition-all duration-300">
+        <i class="ti ti-player-play text-3xl ml-1" aria-hidden="true"></i>
+      </span>
+    </span>
+
+    {category && (
+      <span class="absolute top-3 left-3 bg-black/75 text-white eyebrow px-2 py-0.5 rounded-sm backdrop-blur-xs">{category}</span>
+    )}
+    {duration && (
+      <span class="absolute bottom-3 right-3 bg-black/75 text-white text-caption px-2 py-0.5 rounded-sm backdrop-blur-xs tabular-nums">{duration}</span>
+    )}
+  </button>
+</div>
+
+<script is:inline>
+  // Delegated activation: swap any facade for a real YouTube iframe on click.
+  (function () {
+    if (window.__ytFacadeBound) return;
+    window.__ytFacadeBound = true;
+
+    window.activateYouTube = function (facade, id) {
+      var ytId = id || facade.getAttribute('data-yt-id');
+      if (!ytId) return;
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+      iframe.title = 'Video player';
+      iframe.className = 'absolute inset-0 w-full h-full border-0';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      facade.innerHTML = '';
+      facade.appendChild(iframe);
+      facade.setAttribute('data-yt-id', ytId);
+      facade.removeAttribute('data-yt-facade');
+    };
+
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-yt-play]');
+      if (!btn) return;
+      var facade = btn.closest('[data-yt-facade]');
+      if (facade) window.activateYouTube(facade);
+    });
+  })();
+</script>

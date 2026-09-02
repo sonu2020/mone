@@ -1,0 +1,24 @@
+/* PUBLIC_TYPE_SCALE=editorial — a fluid scale tuned for a Malayalam newsroom:
+   bigger small sizes (Malayalam conjuncts need x-height), a stronger display
+   step for hero headlines, tighter section steps. Same 390→1280 clamp pattern
+   as the current scale. Applied via .type-scale-editorial on <html> (or on any
+   wrapper for a scoped comparison). */
+.type-scale-editorial {
+  --text-display: clamp(2.25rem, 1.8rem + 2.2vw, 4rem);
+  --text-hero: clamp(1.75rem, 1.45rem + 1.5vw, 3rem);
+  --text-title: clamp(1.375rem, 1.25rem + 0.6vw, 2rem);
+  --text-section: clamp(1.25rem, 1.15rem + 0.45vw, 1.75rem);
+  --text-headline: clamp(1rem, 0.94rem + 0.3vw, 1.25rem);
+  --text-lead: clamp(1rem, 0.95rem + 0.25vw, 1.25rem);
+  --text-body: clamp(1rem, 0.97rem + 0.15vw, 1.125rem);
+  --text-meta: clamp(0.8125rem, 0.8rem + 0.06vw, 0.875rem);
+  --text-nav: clamp(1rem, 0.97rem + 0.12vw, 1.125rem);
+  --text-eyebrow: clamp(0.75rem, 0.73rem + 0.1vw, 0.8125rem);
+  --text-caption: clamp(0.75rem, 0.73rem + 0.1vw, 0.8125rem);
+  --text-category: clamp(2rem, 1.7rem + 1.2vw, 3rem);
+  --text-body-small: clamp(0.8125rem, 0.8rem + 0.06vw, 0.875rem);
+  --text-deck: clamp(1rem, 0.97rem + 0.15vw, 1.125rem);
+  --text-feature: clamp(1.25rem, 1.18rem + 0.35vw, 1.5rem);
+  --text-lead-story: clamp(1.375rem, 1.28rem + 0.45vw, 1.75rem);
+  --text-band: clamp(1.125rem, 1.06rem + 0.3vw, 1.375rem);
+}

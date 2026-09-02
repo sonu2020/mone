@@ -1,0 +1,25 @@
+---
+// ATOM · PlayButton — the play affordance. `solid` (azure) for light surfaces,
+// `glass` for over-video. Scales on a `group` hover. Inline SVG triangle so it
+// never depends on an icon font.
+export interface Props {
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'solid' | 'glass';
+  class?: string;
+}
+const { size = 'md', variant = 'solid', class: className = '' } = Astro.props;
+const ring = {
+  sm: 'size-9',
+  md: 'size-14 sm:size-16',
+  lg: 'size-16 sm:size-20',
+}[size];
+const glyph = { sm: 'size-4', md: 'size-6 sm:size-7', lg: 'size-7 sm:size-9' }[size];
+const skin = variant === 'glass'
+  ? 'bg-white/15 backdrop-blur-sm border border-white/40 text-white'
+  : 'bg-azure text-white shadow-[0_6px_24px_rgba(0,8,19,0.35)]';
+---
+<span class:list={['mc', 'grid place-items-center rounded-full transition-transform duration-200 group-hover:scale-105', ring, skin, className]}>
+  <svg viewBox="0 0 24 24" class:list={[glyph, 'ml-0.5 fill-current']} aria-hidden="true">
+    <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z" />
+  </svg>
+</span>

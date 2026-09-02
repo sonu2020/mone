@@ -1,0 +1,52 @@
+---
+// BLOCK · ListBand — the "Latest News" band: a labelled heading over a two-column
+// run of thumbed rows, rule-separated so the list reads as a feed rather than a
+// grid of cards.
+import BandHeading from "./BandHeading.astro";
+import ThumbRow from "./ThumbRow.astro";
+import type { LiveStory as Story } from "../../lib/home4-data";
+
+export interface Props {
+  label: string;
+  href?: string;
+  viewAllHref?: string;
+  stories: Story[];
+  cols?: 2 | 3;
+  class?: string;
+}
+const {
+  label,
+  href,
+  viewAllHref,
+  stories,
+  cols = 2,
+  class: className = "",
+} = Astro.props;
+const colCls = cols === 3 ? "lg:grid-cols-3" : "lg:grid-cols-2";
+---
+
+<section
+  class:list={[
+    "mc",
+    "py-12 border-b border-rule dark:border-ivory/10",
+    className,
+  ]}
+>
+  <BandHeading
+    label={label}
+    href={href}
+    viewAllHref={viewAllHref}
+    class="mb-6"
+  />
+
+  <div class:list={["grid grid-cols-1 gap-x-8 gap-y-0 sm:grid-cols-2", colCls]}>
+    {
+      stories.map((story) => (
+        <ThumbRow
+          story={story}
+          class="py-4 border-b border-rule dark:border-ivory/10"
+        />
+      ))
+    }
+  </div>
+</section>

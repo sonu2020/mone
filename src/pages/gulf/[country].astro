@@ -1,0 +1,133 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/nav/HeaderBar.astro';
+import Footer from '../../components/Footer.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import CardGrid from '../../components/CardGrid.astro';
+import ArticleList from '../../components/ArticleList.astro';
+import SectionBlock from '../../components/SectionBlock.astro';
+import { sections } from '../../lib/sections';
+
+const gulf = sections.find((s) => s.id === 'gulf')!;
+
+export function getStaticPaths() {
+  const countries = ['uae', 'saudi-arabia', 'qatar', 'bahrain', 'kuwait', 'oman'];
+  return countries.map((c) => ({ params: { country: c } }));
+}
+
+const { country } = Astro.params;
+
+const countryNames: Record<string, string> = {
+  'uae': 'UAE',
+  'saudi-arabia': 'Saudi Arabia',
+  'qatar': 'Qatar',
+  'bahrain': 'Bahrain',
+  'kuwait': 'Kuwait',
+  'oman': 'Oman',
+};
+
+const countryName = countryNames[country] || country;
+const articles = gulf.articles;
+const hero = articles[0];
+const grid = articles.slice(1, 7);
+const rest = articles.slice(7);
+
+const gridItems = grid.map((a) => ({
+  title: a.title,
+  category: gulf.name,
+  href: a.href,
+  date: a.date,
+  image: a.image,
+}));
+
+const restItems = rest.map((a) => ({
+  title: a.title,
+  category: gulf.name,
+  href: a.href,
+  date: a.date,
+  image: a.image,
+}));
+---
+
+<Layout title={`${countryName} — Gulf News | MediaOne`} description={`Latest news from ${countryName} and the Gulf region.`}>
+  <Header />
+
+  <main class="flex-1 bg-bg-page">
+    <SectionHeader
+      variant="gradient"
+      title={gulf.nameML}
+      titleEn={`${gulf.name} · ${countryName}`}
+      href="/gulf"
+      viewAllHref="/gulf"
+      sticky={false}
+    />
+
+    <div class="w-full lg:max-w-site lg:mx-auto">
+      <div class="px-4 pt-5 pb-6 sm:px-6 md:px-8 bg-bg-card">
+        <p class="lead-text text-text-secondary max-w-prose text-pretty">Latest news and updates from {countryName} and across the Gulf region.</p>
+        <p class="mt-4 eyebrow text-azure tabular-nums">{articles.length} Articles</p>
+      </div>
+
+      <div class="lg:grid lg:grid-cols-12">
+        <div class="lg:col-span-8 lg:pr-6">
+          {hero && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <ArticleCard
+                variant="lead"
+                title={hero.title}
+                excerpt={hero.excerpt}
+                category={gulf.name}
+                href={hero.href}
+                date={hero.date}
+                image={hero.image}
+              />
+            </div>
+          )}
+
+          {grid.length > 0 && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <SectionBlock title="കൂടുതൽ" titleEn="More Stories" href="/gulf" viewAllHref="/gulf">
+                <CardGrid items={gridItems} cols={2} />
+              </SectionBlock>
+            </div>
+          )}
+
+          {rest.length > 0 && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <SectionBlock title="പഴയ വാർത്തകൾ" titleEn="Earlier" href="/gulf">
+                <ArticleList items={restItems} />
+              </SectionBlock>
+            </div>
+          )}
+        </div>
+
+        <aside class="hidden lg:block lg:col-span-4 lg:border-l lg:border-rule lg:bg-bg-card">
+          <div class="p-6 xl:p-8 space-y-10">
+            <SectionBlock title="Gulf Countries" titleEn="Regions">
+              <ul class="space-y-2">
+                {Object.entries(countryNames).map(([slug, name]) => (
+                  <li>
+                    <a
+                      href={`/gulf/${slug}`}
+                      class:list={[
+                        'block py-2 text-sm transition-colors',
+                        slug === country
+                          ? 'text-azure font-semibold'
+                          : 'text-text-secondary hover:text-azure',
+                      ]}
+                    >
+                      {name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </SectionBlock>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

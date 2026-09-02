@@ -1,0 +1,163 @@
+---
+// ── /sitemap ─────────────────────────────────────────────────────────────────
+// Every page the site builds, grouped and tagged, with a JS filter (search box
+// + tag chips). No-JS fallback renders the full grouped list. The inventory is
+// assembled from the same data sources the routes read, so it can't drift.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import SectionSubNav from '../components/nav/SectionSubNav.astro';
+import Footer from '../components/Footer.astro';
+import { sitemapGroups, sitemapTags } from '../lib/sitemap-data';
+
+const groups = sitemapGroups();
+const tags = sitemapTags();
+const total = groups.reduce((n, g) => n + g.entries.length, 0);
+---
+
+<Layout
+  title="Sitemap — MediaOne"
+  description="Every page on MediaOne — sections, stories, videos, magazine, shelf, programs and more."
+>
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto bg-bg-card">
+      <div class="px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <nav class="flex items-center gap-2 text-meta text-ink-muted dark:text-ivory/45 mb-6" aria-label="Breadcrumb">
+          <a href="/" class="hover:text-azure dark:hover:text-azure-light transition-colors">Home</a>
+          <span aria-hidden="true">/</span>
+          <span class="text-ink dark:text-ivory">Sitemap</span>
+        </nav>
+
+        <header class="border-b border-rule dark:border-ivory/10 pb-8">
+          <h1 class="text-section font-bold text-ink dark:text-ivory text-balance">Sitemap</h1>
+          <p class="mt-3 text-body text-ink-muted dark:text-ivory/60 max-w-prose text-pretty">
+            Every page on the site — {total} pages across {groups.length} groups. Filter by
+            tag or search by title.
+          </p>
+
+          <!-- Filter controls (progressive: the full list renders without JS) -->
+          <div class="mt-6 space-y-4">
+            <label class="block">
+              <span class="sr-only">Search sitemap</span>
+              <input
+                id="sitemap-search"
+                type="search"
+                placeholder="Search pages…"
+                autocomplete="off"
+                class="w-full sm:max-w-md border border-rule dark:border-ivory/15 bg-bg-card dark:bg-brand-elevated px-4 py-2.5 text-body text-ink dark:text-ivory placeholder:text-ink-muted/60 dark:placeholder:text-ivory/35 focus:outline-none focus:border-azure transition-colors"
+              />
+            </label>
+            <div id="sitemap-tags" class="flex flex-wrap gap-2" role="group" aria-label="Filter by tag">
+              {tags.map((tag) => (
+                <button
+                  type="button"
+                  data-tag={tag.toLowerCase()}
+                  class="tag-chip border border-rule dark:border-ivory/15 px-3 py-1 text-meta text-ink-muted dark:text-ivory/60 hover:text-azure hover:border-azure cursor-pointer transition-colors"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+            <p id="sitemap-count" class="text-meta text-ink-muted dark:text-ivory/45 tabular-nums">
+              {total} pages
+            </p>
+          </div>
+        </header>
+
+        <!-- Grouped listing -->
+        <div id="sitemap-list" class="mt-10 space-y-10">
+          {groups.map((group) => (
+            <section data-group={group.id} class="sitemap-group">
+              <h2 class="eyebrow text-azure dark:text-azure-light mb-4 flex items-baseline gap-3">
+                {group.label}
+                <span class="group-count text-meta text-ink-muted dark:text-ivory/40 tabular-nums">
+                  {group.entries.length}
+                </span>
+              </h2>
+              <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2.5">
+                {group.entries.map((e) => (
+                  <li
+                    class="sitemap-row"
+                    data-title={e.title.toLowerCase()}
+                    data-href={e.href.toLowerCase()}
+                    data-tags={e.tags.map((t) => t.toLowerCase()).join(' ')}
+                  >
+                    <a
+                      href={e.href}
+                      class="group flex items-baseline gap-2 text-body text-ink dark:text-ivory hover:text-azure dark:hover:text-azure-light transition-colors leading-snug"
+                    >
+                      <span class="line-clamp-2">{e.title}</span>
+                      <span class="shrink-0 text-meta text-ink-muted/60 dark:text-ivory/35 tabular-nums">
+                        {e.href}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  // Tag + search filtering. Progressive: with JS disabled the full list shows.
+  const search = document.getElementById('sitemap-search');
+  const countEl = document.getElementById('sitemap-count');
+  const chips = [...document.querySelectorAll('.tag-chip')];
+  const rows = [...document.querySelectorAll('.sitemap-row')];
+  const groups = [...document.querySelectorAll('.sitemap-group')];
+
+  // One active tag at a time (a second click clears). Search text narrows the
+  // rows within, so chips + query compose as AND.
+  let activeTag: string | null = null;
+
+  function apply() {
+    const q = (search?.value ?? '').trim().toLowerCase();
+    let visible = 0;
+    for (const row of rows) {
+      const title = row.getAttribute('data-title') ?? '';
+      const href = row.getAttribute('data-href') ?? '';
+      const tags = row.getAttribute('data-tags') ?? '';
+      const matchesQuery = q === '' || title.includes(q) || href.includes(q);
+      const matchesTag = activeTag === null || tags.split(' ').includes(activeTag);
+      const show = matchesQuery && matchesTag;
+      row.classList.toggle('hidden', !show);
+      if (show) visible++;
+    }
+    for (const g of groups) {
+      const anyVisible = [...g.querySelectorAll('.sitemap-row')].some((r) => !r.classList.contains('hidden'));
+      g.classList.toggle('hidden', !anyVisible);
+    }
+    if (countEl) countEl.textContent = `${visible} of ${rows.length} pages`;
+  }
+
+  for (const chip of chips) {
+    chip.addEventListener('click', () => {
+      const tag = chip.getAttribute('data-tag');
+      activeTag = activeTag === tag ? null : tag;
+      for (const c of chips) c.classList.toggle('is-active', c === chip && activeTag !== null);
+      apply();
+    });
+  }
+  search?.addEventListener('input', apply);
+</script>
+
+<style>
+  /* Chips do not re-render, so the active state is styled here. */
+  .tag-chip.is-active {
+    color: var(--color-azure);
+    border-color: var(--color-azure);
+    background: color-mix(in oklch, var(--color-azure) 8%, transparent);
+  }
+  .dark .tag-chip.is-active {
+    color: var(--color-azure-light);
+    border-color: var(--color-azure-light);
+  }
+</style>

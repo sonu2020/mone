@@ -1,0 +1,31 @@
+---
+// BLOCK · VideoBlock — a 16:9 still with a play affordance and a duration chip.
+// Presentational only: the real player is wired elsewhere (MediaPlayer.astro).
+import Placeholder from '../Placeholder.astro';
+export interface Props {
+  title: string;
+  src?: string;
+  duration?: string;
+  label?: string;
+  class?: string;
+}
+const { title, src, duration, label = 'Video', class: className = '' } = Astro.props;
+---
+<figure class:list={['mc', className]}>
+  {label && <figcaption class="eyebrow text-text-muted mb-2">{label}</figcaption>}
+  <a href="#" class="group relative block">
+    <Placeholder class="aspect-video w-full" src={src} alt={title} />
+    <span class="absolute inset-0 bg-ink/15 group-hover:bg-ink/25 transition-colors"></span>
+    <span class="absolute inset-0 grid place-items-center">
+      <span class="grid place-items-center size-14 rounded-full bg-ink/70 text-white group-hover:bg-azure transition-colors">
+        <i class="ti ti-player-play text-[22px]" aria-hidden="true"></i>
+      </span>
+    </span>
+    {duration && (
+      <span class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-ink/85 text-white caption-text tabular-nums">
+        {duration}
+      </span>
+    )}
+  </a>
+  <p class="mt-2 article-title text-text-primary">{title}</p>
+</figure>

@@ -1,0 +1,25 @@
+---
+// BLOCK · StoryCard — the image-top promo unit. The workhorse of grids.
+// Media + Kicker + Headline (+ optional excerpt) + timestamp.
+import Media from '../ui/Media.astro';
+import Kicker from '../ui/Kicker.astro';
+import Headline from '../ui/Headline.astro';
+import type { Story } from '../../lib/home-data';
+export interface Props {
+  story: Story;
+  ratio?: string;
+  size?: 'base' | 'lg';
+  showExcerpt?: boolean;
+  class?: string;
+}
+const { story, ratio = '16/9', size = 'base', showExcerpt = false, class: className = '' } = Astro.props;
+---
+<a href={story.href} class:list={['mc', 'group block', className]}>
+  <Media seed={story.href} ratio={ratio} class="mb-3" />
+  {story.category && <Kicker text={story.category} class="mb-1.5 block" />}
+  <Headline as="h3" size={size} text={story.title} clamp={3} />
+  {showExcerpt && story.excerpt && (
+    <p class="mt-2 body-small text-text-secondary line-clamp-2 hidden sm:block">{story.excerpt}</p>
+  )}
+  {story.date && <p class="mt-2 caption-text text-text-muted tabular-nums">{story.date}</p>}
+</a>

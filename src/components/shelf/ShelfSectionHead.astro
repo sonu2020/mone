@@ -1,0 +1,46 @@
+---
+// COMPONENT · ShelfSectionHead — the quiet marker between Shelf collections.
+//
+// Deliberately not BandHeading. A band heading is a shelf label on a busy
+// homepage and shouts accordingly; here the sections are far apart and the
+// reader arrives at each one having scrolled through whitespace, so the header
+// only has to name the place. A numeral, a name, a count, and a rule.
+export interface Props {
+  /** Position in the run, rendered as 01, 02 … — the spine of the page. */
+  index: number;
+  title: string;
+  count: number;
+  href?: string;
+  /** A line on why this collection reads the way it does. Optional. */
+  note?: string;
+  class?: string;
+}
+
+const { index, title, count, href, note, class: className = '' } = Astro.props;
+const ordinal = String(index).padStart(2, '0');
+const Tag = href ? 'a' : 'div';
+---
+
+<div class:list={['mc', 'border-t border-ink dark:border-ivory/30 pt-4', className]}>
+  <div class="flex items-baseline gap-4 sm:gap-6">
+    <span class="eyebrow tabular-nums text-azure dark:text-azure-light shrink-0">{ordinal}</span>
+
+    <Tag href={href} class="group flex items-baseline gap-3 min-w-0">
+      <h2 class="text-title font-bold text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+        {title}
+      </h2>
+      <span class="caption-text tabular-nums text-text-muted shrink-0">{count}</span>
+    </Tag>
+
+    {href && (
+      <a
+        href={href}
+        class="ml-auto shrink-0 eyebrow text-azure dark:text-azure-light hover:text-azure-dark transition-colors"
+      >All →</a>
+    )}
+  </div>
+
+  {note && (
+    <p class="mt-2 body-small text-text-muted max-w-[46ch]">{note}</p>
+  )}
+</div>

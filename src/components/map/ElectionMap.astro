@@ -1,0 +1,109 @@
+---
+// MAP · ElectionMap — a Leaflet choropleth of election results.
+//
+// Thin shell over the shared runtime (src/lib/election-map.ts): the page owns
+// the data, this component mounts a map for every [data-map-spec] it finds,
+// and the explorer controller mounts additional maps the same way for its
+// runtime-rendered drill section. Fills are read from theme tokens at boot
+// (via probe elements), so dark mode never needs a second colour table.
+//
+// The map knows nothing about elections — any FeatureCollection whose
+// features carry a `leading` property mounts here. It talks over DOM events,
+// like PinMap:
+//
+//   map → page   map:select { id }     a feature was clicked
+//
+// `id` is `properties.slug ?? properties.code ?? properties.name`, so the
+// district map answers with slugs and the local-body map with codes.
+import MapBase from '../map/MapBase.astro';
+
+export interface Props {
+  id: string;
+  /** URL of a FeatureCollection; features need `properties.leading`. */
+  url: string;
+  /** Accessible description of what the map shows. */
+  label: string;
+  class?: string;
+}
+
+const { id, url, label, class: className = '' } = Astro.props;
+---
+
+<MapBase />
+
+<div
+  id={id}
+  class:list={['mc', 'election-map relative w-full overflow-hidden', className]}
+  role="img"
+  aria-label={label}
+>
+  <script type="application/json" data-map-spec set:html={JSON.stringify({ url, label }).replace(/</g, '\\u003c')}></script>
+</div>
+
+<script>
+  import { mountElectionMap } from '../../lib/election-map';
+
+  document.querySelectorAll<HTMLElement>('[data-map-spec]').forEach((specEl) => {
+    const container = specEl.parentElement;
+    if (!container) return;
+    const spec = JSON.parse(specEl.textContent ?? '{}');
+    mountElectionMap(container, spec);
+  });
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('[data-map-spec]').forEach((specEl) => {
+      const container = specEl.parentElement;
+      if (!container) return;
+      const spec = JSON.parse(specEl.textContent ?? '{}');
+      mountElectionMap(container, spec);
+    });
+  });
+</script>
+
+<style is:global>
+  /* The tile theme, matching the route HUD: the basemap is pulled toward the
+     masthead so the map reads as part of the paper, not as an embed. */
+  .election-map .leaflet-tile-pane {
+    filter: saturate(0.55) contrast(0.95) brightness(1.02) hue-rotate(-8deg);
+  }
+  :root.dark .election-map .leaflet-tile-pane {
+    filter: invert(0.92) hue-rotate(180deg) saturate(0.5) brightness(0.92) contrast(0.95);
+  }
+
+  .election-map .leaflet-container {
+    background: var(--color-bg-page);
+    font-family: var(--font-sans);
+    height: 100%;
+    min-height: 100%;
+  }
+  :root.dark .election-map .leaflet-container { background: var(--color-brand-dark); }
+
+  .election-map .leaflet-control-attribution {
+    background: rgba(255, 255, 255, 0.78);
+    font-size: 10px;
+  }
+  :root.dark .election-map .leaflet-control-attribution {
+    background: rgba(11, 46, 93, 0.75);
+    color: var(--color-ivory);
+  }
+  :root.dark .election-map .leaflet-control-attribution a { color: var(--color-azure-light); }
+
+  /* Probes: the fills the JS reads. Kept out of the DOM flow. */
+  .election-map__probe {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .election-map__probe--ldf { background-color: var(--color-accent-red); }
+  .election-map__probe--udf { background-color: var(--color-azure); }
+  .election-map__probe--nda { background-color: var(--color-saffron); }
+  .election-map__probe--oth { background-color: var(--color-ink-muted); }
+  .election-map__probe--tie { background-color: var(--color-ink-light); }
+  .election-map__probe--rule { background-color: var(--color-rule); }
+  .election-map__probe--border { background-color: var(--color-ink-muted); }
+  /* Focused feature: near-white reads on every front fill, light or dark. */
+  .election-map__probe--focus { background-color: var(--color-ivory); }
+
+  .election-map .leaflet-interactive { cursor: pointer; }
+</style>

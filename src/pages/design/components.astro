@@ -1,0 +1,232 @@
+---
+import DesignShell from '../../components/design/DesignShell.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import SectionBlock from '../../components/SectionBlock.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import ArticleList from '../../components/ArticleList.astro';
+import FeaturedCard from '../../components/FeaturedCard.astro';
+import CardGrid from '../../components/CardGrid.astro';
+import PhotoGallery from '../../components/PhotoGallery.astro';
+import BreakingTicker from '../../components/BreakingTicker.astro';
+import EditorialShelf from '../../components/news/EditorialShelf.astro';
+import {
+  shelfEditorialHero,
+  shelfEditorialGrid,
+  keralaEditorialHero,
+  keralaEditorialGrid
+} from '../../lib/home-data';
+
+const components = [
+  { name: 'SectionHeader', desc: 'Reusable section title bar with optional sticky behavior', props: ['title', 'titleEn?', 'href?', 'viewAllHref?', 'sticky?', 'variant?'] },
+  { name: 'SectionBlock', desc: 'Composition wrapper: SectionHeader + slot content', props: ['title', 'titleEn?', 'href?', 'viewAllHref?', 'variant?', 'sticky?'] },
+  { name: 'ArticleCard', desc: 'Flexible article card with 4 variants: lead, standard, compact, overlay', props: ['title', 'excerpt?', 'category?', 'href', 'date?', 'variant?'] },
+  { name: 'ArticleList', desc: 'Vertical list of compact article cards with hairline separators', props: ['items[]'] },
+  { name: 'FeaturedCard', desc: 'Full-width card with gradient overlay and text on image', props: ['title', 'category?', 'href', 'date?', 'excerpt?', 'aspect?'] },
+  { name: 'CardGrid', desc: 'Responsive grid of standard article cards (2/3/4 cols)', props: ['items[]', 'cols?'] },
+  { name: 'PhotoGallery', desc: 'Horizontal scroll on mobile, grid on tablet+', props: ['items[]?', 'title?'] },
+  { name: 'BreakingTicker', desc: 'Red breaking news ticker bar', props: ['label?', 'text?'] },
+  { name: 'EditorialShelf', desc: 'Premium split-hero in-depth composition pattern with selectable grid layouts below', props: ['title', 'titleEn?', 'viewAllHref?', 'heroStory', 'gridStories', 'gridVariant?', 'heroBgClass?', 'class?'] },
+];
+
+const sampleItems = [
+  { title: 'കേരളത്തില്‍ കനത്ത മഴ; ജാഗ്രതാ നിര്‍ദേശം തുടരുന്നു', category: 'Kerala', href: '/story/rain-alert', date: '20 min ago' },
+  { title: 'പാലക്കാട് ജില്ലാ ആശുപത്രിയില്‍ പുതിയ ഓക്സിജന്‍ പ്ലാന്റ് ഉദ്ഘാടനം', category: 'Kerala', href: '/story/palakkad-hospital', date: '45 min ago' },
+  { title: 'ഇന്ത്യ-യു എ ഇ വ്യാപാര കരാര്‍: കയറ്റുമതി ഇരട്ടിയാക്കാന്‍ പദ്ധതി', category: 'India', href: '/story/india-uae-trade', date: '1 hour ago' },
+];
+
+const gridItems = [
+  { title: 'മമ്മൂട്ടിയുടെ പുതിയ ചിത്രത്തിന്റെ റിലീസ് തീയതി', category: 'Entertainment', href: '/story/mammootty-film', date: 'June 12' },
+  { title: 'മോഹന്‍ലാലും ജീത്തു ജോസഫും വീണ്ടും ഒന്നിക്കുന്നു', category: 'Entertainment', href: '/story/mohanlal-jeethu', date: 'June 12' },
+  { title: 'മലയാള സിനിമയില്‍ ഓടിടി റിലീസുകള്‍ കൂടുന്നു', category: 'Entertainment', href: '/story/ott-release', date: 'June 11' },
+  { title: 'ദിലീഷ് പോത്തന്റെ പുതിയ ചിത്രത്തിന് മികച്ച പ്രതികരണം', category: 'Entertainment', href: '/story/dileesh-pothan', date: 'June 11' },
+];
+---
+
+<DesignShell
+  title="Catalogue — MediaOne Design System"
+  description="Reusable Astro components for the MediaOne newsroom interface, with their props."
+  eyebrow="Catalogue"
+  heading="Component Library"
+  lede="The composition components with their public props — what each one takes and when to reach for it. The Gallery renders them live; this page is the API reference."
+  active="components"
+>
+
+      <!-- Component Registry -->
+      <div class="mb-16">
+        <SectionHeader title="Registry" titleEn="All Components" />
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {components.map((c) => (
+            <div class="bg-bg-card p-5 border border-rule rounded-md">
+              <h3 class="article-title text-text-primary">{c.name}</h3>
+              <p class="mt-2 body-small text-text-secondary">{c.desc}</p>
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                {c.props.map((p) => (
+                  <code class="px-2 py-0.5 bg-ivory-dark text-caption text-text-muted rounded-sm">{p}</code>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Live Examples -->
+      <div class="space-y-16">
+        <!-- BreakingTicker -->
+        <section>
+          <SectionHeader title="BreakingTicker" titleEn="Live Demo" />
+          <div class="mt-6">
+            <BreakingTicker />
+          </div>
+        </section>
+
+        <!-- SectionHeader gradient -->
+        <section>
+          <SectionHeader title="SectionHeader" titleEn="Gradient Variant" />
+          <div class="mt-6">
+            <SectionHeader
+              variant="gradient"
+              title="കായികം"
+              titleEn="Sports"
+              href="/sports"
+              viewAllHref="/sports"
+            />
+          </div>
+        </section>
+
+        <!-- ArticleCard variants -->
+        <section>
+          <SectionHeader title="ArticleCard" titleEn="4 Variants" />
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div>
+              <p class="eyebrow text-ink-muted mb-3">lead</p>
+              <ArticleCard
+                variant="lead"
+                title="മുംബൈ മുന്‍സിപ്പല്‍ കമ്മീഷണര്‍ ഐ പി എസ് ഐ ശ്രീകുമാറിന് കൂടുതല്‍ ചുമതല"
+                excerpt="അധികാരക്കൈമാറ്റം സമാധാനപരവും സുഗമവുമായി നടക്കുന്നുണ്ടെന്ന് ഉറപ്പാക്കാൻ..."
+                category="Kerala"
+                href="/story/ips-shrikumar"
+                date="June 12"
+              />
+            </div>
+            <div>
+              <p class="eyebrow text-ink-muted mb-3">standard</p>
+              <ArticleCard
+                variant="standard"
+                title="മമ്മൂട്ടിയുടെ പുതിയ ചിത്രത്തിന്റെ റിലീസ് തീയതി"
+                category="Entertainment"
+                href="/story/mammootty-film"
+                date="June 12"
+              />
+            </div>
+            <div>
+              <p class="eyebrow text-ink-muted mb-3">compact</p>
+              <ArticleCard
+                variant="compact"
+                title="കേരളത്തില്‍ കനത്ത മഴ; ജാഗ്രതാ നിര്‍ദേശം"
+                category="Kerala"
+                href="/story/rain-alert"
+                date="20 min ago"
+              />
+            </div>
+            <div>
+              <p class="eyebrow text-ink-muted mb-3">overlay</p>
+              <ArticleCard
+                variant="overlay"
+                title="എഐവൈഎഫ് മാര്‍ച്ചിനെതിരെ ജലപീരങ്കിയില്‍"
+                category="Kerala"
+                href="/story/pala-election"
+                date="June 12"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- ArticleList -->
+        <section>
+          <SectionHeader title="ArticleList" titleEn="Compact List" />
+          <div class="mt-6 bg-bg-card p-4 sm:p-6 rounded-md">
+            <ArticleList items={sampleItems} />
+          </div>
+        </section>
+
+        <!-- FeaturedCard -->
+        <section>
+          <SectionHeader title="FeaturedCard" titleEn="Overlay Card" />
+          <div class="mt-6 max-w-2xl">
+            <FeaturedCard
+              title="എഐവൈഎഫ് മാര്‍ച്ചിനെതിരെ ജലപീരങ്കിയില്‍ പ്രയോഗിച്ചത് മലിനജലമെന്ന് ആരോപണം"
+              category="Kerala"
+              href="/story/pala-election"
+              date="June 12"
+              excerpt="ചെളിവെള്ള കുപ്പിയുമായി പ്രതിപക്ഷ നേതാവ് സഭയില്‍"
+            />
+          </div>
+        </section>
+
+        <!-- CardGrid -->
+        <section>
+          <SectionHeader title="CardGrid" titleEn="4-column Grid" />
+          <div class="mt-6 bg-white p-4 sm:p-6 rounded-md">
+            <CardGrid items={gridItems} cols={4} />
+          </div>
+        </section>
+
+        <!-- PhotoGallery -->
+        <section>
+          <SectionHeader title="PhotoGallery" titleEn="Scroll / Grid" />
+          <div class="mt-6 bg-white p-4 sm:p-6 rounded-md">
+            <PhotoGallery />
+          </div>
+        </section>
+
+        <!-- SectionBlock composition -->
+        <section>
+          <SectionHeader title="SectionBlock" titleEn="Composition Pattern" />
+          <div class="mt-6 bg-white p-4 sm:p-6 rounded-md">
+            <SectionBlock title="കേരളം" titleEn="Kerala" href="/kerala" viewAllHref="/kerala">
+              <ArticleCard
+                variant="lead"
+                title="മുംബൈ മുന്‍സിപ്പല്‍ കമ്മീഷണര്‍ ഐ പി എസ് ഐ ശ്രീകുമാറിന് കൂടുതല്‍ ചുമതല"
+                excerpt="അധികാരക്കൈമാറ്റം സമാധാനപരവും സുഗമവുമായി നടക്കുന്നുണ്ടെന്ന് ഉറപ്പാക്കാൻ..."
+                category="Kerala"
+                href="/story/ips-shrikumar"
+                date="June 12"
+              />
+              <div class="mt-6">
+                <ArticleList items={sampleItems.slice(0, 2)} />
+              </div>
+            </SectionBlock>
+          </div>
+        </section>
+
+        <!-- EditorialShelf -->
+        <section>
+          <SectionHeader title="EditorialShelf" titleEn="Columns Variant" />
+          <div class="mt-6 bg-white dark:bg-brand-dark border border-rule dark:border-ivory/10 p-4 sm:p-6 rounded-md">
+            <EditorialShelf
+              title="ഷെൽഫ്"
+              titleEn="Shelf"
+              viewAllHref="/shelf"
+              heroStory={shelfEditorialHero}
+              gridStories={shelfEditorialGrid}
+              gridVariant="columns"
+            />
+          </div>
+        </section>
+
+        <section>
+          <SectionHeader title="EditorialShelf" titleEn="Lists Variant" />
+          <div class="mt-6 bg-white dark:bg-brand-dark border border-rule dark:border-ivory/10 p-4 sm:p-6 rounded-md">
+            <EditorialShelf
+              title="കേരളം"
+              titleEn="Kerala"
+              viewAllHref="/kerala"
+              heroStory={keralaEditorialHero}
+              gridStories={keralaEditorialGrid}
+              gridVariant="lists"
+            />
+          </div>
+        </section>
+      </div>
+    </div>
+</DesignShell>

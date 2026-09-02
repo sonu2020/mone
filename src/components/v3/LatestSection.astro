@@ -1,0 +1,27 @@
+---
+// SECTION · LatestSection — "what else is new, and what's everyone reading?"
+// A Latest promo grid (8 cols) beside a Most-read numbered list (4 cols). The
+// bread-and-butter second band: recency on the left, popularity on the right.
+import SectionHeading from '../ui/SectionHeading.astro';
+import PromoGrid from '../news/PromoGrid.astro';
+import NumberedList from '../news/NumberedList.astro';
+import type { Story } from '../../lib/home-data';
+
+export interface Props {
+  latest: Story[];
+  mostRead: Story[];
+  latestHref?: string;
+  class?: string;
+}
+const { latest, mostRead, latestHref = '/latest-news', class: className = '' } = Astro.props;
+---
+<section class:list={['mc', 'grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-7 lg:py-10 border-t border-rule', className]}>
+  <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+    <SectionHeading title="ഏറ്റവും പുതിയത്" titleEn="Latest" viewAllHref={latestHref} />
+    <PromoGrid items={latest} cols={3} />
+  </div>
+  <aside class="lg:col-span-4 mt-9 lg:mt-0">
+    <SectionHeading title="ജനപ്രിയം" titleEn="Popular" />
+    <NumberedList items={mostRead} />
+  </aside>
+</section>

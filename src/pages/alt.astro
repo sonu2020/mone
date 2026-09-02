@@ -1,0 +1,116 @@
+---
+// ── /alt — isolated typography trial: Noto Sans / Noto Sans Malayalam only ──
+// Not routed through layouts/Layout.astro on purpose: this page owns its full
+// <html> document so the font-token override below can't leak to any other
+// route. It still reuses the real design-system kit (Header, Footer,
+// StoryCard, SectionHeading, PromoGrid, NumberedList, SectionColumn) and the
+// shared app.css utilities/tokens — only the font family changes.
+import '../styles/app.css';
+import Header from '../components/OldHeader.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import StoryCard from '../components/news/StoryCard.astro';
+import PromoGrid from '../components/news/PromoGrid.astro';
+import NumberedList from '../components/news/NumberedList.astro';
+import SectionColumn from '../components/news/SectionColumn.astro';
+import { hero, topStories, latest, cluster } from '../lib/home-data';
+
+const kerala = cluster('kerala');
+const gulf = cluster('gulf');
+const india = cluster('india');
+---
+
+<!DOCTYPE html>
+<html lang="ml" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Noto Sans Trial — /alt | MediaOne</title>
+    <meta name="description" content="Isolated typography trial: this page only, set entirely in Noto Sans / Noto Sans Malayalam." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#f8f9fa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1017" media="(prefers-color-scheme: dark)" />
+
+    <!-- Noto Sans + Noto Sans Malayalam — loaded only on this page -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Set theme before paint to avoid a flash (mirrors Layout.astro). -->
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <style>
+      /* Scoped to this document only (its own <html>, not the shared
+         Layout.astro). Every utility in app.css reads font-family from these
+         three tokens — overriding them here is enough to make the whole page
+         Noto Sans / Noto Sans Malayalam without touching app.css itself. */
+      html {
+        --font-sans: "Noto Sans", "Noto Sans Malayalam", system-ui, sans-serif;
+        --font-malayalam: "Noto Sans Malayalam", "Noto Sans", system-ui, sans-serif;
+        --font-malayalam-alt: "Noto Sans Malayalam", "Noto Sans", system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="min-h-dvh flex flex-col">
+    <Header isBreaking={false} />
+
+    <main class="flex-1 bg-bg-page">
+      <div class="w-full max-w-site mx-auto bg-bg-card">
+        <div class="px-4 sm:px-6 lg:px-8">
+
+          <!-- Trial banner -->
+          <div class="py-4 border-b border-rule">
+            <p class="eyebrow text-azure">Typography trial · isolated to /alt</p>
+            <p class="mt-1.5 body-small text-text-secondary max-w-prose">
+              Every headline, body copy, nav, and label on this page is set in Noto Sans / Noto Sans Malayalam only — components and layout are reused from the design system, just the font changes. No other page is affected.
+            </p>
+          </div>
+
+          <!-- Lead -->
+          <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-6 lg:py-8 border-b border-rule">
+            <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+              <StoryCard story={hero} ratio="16/9" size="lg" showExcerpt />
+            </div>
+            <aside class="lg:col-span-4 mt-8 lg:mt-0">
+              <SectionHeading title="ടോപ് സ്റ്റോറീസ്" titleEn="Top Stories" />
+              <NumberedList items={topStories} />
+            </aside>
+          </section>
+
+          <!-- Latest grid -->
+          <section class="py-6 lg:py-8 border-b border-rule">
+            <SectionHeading title="ഏറ്റവും പുതിയത്" titleEn="Latest" />
+            <PromoGrid items={latest.slice(0, 6)} cols={3} />
+          </section>
+
+          <!-- Section columns -->
+          <section class="py-6 lg:py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-9">
+              <SectionColumn cluster={kerala} class="lg:border-r border-rule lg:pr-8" />
+              <SectionColumn cluster={gulf} class="lg:border-r border-rule lg:pr-8" />
+              <SectionColumn cluster={india} />
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </main>
+
+    <Footer />
+  </body>
+</html>

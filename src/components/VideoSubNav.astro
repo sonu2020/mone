@@ -1,0 +1,49 @@
+---
+// COMPONENT · VideoSubNav — secondary section header shared across the whole
+// videos section (Videos hub, Programs, watch pages) so they read as one
+// cohesive product. Highlights the active tab from the current path.
+//
+// /videos/shows is deliberately absent: those pages still build and still work
+// if you go straight to them, but the section is unlisted, so nothing on the
+// site links into it.
+const tabs = [
+  { label: 'Videos', ml: 'വീഡിയോ', href: '/videos', match: ['/videos'] },
+  { label: 'Programs', ml: 'പരിപാടികൾ', href: '/programs', match: ['/programs'] },
+  { label: 'Live TV', ml: 'തത്സമയം', href: '/live', match: ['/live'] },
+];
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+function isActive(matches: string[]) {
+  return matches.some((m) => path === m || path.startsWith(m + '/'));
+}
+---
+
+<div class="border-b border-rule dark:border-ivory/10 bg-bg-card">
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-none -mb-px" aria-label="Video sections">
+      <span class="shrink-0 mr-3 flex items-center gap-1.5 text-azure">
+        <i class="ti ti-player-play text-base" aria-hidden="true"></i>
+        <span class="eyebrow hidden sm:inline">MediaOne TV</span>
+      </span>
+      {tabs.map((t) => {
+        const active = isActive(t.match);
+        return (
+          <a
+            href={t.href}
+            aria-current={active ? 'page' : undefined}
+            class:list={[
+              'shrink-0 flex items-baseline gap-1.5 px-3 py-3 nav-text whitespace-nowrap border-b-2 -mb-px transition-colors',
+              'focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2',
+              active
+                ? 'text-azure dark:text-azure-light border-azure dark:border-azure-light'
+                : 'text-ink-light hover:text-azure dark:text-ivory/70 dark:hover:text-azure-light border-transparent',
+            ]}
+          >
+            {t.label}
+            <span class="caption-text text-text-muted hidden md:inline">{t.ml}</span>
+          </a>
+        );
+      })}
+    </nav>
+  </div>
+</div>

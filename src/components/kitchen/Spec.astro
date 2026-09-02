@@ -1,0 +1,54 @@
+---
+// KITCHEN · Spec — the gallery frame around one live component demo. Carries the
+// component's name, source path and lifecycle status, and exposes them as data
+// attributes so the kitchen browser can filter without re-rendering anything.
+export interface Props {
+  name: string;
+  path?: string;              // repo path, e.g. components/home4/ThumbRow.astro
+  status?: 'production' | 'legacy' | 'atom';
+  note?: string;              // one line: what it is / when to reach for it
+  group: string;              // section id this belongs to
+  wide?: boolean;             // span the full gallery column
+  class?: string;
+}
+const {
+  name,
+  path,
+  status = 'production',
+  note,
+  group,
+  wide = false,
+  class: className = '',
+} = Astro.props;
+
+const chip = {
+  production: 'text-azure border-azure/40 bg-azure/5',
+  legacy: 'text-text-muted border-rule bg-bg-page',
+  atom: 'text-accent-cyan border-accent-cyan/40 bg-accent-cyan/5',
+}[status];
+
+const label = { production: 'Production', legacy: 'Legacy', atom: 'Atom' }[status];
+---
+
+<article
+  class:list={['mc', 'border border-rule dark:border-ivory/10 bg-bg-card', wide && 'lg:col-span-2', className]}
+  data-spec
+  data-name={name.toLowerCase()}
+  data-path={(path ?? '').toLowerCase()}
+  data-group={group}
+  data-status={status}
+>
+  <header class="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 border-b border-rule dark:border-ivory/10 px-5 py-3">
+    <h3 class="text-headline font-bold text-ink dark:text-ivory">{name}</h3>
+    <span class:list={['eyebrow border px-1.5 py-0.5 shrink-0', chip]}>{label}</span>
+    {path && <code class="ml-auto text-meta font-mono text-text-muted dark:text-ivory/40">{path}</code>}
+  </header>
+
+  {note && (
+    <p class="px-5 pt-3 body-small text-text-secondary dark:text-ivory/60 max-w-prose">{note}</p>
+  )}
+
+  <div class="p-5">
+    <slot />
+  </div>
+</article>

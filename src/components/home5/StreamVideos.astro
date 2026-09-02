@@ -1,0 +1,59 @@
+---
+// BLOCK · StreamVideos — a sideways run of stills dropped into the feed.
+//
+// The homepage gives video a full band with tabs and a picks column. Here it
+// gets one strip the reader scrolls across instead of down: enough of a change
+// of axis to register as a different kind of thing, small enough that it never
+// becomes a section the surrounding stories belong to. Tiles open the shared
+// VideoModal via `data-video-open`, exactly as the homepage's band does, and
+// fall back to /videos where the modal script has not loaded.
+import Media from '../ui/Media.astro';
+import Kicker from '../ui/Kicker.astro';
+import type { StreamVideo } from '../../lib/home5-stream';
+
+export interface Props {
+  label: string;
+  href: string;
+  videos: StreamVideo[];
+  class?: string;
+}
+const { label, href, videos, class: className = '' } = Astro.props;
+---
+
+<section class:list={['mc', 'py-6 sm:py-7', className]}>
+  <div class="flex items-baseline gap-4 pb-3.5">
+    <span class="band-label text-text-navy-deep dark:text-ivory">{label}</span>
+    <span class="h-px flex-1 bg-rule dark:bg-ivory/15" aria-hidden="true"></span>
+    <a href={href} class="eyebrow text-azure dark:text-azure-light hover:text-azure-dark dark:hover:text-azure transition-colors">All video →</a>
+  </div>
+
+  <!-- Edge-to-edge on small screens: the strip is meant to look cut off, so
+       the next tile is visible as an invitation rather than a surprise. The
+       negative margin is undone by matching padding on the track. -->
+  <div class="-mx-4 sm:mx-0 overflow-x-auto scrollbar-none overscroll-x-contain">
+    <div class="flex gap-4 px-4 sm:px-0 snap-x snap-mandatory">
+      {videos.map((video) => (
+        <a
+          href={video.href}
+          data-video-open={video.modalId}
+          class="group block w-56 sm:w-64 shrink-0 snap-start"
+        >
+          <div class="relative">
+            <Media seed={video.seed} src={video.imageUrl} ratio="16/9" w={520} zoom loading="lazy" class="rounded-md" />
+            {video.duration && (
+              <span class="absolute bottom-1.5 right-1.5 rounded bg-ink/80 px-1.5 py-0.5 eyebrow text-ivory tabular-nums">
+                {video.duration}
+              </span>
+            )}
+          </div>
+          <div class="pt-2 flex flex-col gap-1">
+            <Kicker text={video.category} />
+            <h3 class="headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2">
+              {video.title}
+            </h3>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

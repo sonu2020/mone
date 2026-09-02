@@ -1,0 +1,136 @@
+---
+// COMPONENT · ContentGridAd — a widgets.mgid.com native content-recommendation
+// slot. MGID's own script paints the grid (usually mixed English/Hindi), so
+// in production this component just owns placement, the "Promoted Content"
+// label, and a font reset — the container must not inherit the site's
+// variable Anek font stack, since MGID's markup carries its own fonts.
+//
+// Pass scriptSrc + containerId (straight from the embed snippet MGID or the
+// advertiser gives you) to go live. Until then it renders a dummy grid that
+// looks like a real MGID unit, so pages can be designed/reviewed against it.
+import Placeholder from '../Placeholder.astro';
+
+export interface AdItem {
+  title: string;
+  image?: string;
+  source: string;
+}
+
+export interface Props {
+  containerId?: string;
+  scriptSrc?: string;
+  items?: AdItem[];
+  class?: string;
+}
+
+// Dummy creative — the sensational-headline, mixed-language style real MGID
+// inventory actually serves, so the placeholder reads like the real thing.
+const DUMMY_ITEMS: AdItem[] = [
+  { title: 'Doctors Stunned: This One Trick Melts Belly Fat Overnight', source: 'HealthDaily', image: 'https://picsum.photos/seed/mgid-1/400/225' },
+  { title: 'ये 5 चीज़ें जो हर भारतीय को पता होनी चाहिए', source: 'WealthTips', image: 'https://picsum.photos/seed/mgid-2/400/225' },
+  { title: 'She Was Once The World’s Most Beautiful Girl, Now Look At Her', source: 'CelebNow', image: 'https://picsum.photos/seed/mgid-3/400/225' },
+  { title: 'क्रेडिट कार्ड से जुड़े ये राज़ आपको हैरान कर देंगे', source: 'FinancePro', image: 'https://picsum.photos/seed/mgid-4/400/225' },
+  { title: 'This Simple Trick Can Cut Your Electricity Bill by 50%', source: 'SmartSave', image: 'https://picsum.photos/seed/mgid-5/400/225' },
+  { title: 'पुरानी कार बेचने से पहले जान लें ये ज़रूरी बातें', source: 'AutoDekho', image: 'https://picsum.photos/seed/mgid-6/400/225' },
+];
+
+const {
+  containerId,
+  scriptSrc,
+  items = DUMMY_ITEMS,
+  class: className = '',
+} = Astro.props;
+
+// Real MGID units aren't a uniform grid — one featured card, then a pair,
+// repeating. Chunk into groups of 3 (featured + 2) to match that.
+const groups: AdItem[][] = [];
+for (let i = 0; i < items.length; i += 3) groups.push(items.slice(i, i + 3));
+---
+
+<section
+  class:list={['mc', className]}
+  aria-label="Promoted content"
+  data-content-ad
+  style="font-family: system-ui, 'Noto Sans Devanagari', sans-serif; font-variation-settings: normal;"
+>
+  <header class="flex items-center gap-3 mb-5">
+    <span class="text-[11px] uppercase tracking-widest text-text-muted">Promoted Content</span>
+    <span class="h-px flex-1 bg-rule" aria-hidden="true"></span>
+    <!-- Collapsible affordance, the way Google's own native-content units
+         (Matched Content) let a reader fold the block down to this bar. -->
+    <button
+      type="button"
+      data-content-ad-toggle
+      aria-expanded="true"
+      class="inline-flex items-center gap-1 text-[11px] text-text-muted hover:text-text-primary transition-colors"
+    >
+      <span data-content-ad-toggle-label>Hide</span>
+      <i class="ti ti-chevron-up text-sm" aria-hidden="true" data-content-ad-chevron></i>
+    </button>
+  </header>
+
+  <div data-content-ad-body class="overflow-hidden transition-[max-height,opacity] duration-300 ease-out">
+  {scriptSrc && containerId ? (
+    <div id={containerId} />
+    <script async is:inline src={scriptSrc}></script>
+  ) : (
+    <div class="flex flex-col">
+      {groups.map((group, gi) => (
+        <div class:list={[gi > 0 && 'mt-6 pt-6 border-t border-rule dark:border-ivory/10']}>
+          <a href="#" rel="sponsored nofollow noopener" class="flex flex-col sm:flex-row gap-4 group">
+            <div class="relative aspect-[16/9] sm:w-2/5 sm:shrink-0 overflow-hidden">
+              <Placeholder class="w-full h-full" src={group[0].image} alt="" />
+            </div>
+            <div class="min-w-0 flex flex-col justify-center">
+              <p class="text-base sm:text-lg leading-snug font-semibold text-text-primary group-hover:text-azure transition-colors line-clamp-3">
+                {group[0].title}
+              </p>
+              <p class="mt-1.5 text-xs text-text-muted">{group[0].source}</p>
+            </div>
+          </a>
+
+          {group.length > 1 && (
+            <div class="mt-5 grid grid-cols-2 gap-x-3 gap-y-5 sm:gap-x-5">
+              {group.slice(1).map((item) => (
+                <a href="#" rel="sponsored nofollow noopener" class="block group">
+                  <div class="relative aspect-[16/9] overflow-hidden">
+                    <Placeholder class="w-full h-full" src={item.image} alt="" />
+                  </div>
+                  <p class="mt-2 text-[13px] sm:text-[15px] leading-snug font-semibold text-text-primary group-hover:text-azure transition-colors line-clamp-3">
+                    {item.title}
+                  </p>
+                  <p class="mt-1 text-xs text-text-muted">{item.source}</p>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('[data-content-ad]').forEach(function (section) {
+      var btn = section.querySelector('[data-content-ad-toggle]');
+      var body = section.querySelector('[data-content-ad-body]');
+      var chevron = section.querySelector('[data-content-ad-chevron]');
+      var label = section.querySelector('[data-content-ad-toggle-label]');
+      if (!btn || !body) return;
+
+      body.style.maxHeight = body.scrollHeight + 'px';
+
+      btn.addEventListener('click', function () {
+        var expanded = btn.getAttribute('aria-expanded') !== 'false';
+        var next = !expanded;
+        btn.setAttribute('aria-expanded', String(next));
+        body.style.maxHeight = next ? body.scrollHeight + 'px' : '0px';
+        body.style.opacity = next ? '1' : '0';
+        if (chevron) { chevron.classList.toggle('ti-chevron-up', next); chevron.classList.toggle('ti-chevron-down', !next); }
+        if (label) label.textContent = next ? 'Hide' : 'Show';
+      });
+    });
+  })();
+</script>

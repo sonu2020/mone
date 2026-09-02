@@ -1,0 +1,137 @@
+---
+// COMPONENT · MediaPlayer — the ONE reusable inline video player for MediaOne.
+// Renders a lightweight facade (poster + black play square, zero player JS on
+// load). On first click it lazy-mounts the real player via src/lib/player.ts:
+//   • a file src  → Video.js v10 behind the MediaOne skin
+//   • a youtubeId → a raw autoplay iframe
+// A single delegated listener (bound once) activates any MediaPlayer on the
+// page, so N players cost one listener. Progressive: without JS the poster
+// still shows; the button is simply inert.
+import DummyImage from './DummyImage.astro';
+
+export interface Props {
+  src?: string; // mp4/hls URL
+  youtubeId?: string; // real YouTube id (wins over src)
+  poster?: string; // real poster image URL
+  title?: string;
+  seed?: string; // DummyImage seed when no poster
+  category?: string;
+  duration?: string;
+  ratio?: string; // aspect-ratio, e.g. "16/9"
+  id?: string;
+  class?: string;
+}
+
+const {
+  src,
+  youtubeId,
+  poster,
+  title = '',
+  seed,
+  category,
+  duration,
+  ratio = '16/9',
+  id,
+  class: className = '',
+} = Astro.props;
+
+// Serialize the source for the client. Escape < so a title can't break markup.
+const source = JSON.stringify({ src, youtubeId, poster, title }).replace(/</g, '\\u003c');
+---
+
+<div
+  id={id}
+  data-media-player
+  data-source={source}
+  class:list={[
+    'mc',
+    'relative overflow-hidden bg-black border border-rule dark:border-ivory/10 shadow-sm select-none',
+    className,
+  ]}
+  style={`aspect-ratio:${ratio}`}
+>
+  <button
+    type="button"
+    data-media-play
+    class="group absolute inset-0 w-full h-full cursor-pointer"
+    aria-label={title ? `Play: ${title}` : 'Play video'}
+  >
+    {
+      poster ? (
+        <img
+          src={poster}
+          alt={title}
+          loading="lazy"
+          class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+        />
+      ) : (
+        <DummyImage
+          class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+          w={1280}
+          h={720}
+          seed={seed || youtubeId || 'video'}
+        />
+      )
+    }
+    <span class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></span>
+
+    <!-- Play affordance — black square, bottom-left, filled triangle icon,
+         dim duration beside it. Square and chip share one height (size-10)
+         and sit flush against each other, no gap. -->
+    <span class="absolute bottom-3 left-3 flex items-stretch">
+      <span
+        class="size-10 rounded-xs bg-black/80 border border-white/15 backdrop-blur-xs flex items-center justify-center text-white shadow-md group-hover:bg-black group-hover:scale-105 transition-all duration-200"
+      >
+        <svg class="size-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.286 5.36a1.5 1.5 0 0 1 2.288-1.287l10.143 6.64a1.5 1.5 0 0 1 0 2.574L10.574 19.93A1.5 1.5 0 0 1 8.286 18.64V5.36z" />
+        </svg>
+      </span>
+      {
+        duration && (
+          <span class="h-10 flex items-center rounded-xs bg-black/60 text-ivory/70 border border-l-0 border-white/10 backdrop-blur-xs px-2.5 caption-text tabular-nums">
+            {duration}
+          </span>
+        )
+      }
+    </span>
+
+    {
+      category && (
+        <span class="absolute top-3 left-3 bg-black/75 text-white eyebrow px-2 py-0.5 rounded-sm backdrop-blur-xs">
+          {category}
+        </span>
+      )
+    }
+  </button>
+</div>
+
+<script>
+  import { mount, type PlayerSource } from '../lib/player';
+
+  // Bind once per page — one delegated listener serves every MediaPlayer.
+  const w = window as unknown as { __mediaPlayerBound?: boolean };
+  if (!w.__mediaPlayerBound) {
+    w.__mediaPlayerBound = true;
+
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as Element)?.closest?.('[data-media-play]');
+      if (!btn) return;
+      const host = btn.closest('[data-media-player]') as HTMLElement | null;
+      if (!host || host.dataset.mounted) return;
+
+      let source: PlayerSource;
+      try {
+        source = JSON.parse(host.dataset.source || '{}');
+      } catch {
+        return;
+      }
+
+      host.dataset.mounted = '1';
+      btn.remove(); // drop the facade button; the player fills the host
+      mount(host, source).catch(() => {
+        // On failure, allow a retry by restoring the mounted flag.
+        delete host.dataset.mounted;
+      });
+    });
+  }
+</script>

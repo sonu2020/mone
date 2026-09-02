@@ -1,0 +1,114 @@
+---
+// ── MediaOne /v3 ────────────────────────────────────────────────────────────
+// The thesis homepage. Pure composition: this file is a table of contents. Every
+// section is a self-contained block under src/components/v3/* that itself composes
+// only the design-system atoms + news blocks. Add a section → one import + one
+// tag. Remove a section → delete one tag. See thesis.md for the rationale.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/OldHeader.astro';
+import Footer from '../components/Footer.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+import LiveBar from '../components/v3/LiveBar.astro';
+import HeroSection from '../components/v3/HeroSection.astro';
+import LatestSection from '../components/v3/LatestSection.astro';
+import ShelfSection from '../components/v3/ShelfSection.astro';
+import VideoSection from '../components/v3/VideoSection.astro';
+import ShortsSection from '../components/v3/ShortsSection.astro';
+import ClusterDuo from '../components/v3/ClusterDuo.astro';
+import PhotoSection from '../components/v3/PhotoSection.astro';
+import MoreSection from '../components/v3/MoreSection.astro';
+
+import {
+  hero, topStories, latest, mostRead, cluster,
+  galleryItems, shelfEditorialHero, shelfEditorialGrid,
+  keralaEditorialHero, keralaEditorialGrid,
+} from '../lib/home-data';
+import { videoItems, shorts, featuredVideo } from '../lib/video-data';
+
+// ── Assemble the data ────────────────────────────────────────────────────────
+const kerala = cluster('kerala');
+const india = cluster('india');
+const gulf = cluster('gulf');
+const entertainment = cluster('entertainment');
+const sports = cluster('sports');
+
+const heroSecondaries = [latest[1], india.lead, gulf.lead];
+const moreNews = [...mostRead.slice(0, 4)];
+---
+
+<Layout title="MediaOne | Malayalam News" description="The most authoritative source for news in Malayalam.">
+  <Header isBreaking={false} />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto bg-bg-card">
+
+      <!-- 0 · LIVE SIGNAL — the broadcaster's "now" -->
+      <LiveBar />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 1 · LEAD — broadcast-frame hero + top-stories rail -->
+        <HeroSection hero={hero} secondaries={heroSecondaries} topStories={topStories} />
+      </div>
+
+      <AdSlot slot="v3-1" format="leaderboard" />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 2 · LATEST + POPULAR -->
+        <LatestSection latest={latest.slice(0, 6)} mostRead={mostRead} />
+      </div>
+
+      <!-- 3 · SHELF (branded in-depth) -->
+      <ShelfSection
+        title="ഷെൽഫ്"
+        titleEn="Shelf"
+        viewAllHref="/shelf"
+        heroStory={shelfEditorialHero}
+        gridStories={shelfEditorialGrid}
+        gridVariant="columns"
+      />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 4 · VIDEOS — elevated (broadcaster identity, the spine) -->
+        <VideoSection feature={featuredVideo} upNext={videoItems.slice(1, 5)} grid={videoItems.slice(0, 4)} />
+
+        <!-- 5 · SHORTS / REELS — the 40-second version -->
+        <ShortsSection items={shorts} />
+      </div>
+
+      <AdSlot slot="v3-2" format="leaderboard" />
+
+      <!-- 6 · KERALA (home market) -->
+      <ShelfSection
+        title="കേരളം"
+        titleEn="Kerala"
+        viewAllHref="/kerala"
+        heroStory={keralaEditorialHero}
+        gridStories={keralaEditorialGrid}
+        gridVariant="lists"
+      />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 7 · GULF + INDIA (diaspora beats, side by side) -->
+        <ClusterDuo left={gulf} right={india} />
+      </div>
+
+      <AdSlot slot="v3-3" format="leaderboard" />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 8 · ENTERTAINMENT + SPORTS (diversion beats, side by side) -->
+        <ClusterDuo left={entertainment} right={sports} />
+
+        <!-- 9 · PHOTO STORY — the image of the day -->
+        <PhotoSection items={galleryItems} />
+
+        <!-- 10 · MORE ACROSS MEDIAONE — the long tail -->
+        <MoreSection items={moreNews} />
+      </div>
+
+      <AdSlot slot="v3-4" format="rectangle" />
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

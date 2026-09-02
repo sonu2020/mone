@@ -1,0 +1,18 @@
+---
+// ATOM · MetaRow — the category · timestamp line. Pair with a Kicker above a
+// headline, or use inline beneath. `onDark` for over-image contexts.
+export interface Props {
+  category?: string;
+  date?: string;
+  tone?: 'default' | 'onDark';
+  class?: string;
+}
+const { category, date, tone = 'default', class: className = '' } = Astro.props;
+const cat = tone === 'onDark' ? 'text-azure-light' : 'text-azure';
+const dim = tone === 'onDark' ? 'text-white/55' : 'text-text-muted';
+---
+<div class:list={['mc', 'flex items-center gap-2 caption-text', className]}>
+  {category && <span class={cat}>{category}</span>}
+  {category && date && <span class={dim}>·</span>}
+  {date && <span class:list={[dim, 'tabular-nums']}>{date}</span>}
+</div>

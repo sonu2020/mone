@@ -1,0 +1,27 @@
+---
+// BLOCK · OverlayStory — image with the headline laid over a scrim. Heroes and
+// featured cards. Media(overlay+zoom) + onDark Kicker/Headline + optional Badge.
+import Media from '../ui/Media.astro';
+import Kicker from '../ui/Kicker.astro';
+import Headline from '../ui/Headline.astro';
+import Badge from '../ui/Badge.astro';
+import type { Story } from '../../lib/home-data';
+export interface Props {
+  story: Story;
+  ratio?: string;
+  size?: 'hero' | 'lg' | 'base';
+  badge?: string;
+  badgeVariant?: 'breaking' | 'live' | 'solid' | 'outline';
+  class?: string;
+}
+const { story, ratio = '16/9', size = 'lg', badge, badgeVariant = 'live', class: className = '' } = Astro.props;
+---
+<a href={story.href} class:list={['mc', 'group relative block', className]}>
+  <Media seed={story.href} ratio={ratio} overlay="strong" zoom />
+  {badge && <div class="absolute top-3 left-3"><Badge label={badge} variant={badgeVariant} /></div>}
+  <div class="absolute inset-x-0 bottom-0 p-4 sm:p-6 lg:p-7">
+    {story.category && <Kicker text={story.category} tone="onDark" class="mb-2 block" />}
+    <Headline as="h2" size={size} tone="onDark" text={story.title} clamp={3} />
+    {story.date && <p class="mt-2 caption-text text-white/55 tabular-nums">{story.date}</p>}
+  </div>
+</a>

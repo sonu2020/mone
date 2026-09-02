@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Contact Us — MediaOne" description="Contact MediaOne Online">
+  <Header />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto px-4 sm:px-6 md:px-8 py-10">
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">Contact Us</span>
+      </nav>
+
+      <h1 class="text-hero font-bold text-text-primary text-balance">Contact Us</h1>
+
+      <div class="mt-8 max-w-prose space-y-5 text-body text-text-primary">
+        <p>
+          We value your feedback, story tips, and partnership enquiries. Reach out to the MediaOne team using the information below.
+        </p>
+
+        <div class="mt-8 space-y-4">
+          <div class="p-4 border border-rule bg-bg-card">
+            <h2 class="section-header text-text-primary">Editorial Desk</h2>
+            <p class="mt-1 text-meta text-text-muted">editor@mediaoneonline.com</p>
+          </div>
+          <div class="p-4 border border-rule bg-bg-card">
+            <h2 class="section-header text-text-primary">Newsroom</h2>
+            <p class="mt-1 text-meta text-text-muted">news@mediaoneonline.com</p>
+          </div>
+          <div class="p-4 border border-rule bg-bg-card">
+            <h2 class="section-header text-text-primary">Advertising</h2>
+            <p class="mt-1 text-meta text-text-muted">ads@mediaoneonline.com</p>
+          </div>
+          <div class="p-4 border border-rule bg-bg-card">
+            <h2 class="section-header text-text-primary">Head Office</h2>
+            <p class="mt-1 text-meta text-text-muted">MediaOne, Kozhikode, Kerala, India</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

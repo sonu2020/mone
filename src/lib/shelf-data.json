@@ -1,0 +1,387 @@
+{
+  "meta": {
+    "source": "https://www.mediaoneonline.com/mediaone-shelf",
+    "scrapedAt": "2026-06-25",
+    "totalArticles": 24,
+    "categories": [
+      "Analysis",
+      "Interview",
+      "Column",
+      "Art and Literature",
+      "Life Story"
+    ]
+  },
+  "navigation": [
+    {
+      "label": "Interview",
+      "href": "/shelf/interview"
+    },
+    {
+      "label": "Podcast",
+      "href": "/shelf/podcast"
+    },
+    {
+      "label": "Rack",
+      "href": "/shelf"
+    },
+    {
+      "label": "Analysis",
+      "href": "/shelf/analysis"
+    },
+    {
+      "label": "Life Story",
+      "href": "/shelf/life-story"
+    },
+    {
+      "label": "Column",
+      "href": "/shelf/column"
+    },
+    {
+      "label": "Art and Literature",
+      "href": "/shelf/art-and-literature"
+    },
+    {
+      "label": "Videos",
+      "href": "/shelf/videos"
+    }
+  ],
+  "featured": [
+    {
+      "slug": "vincius-jnior-life-story-327688",
+      "title": "വിനീഷ്യസ് ജൂനിയർ.. വെറുക്കപ്പെട്ടവനിൽ നിന്നും പ്രിയപ്പെട്ടവനിലേക്കുള്ള ദൂരം",
+      "category": "Football",
+      "shelfCategory": "Analysis",
+      "author": "സഫ്‌വാന്‍ റാഷിദ്",
+      "authorSlug": "user-46482",
+      "image": "https://www.mediaoneonline.com/h-upload/2026/06/20/500x300_1556717-8.webp",
+      "href": "/shelf/vincius-jnior-life-story-327688",
+      "date": "20 Jun 2026"
+    },
+    {
+      "slug": "media-scan-latest-episode-327683",
+      "title": "രണ്ട് ജനാധിപത്യ രാജ്യങ്ങൾ; രണ്ടുതരം മാധ്യമ വേട്ട",
+      "category": "Analysis",
+      "shelfCategory": "Analysis",
+      "author": "യാസീന്‍ അശ്‌റഫ്",
+      "authorSlug": "user-27958",
+      "image": "https://www.mediaoneonline.com/h-upload/2026/06/20/500x300_1556710-untitled-1.webp",
+      "href": "/shelf/media-scan-latest-episode-327683",
+      "date": "20 Jun 2026"
+    },
+    {
+      "slug": "should-sir-india-live-or-die-327553",
+      "title": "എസ്ഐആർ ഇന്ത്യ ജീവിക്കണോ മരിക്കണോ?",
+      "category": "Column",
+      "shelfCategory": "Column",
+      "author": "പ്രമോദ് രാമൻ",
+      "authorSlug": "pramod-raman",
+      "image": "https://www.mediaoneonline.com/h-upload/2026/06/19/500x300_1556438-ami.webp",
+      "href": "/shelf/should-sir-india-live-or-die-327553",
+      "date": "19 Jun 2026"
+    },
+    {
+      "slug": "cristiano-ronaldo-never-write-him-off-327442",
+      "title": "എഴുതിത്തള്ളാറായിട്ടില്ല, ആ കിരീടം അയാളെ അർഹിക്കുന്നുണ്ട്",
+      "category": "Football",
+      "shelfCategory": "Analysis",
+      "author": "ഷെബീൻ മെഹബൂബ്",
+      "authorSlug": "shebeenmehaboob",
+      "image": "https://www.mediaoneonline.com/h-upload/2026/06/18/500x300_1556220-kjdsbf.webp",
+      "href": "/shelf/cristiano-ronaldo-never-write-him-off-327442",
+      "date": "18 Jun 2026"
+    },
+    {
+      "slug": "fyugp-a-new-chapter-in-higher-education-or-a-new-challenge-for-students-327077",
+      "title": "FYUGP: ഉന്നത വിദ്യാഭ്യാസത്തിലെ പുതിയ അധ്യായമോ, വിദ്യാർഥികൾക്കുള്ള പുതിയ വെല്ലുവിളിയോ?",
+      "category": "Analysis",
+      "shelfCategory": "Analysis",
+      "author": "എം.സി ഷാജഹാൻ",
+      "authorSlug": "shajahan",
+      "image": "https://www.mediaoneonline.com/h-upload/2026/06/15/500x300_1555478-graduation.webp",
+      "href": "/shelf/fyugp-a-new-chapter-in-higher-education-or-a-new-challenge-for-students-327077",
+      "date": "15 Jun 2026"
+    }
+  ],
+  "sections": [
+    {
+      "id": "analysis",
+      "title": "Analysis",
+      "titleML": "വിശകലനം",
+      "href": "/shelf/analysis",
+      "articles": [
+        {
+          "slug": "vincius-jnior-life-story-327688",
+          "title": "വിനീഷ്യസ് ജൂനിയർ.. വെറുക്കപ്പെട്ടവനിൽ നിന്നും പ്രിയപ്പെട്ടവനിലേക്കുള്ള ദൂരം",
+          "category": "Football",
+          "author": "സഫ്‌വാന്‍ റാഷിദ്",
+          "authorSlug": "user-46482",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/20/500x300_1556717-8.webp",
+          "href": "/shelf/vincius-jnior-life-story-327688",
+          "date": "20 Jun 2026"
+        },
+        {
+          "slug": "media-scan-latest-episode-327683",
+          "title": "രണ്ട് ജനാധിപത്യ രാജ്യങ്ങൾ; രണ്ടുതരം മാധ്യമ വേട്ട",
+          "category": "Analysis",
+          "author": "യാസീന്‍ അശ്‌റഫ്",
+          "authorSlug": "user-27958",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/20/500x300_1556710-untitled-1.webp",
+          "href": "/shelf/media-scan-latest-episode-327683",
+          "date": "20 Jun 2026"
+        },
+        {
+          "slug": "cristiano-ronaldo-never-write-him-off-327442",
+          "title": "എഴുതിത്തള്ളാറായിട്ടില്ല, ആ കിരീടം അയാളെ അർഹിക്കുന്നുണ്ട്",
+          "category": "Football",
+          "author": "ഷെബീൻ മെഹബൂബ്",
+          "authorSlug": "shebeenmehaboob",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/18/500x300_1556220-kjdsbf.webp",
+          "href": "/shelf/cristiano-ronaldo-never-write-him-off-327442",
+          "date": "18 Jun 2026"
+        },
+        {
+          "slug": "fyugp-a-new-chapter-in-higher-education-or-a-new-challenge-for-students-327077",
+          "title": "FYUGP: ഉന്നത വിദ്യാഭ്യാസത്തിലെ പുതിയ അധ്യായമോ, വിദ്യാർഥികൾക്കുള്ള പുതിയ വെല്ലുവിളിയോ?",
+          "category": "Analysis",
+          "author": "എം.സി ഷാജഹാൻ",
+          "authorSlug": "shajahan",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/15/500x300_1555478-graduation.webp",
+          "href": "/shelf/fyugp-a-new-chapter-in-higher-education-or-a-new-challenge-for-students-327077",
+          "date": "15 Jun 2026"
+        }
+      ]
+    },
+    {
+      "id": "interview",
+      "title": "Interview",
+      "titleML": "അഭിമുഖം",
+      "href": "/shelf/interview",
+      "articles": [
+        {
+          "slug": "feminichi-fathima-director-fasil-muhammed-interview-305459",
+          "title": "ഒരുപാട് ഫാത്തിമമാർക്ക് ഇടയിൽ വച്ചാണ് ഫെമിനിച്ചി ഫാത്തിമ ഷൂട്ട് ചെയ്തത്",
+          "category": "Interview",
+          "author": "ഹനൂന്‍ റസീന അഷ്റഫ്",
+          "authorSlug": "user-50066",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/11/04/500x300_1507604-untitled-2-recovered.webp",
+          "href": "/shelf/feminichi-fathima-director-fasil-muhammed-interview-305459",
+          "date": "04 Nov 2025"
+        },
+        {
+          "slug": "rima-has-put-in-the-effort-of-getting-paid-for-three-films-not-many-people-have-used-her-as-an-actor-sajin-babu-speaks-303110",
+          "title": "റിമ ചെയ്തത് മൂന്ന് സിനിമയ്ക്ക് വാങ്ങുന്ന പ്രതിഫലത്തിന്റെ എഫർട്ട്, ഒരു അഭിനേതാവ് എന്ന നിലയിൽ അവരെ പലരും യൂസ് ചെയ്‌തിട്ടില്ല",
+          "category": "Entertainment",
+          "author": "ഫർസാന ജലീൽ",
+          "authorSlug": "farsanajaleel",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/10/16/500x300_1502925-untitled-1.webp",
+          "href": "/shelf/rima-has-put-in-the-effort-of-getting-paid-for-three-films-not-many-people-have-used-her-as-an-actor-sajin-babu-speaks-303110",
+          "date": "16 Oct 2025"
+        },
+        {
+          "slug": "karinji-movie-director-sheethal-ns-interview-301050",
+          "title": "നമ്മുടെ കാഴ്ചപ്പാടിൽ നിന്ന് കൊണ്ട് സിനിമയിൽ പരീക്ഷണം തുടരാനുള്ള പ്രോത്സാഹനമാണ് ഫെസ്റ്റിവൽ",
+          "category": "Interview",
+          "author": "ഷബാസ് ഹാരിസ്",
+          "authorSlug": "shabasharis",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/09/25/500x300_1498339-untitled-2.webp",
+          "href": "/shelf/karinji-movie-director-sheethal-ns-interview-301050",
+          "date": "25 Sep 2025"
+        },
+        {
+          "slug": "interview-engandiyoor-chandrasekharan-288721",
+          "title": "കവിതയെനിക്ക് സമരം മാത്രമല്ല, ആയുധം കൂടിയാണ്, കണ്ണോട് കണ്ണായിടാം എന്ന പാട്ട് ഒരു ജോബ് കുര്യൻ മാജിക്കാണ്",
+          "category": "Interview",
+          "author": "നജ്മ മജീദ്",
+          "authorSlug": "user-53858",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/05/18/500x300_1475303-engandiyur.webp",
+          "href": "/shelf/interview-engandiyoor-chandrasekharan-288721",
+          "date": "18 May 2025"
+        },
+        {
+          "slug": "the-waqf-amendment-bill-eliminates-the-concept-of-waqf-285221",
+          "title": "വഖഫ് ഭേദഗതി നിയമം മുനമ്പത്തുകാർക്ക് ഗുണകരമാകുമോ എന്ന് സംശയം",
+          "category": "Interview",
+          "author": "മനു സെബാസ്റ്റ്യൻ",
+          "authorSlug": "manusebastian",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/04/09/500x300_1469719-untitled-1.webp",
+          "href": "/shelf/the-waqf-amendment-bill-eliminates-the-concept-of-waqf-285221",
+          "date": "09 Apr 2025"
+        },
+        {
+          "slug": "interview-with-shooba-ks-about-his-new-drama-283159",
+          "title": "ശാകുന്തളം മുതൽ സാമുദ്രകം വരെ - ശകുന്തളയുടെ സഞ്ചാരങ്ങൾ",
+          "category": "Interview",
+          "author": "അനസ് അസീന്‍",
+          "authorSlug": "wj-anas-aseen-s",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/03/19/500x300_1466543-untitled-1-recovered.webp",
+          "href": "/shelf/interview-with-shooba-ks-about-his-new-drama-283159",
+          "date": "19 Mar 2025"
+        }
+      ]
+    },
+    {
+      "id": "column",
+      "title": "Column",
+      "titleML": "കോളം",
+      "href": "/shelf/column",
+      "articles": [
+        {
+          "slug": "should-sir-india-live-or-die-327553",
+          "title": "എസ്ഐആർ ഇന്ത്യ ജീവിക്കണോ മരിക്കണോ?",
+          "category": "Column",
+          "author": "പ്രമോദ് രാമൻ",
+          "authorSlug": "pramod-raman",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/19/500x300_1556438-ami.webp",
+          "href": "/shelf/should-sir-india-live-or-die-327553",
+          "date": "19 Jun 2026"
+        },
+        {
+          "slug": "invisible-lives-undiscussed-women-work-sector-in-kerala-media-one-shelf-325841",
+          "title": "അദൃശ്യ ജീവിതങ്ങൾ: കേരളം ചർച്ച ചെയ്യാത്ത സ്ത്രീകളുടെ തൊഴിൽ മേഖല",
+          "category": "Shelf",
+          "author": "നഹ്ദ ടി.കെ",
+          "authorSlug": "nahdatk",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/03/500x300_1552911-mk.webp",
+          "href": "/shelf/invisible-lives-undiscussed-women-work-sector-in-kerala-media-one-shelf-325841",
+          "date": "03 Jun 2026"
+        },
+        {
+          "slug": "pep-guardiola-jurgen-klopp-football-premier-league-325782",
+          "title": "സ്ഥലകാലങ്ങളുടെ സിംഫണി: പെപ്പും ക്ലോപ്പും മാറ്റിയെഴുതിയ ഫുട്ബോൾ",
+          "category": "World",
+          "author": "ആത്തിക്ക് ഹനീഫ്",
+          "authorSlug": "author-athique-haneef",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/02/500x300_1552753-scfx.webp",
+          "href": "/shelf/pep-guardiola-jurgen-klopp-football-premier-league-325782",
+          "date": "02 Jun 2026"
+        },
+        {
+          "slug": "who-is-the-strategist-mo-bopath-who-changed-the-course-of-bangalore-325596",
+          "title": "ആർത്തിയെന്ന് തെറ്റിദ്ധരിച്ച ആ വാക്കുകൾ; ഇന്ന് ആർസിബിയുടെ വിജയചരിത്രം! ആരാണ് ബാംഗ്ലൂരിന്റെ തലവര മാറ്റിയ മോ ബൊപാത് എന്ന തന്ത്രജ്ഞൻ?",
+          "category": "Shelf",
+          "author": "സോനു സഫീർ",
+          "authorSlug": "user-30391",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/01/500x300_1552325-rcb-rcb.webp",
+          "href": "/shelf/who-is-the-strategist-mo-bopath-who-changed-the-course-of-bangalore-325596",
+          "date": "01 Jun 2026"
+        },
+        {
+          "slug": "pep-guardiola-master-of-the-masters-324818",
+          "title": "പെപ് ഗ്വാർഡിയോള: മാസ്റ്റർ ഓഫ് ദി മാസ്റ്റേഴ്സ്",
+          "category": "Football",
+          "author": "ആത്തിക്ക് ഹനീഫ്",
+          "authorSlug": "author-athique-haneef",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/05/24/500x300_1550475-xfdv.webp",
+          "href": "/shelf/pep-guardiola-master-of-the-masters-324818",
+          "date": "24 May 2026"
+        },
+        {
+          "slug": "forms-of-resistance-the-sculptures-of-haseena-suresh-322824",
+          "title": "പ്രതിരോധത്തിന്റെ രൂപങ്ങൾ: ഹസീന സുരേഷിന്റെ ശിൽപ്പങ്ങൾ",
+          "category": "Column",
+          "author": "മെഹ അസ്ഗർ",
+          "authorSlug": "mehaasgar",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/05/05/500x300_1546210-pp.webp",
+          "href": "/shelf/forms-of-resistance-the-sculptures-of-haseena-suresh-322824",
+          "date": "05 May 2026"
+        }
+      ]
+    },
+    {
+      "id": "art-and-literature",
+      "title": "Art and Literature",
+      "titleML": "കലയും സാഹിത്യവും",
+      "href": "/shelf/art-and-literature",
+      "articles": [
+        {
+          "slug": "war-in-arabic-literature-321251",
+          "title": "അറബി സാഹിത്യത്തിലെ യുദ്ധം: വീര്യത്തിന്റെ സംഗീതം മുതൽ വിനാശത്തിന്റെ വിലാപം വരെ",
+          "category": "Analysis",
+          "author": "ഡോ. ഹഫീദ് നദ്‌വി",
+          "authorSlug": "hafeednadwi",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/04/19/500x300_1542517-thbgvbc.webp",
+          "href": "/shelf/war-in-arabic-literature-321251",
+          "date": "19 Apr 2026"
+        },
+        {
+          "slug": "pennum-porattum-changing-the-beauty-standards-of-the-cinematic-visuals-315290",
+          "title": "സിനിമയുടെ കാഴ്ചകളുടെ സൗന്ദര്യത്തെ അട്ടിമറിക്കുന്ന പെണ്ണും പൊറാട്ടും",
+          "category": "Shelf",
+          "author": "രൂപേഷ് കുമാര്‍",
+          "authorSlug": "user-32099",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/02/14/500x300_1529234-p.webp",
+          "href": "/shelf/pennum-porattum-changing-the-beauty-standards-of-the-cinematic-visuals-315290",
+          "date": "14 Feb 2026"
+        },
+        {
+          "slug": "concepts-that-revived-the-arabic-language-313364",
+          "title": "പ്രതിരോധ - തടവറ സാഹിത്യങ്ങൾ: അറബി ഭാഷയ്ക്ക് പുനർജനി നല്കിയ സങ്കേതങ്ങൾ",
+          "category": "Shelf",
+          "author": "ഡോ. ഹഫീദ് നദ്‌വി",
+          "authorSlug": "hafeednadwi",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/01/26/500x300_1525164-p.webp",
+          "href": "/shelf/concepts-that-revived-the-arabic-language-313364",
+          "date": "26 Jan 2026"
+        },
+        {
+          "slug": "maqamat-marking-the-beauty-of-language-310403",
+          "title": "മഖാമാത്ത്: ഭാഷാസൗന്ദര്യത്തിന്റെ അടയാളപ്പെടുത്തൽ",
+          "category": "Art and Literature",
+          "author": "ഡോ. ഹഫീദ് നദ്‌വി",
+          "authorSlug": "hafeednadwi",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/12/26/500x300_1518928-untitled-1.webp",
+          "href": "/shelf/maqamat-marking-the-beauty-of-language-310403",
+          "date": "26 Dec 2025"
+        }
+      ]
+    },
+    {
+      "id": "life-story",
+      "title": "Life Story",
+      "titleML": "ജീവിതകഥ",
+      "href": "/shelf/life-story",
+      "articles": [
+        {
+          "slug": "story-about-nadibalam-randathani-325997",
+          "title": "ചന്തകളിൽ നിന്ന് ഇൻസ്റ്റാഗ്രാം റീൽസിലേക്ക്; നാടിബലം എന്ന നാടൻ സ്റ്റാർട്ടപ്പ് കഥ",
+          "category": "Life Story",
+          "author": "ശ്രീതു",
+          "authorSlug": "sreethu",
+          "image": "https://www.mediaoneonline.com/h-upload/2026/06/04/500x300_1553241-untitled-1.webp",
+          "href": "/shelf/story-about-nadibalam-randathani-325997",
+          "date": "04 Jun 2026"
+        },
+        {
+          "slug": "comrade-vs-achuthanandan-is-my-co-star-adam-ayub-299176",
+          "title": "സഖാവ് വി.എസ് അച്യുതാനന്ദൻ എന്റെ സഹനടൻ: ആദം അയൂബ്",
+          "category": "Life Story",
+          "author": "ആദം അയ്യൂബ്",
+          "authorSlug": "user-31663",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/09/03/500x300_1494363-untitled-1-recovered.webp",
+          "href": "/shelf/comrade-vs-achuthanandan-is-my-co-star-adam-ayub-299176",
+          "date": "03 Sep 2025"
+        },
+        {
+          "slug": "hala-al-khatib-is-an-english-literature-student-from-gaza-288931",
+          "title": "അമ്മായീ, നമ്മൾ എന്നാണ് സ്വർഗത്തിലേക്ക് പോവുക?; ഗസ്സയിലെ കുഞ്ഞുങ്ങളുടെ ചോദ്യം ലോകത്തിന് മുന്നിലെത്തിച്ച ഹാല",
+          "category": "Life Story",
+          "author": "ഫാത്തിമ സംഹ സി.കെ",
+          "authorSlug": "user-53935",
+          "image": "https://www.mediaoneonline.com/h-upload/2025/05/20/500x300_1475620-untitled-1.webp",
+          "href": "/shelf/hala-al-khatib-is-an-english-literature-student-from-gaza-288931",
+          "date": "20 May 2025"
+        },
+        {
+          "slug": "vinicius-jr-life-story-and-politics-275566",
+          "title": "വിനീഷ്യസ്... നിങ്ങൾ പോരാട്ടം തുടരുക",
+          "category": "Football",
+          "author": "സഫ്‌വാന്‍ റാഷിദ്",
+          "authorSlug": "user-46482",
+          "image": "https://www.mediaoneonline.com/h-upload/2024/12/21/500x300_1455519-8.webp",
+          "href": "/shelf/vinicius-jr-life-story-and-politics-275566",
+          "date": "21 Dec 2024"
+        }
+      ]
+    }
+  ]
+}

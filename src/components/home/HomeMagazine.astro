@@ -1,0 +1,159 @@
+---
+// ── Magazine (previous production homepage, preserved for comparison) ─────
+// Snapshot of the pre-"Modular" homepage: OverlayStory hero (large headline),
+// EditorialShelf 50/50 bands for Kerala/Gulf/India. Kept here — unchanged —
+// so this direction stays reachable at /home/magazine after index.astro
+// switched to HomeModular. See HomeModular.astro for the current homepage.
+import AdSlot from '../AdSlot.astro';
+import PhotoGallery from '../PhotoGallery.astro';
+import EditorialShelf from '../news/EditorialShelf.astro';
+import AsymmetricShelf from '../news/AsymmetricShelf.astro';
+import CategoryColumnsShelf from '../news/CategoryColumnsShelf.astro';
+import OverlayStory from '../news/OverlayStory.astro';
+import StoryCard from '../news/StoryCard.astro';
+import StoryList from '../news/StoryList.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import PromoGrid from '../news/PromoGrid.astro';
+import NumberedList from '../news/NumberedList.astro';
+import TopVideosShelf from '../news/TopVideosShelf.astro';
+
+import {
+  hero,
+  topStories,
+  latest,
+  mostRead,
+  cluster,
+  galleryItems,
+  shelfEditorialHero,
+  shelfEditorialGrid,
+  keralaEditorialHero,
+  keralaEditorialGrid
+} from '../../lib/home-data';
+import { videoItems } from '../../lib/video-data';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+const gulf = cluster('gulf');
+const entertainment = cluster('entertainment');
+const sports = cluster('sports');
+---
+
+<div class:list={['mc', 'w-full max-w-site mx-auto bg-bg-card']}>
+  <div class="px-4 sm:px-6 lg:px-8">
+
+    <!-- 1 · LEAD — image-led hero + top-stories rail -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-5 lg:py-7">
+      <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+        <OverlayStory story={hero} ratio="16/9" size="hero" badge="Live" badgeVariant="live" />
+        <p class="mt-4 lead-text text-text-secondary max-w-prose">{hero.excerpt}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-7 pt-7 border-t border-rule">
+          {[latest[1], india.lead, gulf.lead].map((s) => <StoryCard story={s} ratio="16/10" />)}
+        </div>
+      </div>
+      <aside class="lg:col-span-4 mt-9 lg:mt-0">
+        <h2 class="section-header text-ink pb-2.5 mb-4 border-b-2 border-ink">ടോപ് സ്റ്റോറീസ്</h2>
+        <StoryCard story={topStories[0]} ratio="16/9" size="lg" class="mb-4 pb-4 border-b border-rule" />
+        <StoryList items={topStories.slice(1)} />
+      </aside>
+    </section>
+  </div>
+
+  <AdSlot slot="home-1" format="leaderboard" />
+
+  <div class="px-4 sm:px-6 lg:px-8">
+    <!-- 2 · LATEST + POPULAR -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-5 lg:py-7 border-t border-rule">
+      <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+        <SectionHeading title="ഏറ്റവും പുതിയത്" titleEn="Latest" viewAllHref="/latest-news" />
+        <PromoGrid items={latest.slice(0, 6)} cols={3} />
+      </div>
+      <aside class="lg:col-span-4 mt-9 lg:mt-0">
+        <SectionHeading title="ജനപ്രിയം" titleEn="Popular" />
+        <NumberedList items={mostRead} />
+      </aside>
+    </section>
+  </div>
+
+  <!-- 3 · SHELF (branded in-depth) -->
+  <div class="px-4 sm:px-6 lg:px-8 border-t border-rule dark:border-ivory/10">
+    <AsymmetricShelf
+      title="ഷെൽഫ്"
+      titleEn="Shelf"
+      viewAllHref="/shelf"
+      leadStory={shelfEditorialHero}
+      bottomStories={[...shelfEditorialGrid, topStories[3]]}
+      sidebarStories={[mostRead[0], mostRead[1], mostRead[2]]}
+    />
+  </div>
+</div>
+
+<!-- 4 · TOP VIDEOS (Full-bleed Blue Band) -->
+<TopVideosShelf
+  title="വീഡിയോ"
+  titleEn="TOP VIDEOS"
+  viewAllHref="/videos"
+  videos={videoItems}
+/>
+
+<div class:list={['mc', 'w-full max-w-site mx-auto bg-bg-card']}>
+  <AdSlot slot="home-2" format="leaderboard" />
+
+  <div class="px-4 sm:px-6 lg:px-8">
+    <!-- 5 · KERALA -->
+    <EditorialShelf
+      title="കേരളം"
+      titleEn="Kerala"
+      viewAllHref="/kerala"
+      heroStory={keralaEditorialHero}
+      gridStories={keralaEditorialGrid}
+      gridVariant="lists"
+      class="border-t border-rule dark:border-ivory/10"
+    />
+
+    <!-- 6 · GULF -->
+    <EditorialShelf
+      title={gulf.name}
+      titleEn={gulf.nameEn}
+      viewAllHref={gulf.href}
+      heroStory={gulf.lead}
+      gridStories={gulf.items}
+      gridVariant="columns"
+      class="border-t border-rule dark:border-ivory/10"
+    />
+
+    <!-- 7 · INDIA -->
+    <EditorialShelf
+      title={india.name}
+      titleEn={india.nameEn}
+      viewAllHref={india.href}
+      heroStory={india.lead}
+      gridStories={india.items}
+      gridVariant="columns"
+      class="border-t border-rule dark:border-ivory/10"
+    />
+  </div>
+
+  <AdSlot slot="home-3" format="leaderboard" />
+
+  <div class="px-4 sm:px-6 lg:px-8">
+    <!-- 8 · CATEGORY COLUMNS -->
+    <CategoryColumnsShelf
+      clusters={[kerala, gulf, entertainment, sports]}
+      class="border-t border-rule dark:border-ivory/10"
+    />
+
+    <!-- 9 · PHOTO STORY -->
+    <section class="py-5 lg:py-7 border-t border-rule">
+      <SectionHeading title="ചിത്രങ്ങൾ" titleEn="Photo Story" viewAllHref="/" />
+      <PhotoGallery items={galleryItems} />
+    </section>
+
+    <!-- 10 · MORE ACROSS MEDIAONE -->
+    <section class="py-5 lg:py-7 border-t border-rule">
+      <SectionHeading title="കൂടുതൽ" titleEn="More from MediaOne" />
+      <PromoGrid items={[...mostRead.slice(0, 4)]} cols={4} />
+    </section>
+  </div>
+
+  <AdSlot slot="home-4" format="rectangle" />
+</div>

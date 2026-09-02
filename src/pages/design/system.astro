@@ -1,0 +1,567 @@
+---
+import DesignShell from '../../components/design/DesignShell.astro';
+import Placeholder from '../../components/Placeholder.astro';
+import StoryListItem from '../../components/news/StoryListItem.astro';
+import AdSlot from '../../components/AdSlot.astro';
+
+// The composable library — dogfooded live in the Composition section below.
+import Kicker from '../../components/ui/Kicker.astro';
+import MetaRow from '../../components/ui/MetaRow.astro';
+import Headline from '../../components/ui/Headline.astro';
+import Media from '../../components/ui/Media.astro';
+import Badge from '../../components/ui/Badge.astro';
+import StoryCard from '../../components/news/StoryCard.astro';
+import StoryList from '../../components/news/StoryList.astro';
+import OverlayStory from '../../components/news/OverlayStory.astro';
+import NumberedList from '../../components/news/NumberedList.astro';
+import EditorialShelf from '../../components/news/EditorialShelf.astro';
+import AsymmetricShelf from '../../components/news/AsymmetricShelf.astro';
+import CategoryColumnsShelf from '../../components/news/CategoryColumnsShelf.astro';
+import TopVideosShelf from '../../components/news/TopVideosShelf.astro';
+import {
+  hero,
+  topStories,
+  mostRead,
+  cluster,
+  shelfEditorialHero,
+  shelfEditorialGrid,
+  keralaEditorialHero,
+  keralaEditorialGrid
+} from '../../lib/home-data';
+import { videoItems } from '../../lib/video-data';
+const demoKerala = cluster('kerala');
+
+// ─── Type scale (mirrors @theme in src/styles/app.css) ───────────────────────
+const typeScale = [
+  { token: 'display', cls: 'text-display', size: '3.5rem', lh: '1.06', weight: '700', role: 'Cover splash, system hero' },
+  { token: 'hero', cls: 'text-hero', size: '2.75rem', lh: '1.12', weight: '700', role: 'Lead story headline' },
+  { token: 'title', cls: 'text-title', size: '1.875rem', lh: '1.2', weight: '700', role: 'Section feature' },
+  { token: 'section', cls: 'text-section', size: '1.5rem', lh: '1.27', weight: '600', role: 'Section heading' },
+  { token: 'headline', cls: 'text-headline', size: '1.125rem', lh: '1.34', weight: '600', role: 'Card / list headline' },
+  { token: 'lead', cls: 'text-lead', size: '1.1875rem', lh: '1.62', weight: '400', role: 'Article lead paragraph' },
+  { token: 'body', cls: 'text-body', size: '1.0625rem', lh: '1.72', weight: '400', role: 'Long-form body' },
+  { token: 'nav', cls: 'text-nav', size: '0.875rem', lh: '1.4', weight: '600', role: 'Navigation, links' },
+  { token: 'meta', cls: 'text-meta', size: '0.8125rem', lh: '1.5', weight: '500', role: 'Timestamps, bylines' },
+  { token: 'caption', cls: 'text-caption', size: '0.75rem', lh: '1.45', weight: '400', role: 'Fine print, captions' },
+];
+
+const neutrals = [
+  { name: 'ink', cls: 'bg-ink', oklch: '0.376 0.065 262', use: 'Headlines, body, footer — navy #2e4164' },
+  { name: 'ink-light', cls: 'bg-ink-light', oklch: '0.52 0.018 256', use: 'Secondary text' },
+  { name: 'ink-muted', cls: 'bg-ink-muted', oklch: '0.555 0.013 256', use: 'Timestamps, captions' },
+  { name: 'rule', cls: 'bg-rule', oklch: '0.905 0.006 250', use: 'Hairline dividers' },
+  { name: 'ivory-dark', cls: 'bg-ivory-dark', oklch: '0.965 0.004 250', use: 'Soft bands, hovers' },
+  { name: 'ivory', cls: 'bg-ivory', oklch: '0.988 0.002 250', use: 'Page canvas' },
+];
+
+const accents = [
+  { name: 'azure-dark', cls: 'bg-azure-dark', oklch: '0.43 0.123 254', use: 'Hover / pressed' },
+  { name: 'azure', cls: 'bg-azure', oklch: '0.527 0.153 253', use: 'MediaOne blue #166bc0 — accent' },
+  { name: 'azure-light', cls: 'bg-azure-light', oklch: '0.68 0.125 245', use: 'Blue on dark' },
+  { name: 'brand-dark', cls: 'bg-brand-dark', oklch: '0.145 0.018 262', use: 'Dark-mode canvas — Radix-style near-black' },
+  { name: 'brand-elevated', cls: 'bg-brand-elevated', oklch: '0.195 0.022 262', use: 'Dark-mode cards / placeholders' },
+  { name: 'brand-overlay', cls: 'bg-brand-overlay', oklch: '0.245 0.026 262', use: 'Dark-mode hover / overlay' },
+];
+
+const toc = [
+  { id: 'typography', label: 'Typography' },
+  { id: 'color', label: 'Color' },
+  { id: 'space', label: 'Space & Geometry' },
+  { id: 'components', label: 'Components' },
+  { id: 'composition', label: 'Composition' },
+];
+---
+
+<DesignShell
+  title="Foundations — MediaOne Design System"
+  description="The canonical standards for the MediaOne newsroom interface: type scale, color tokens, spacing, and components."
+  eyebrow="Foundations"
+  heading="Tokens & Standards"
+  lede="One source of truth for the newsroom interface. Editorial restraint set in Anek Latin and Anek Malayalam, with the MediaOne blue as the single accent. Every token here lives in src/styles/app.css — change it there and it propagates everywhere."
+  active="foundations"
+  contained={false}
+>
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <!-- TOC -->
+        <aside class="hidden lg:block lg:col-span-3">
+          <nav class="sticky top-8" aria-label="On this page">
+            <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-4">On this page</p>
+            <ul class="space-y-1">
+              {toc.map((item) => (
+                <li>
+                  <a href={`#${item.id}`} class="block py-1.5 text-nav text-ink-light hover:text-azure dark:text-ivory/60 dark:hover:text-azure-light transition-colors">
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
+
+        <!-- Content -->
+        <div class="lg:col-span-9 space-y-24">
+          <!-- TYPOGRAPHY -->
+          <section id="typography" class="scroll-mt-8">
+            <div class="flex items-baseline gap-3">
+              <span class="eyebrow text-azure dark:text-azure-light tabular-nums">01</span>
+              <h2 class="text-title text-ink dark:text-ivory">Typography</h2>
+            </div>
+            <p class="mt-3 text-body text-ink-light dark:text-ivory/70 max-w-2xl">
+              Two metrically matched faces carry the whole system. Latin leads the stack;
+              Malayalam falls through per-glyph, so mixed lines stay on one baseline.
+              Size, line-height, and weight are fixed per token — never set ad hoc in markup.
+            </p>
+
+            <!-- Families -->
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-px bg-rule dark:bg-ivory/10 border border-rule dark:border-ivory/10">
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-ink-muted dark:text-ivory/40">Anek Latin</p>
+                <p class="mt-3 text-title text-ink dark:text-ivory">AaBbGg 0123</p>
+                <p class="text-body text-ink-light dark:text-ivory/70">The press guards democracy.</p>
+              </div>
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-ink-muted dark:text-ivory/40">Anek Malayalam</p>
+                <p class="mt-3 text-title text-ink dark:text-ivory">അആഇ ൦൧൨൩</p>
+                <p class="text-body text-ink-light dark:text-ivory/70">മാധ്യമം ജനാധിപത്യത്തിന്റെ കാവലാൾ.</p>
+              </div>
+            </div>
+
+            <!-- Scale specimens -->
+            <div class="mt-8 border-t border-rule dark:border-ivory/10">
+              {typeScale.map((t) => (
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-6 py-6 border-b border-rule dark:border-ivory/10 items-baseline">
+                  <div class="sm:col-span-3">
+                    <p class="font-mono text-meta text-ink dark:text-ivory">text-{t.token}</p>
+                    <p class="mt-1 font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums">
+                      {t.size} · {t.lh} · {t.weight}
+                    </p>
+                    <p class="mt-1 text-caption text-ink-muted dark:text-ivory/40">{t.role}</p>
+                  </div>
+                  <div class="sm:col-span-9 min-w-0">
+                    <p class={`${t.cls} text-ink dark:text-ivory truncate`}>വാർത്ത ലോകത്തെ മാറ്റുന്നു</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <!-- Eyebrow note -->
+            <div class="mt-8 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 p-6 bg-ivory-dark dark:bg-brand-elevated border border-rule dark:border-ivory/10">
+              <p class="eyebrow text-azure dark:text-azure-light shrink-0">Category Eyebrow</p>
+              <p class="text-meta text-ink-light dark:text-ivory/60">
+                The one place letter-spacing is allowed. Use the <span class="font-mono text-ink dark:text-ivory">eyebrow</span> utility
+                on uppercase Latin labels only — never on Malayalam, where tracking collides conjuncts.
+              </p>
+            </div>
+          </section>
+          <!-- COLOR -->
+          <section id="color" class="scroll-mt-8">
+            <div class="flex items-baseline gap-3">
+              <span class="eyebrow text-azure dark:text-azure-light tabular-nums">02</span>
+              <h2 class="text-title text-ink dark:text-ivory">Color</h2>
+            </div>
+            <p class="mt-3 text-body text-ink-light dark:text-ivory/70 max-w-2xl">
+              Cool navy and slate neutrals matched to mediaoneonline.com, never pure black or
+              white. The MediaOne blue (#166bc0) over a navy ink (#2e4164) is the only chromatic
+              voice, reserved for eyebrows, links, hover, and the masthead rule. Values are OKLCH
+              so lightness and chroma stay perceptually even.
+            </p>
+
+            <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mt-8">Neutrals</h3>
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {neutrals.map((c) => (
+                <div>
+                  <div class={`aspect-[4/3] border border-rule dark:border-ivory/15 ${c.cls}`}></div>
+                  <p class="mt-2 font-mono text-meta text-ink dark:text-ivory">{c.name}</p>
+                  <p class="font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums">{c.oklch}</p>
+                  <p class="text-caption text-ink-muted dark:text-ivory/40">{c.use}</p>
+                </div>
+              ))}
+            </div>
+
+            <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mt-10">Accent &amp; Dark</h3>
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {accents.map((c) => (
+                <div>
+                  <div class={`aspect-[4/3] border border-rule dark:border-ivory/15 ${c.cls}`}></div>
+                  <p class="mt-2 font-mono text-meta text-ink dark:text-ivory">{c.name}</p>
+                  <p class="font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums">{c.oklch}</p>
+                  <p class="text-caption text-ink-muted dark:text-ivory/40">{c.use}</p>
+                </div>
+              ))}
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-px bg-rule dark:bg-ivory/10 border border-rule dark:border-ivory/10">
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-azure dark:text-azure-light">Do</p>
+                <p class="mt-2 text-meta text-ink-light dark:text-ivory/60">
+                  Let ink-on-ivory carry the page. Spend azure once per view — a label,
+                  a link, the rule. Restraint is the identity.
+                </p>
+              </div>
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-ink-muted dark:text-ivory/40">Don't</p>
+                <p class="mt-2 text-meta text-ink-light dark:text-ivory/60">
+                  No gradients, no second accent, no pure #000 / #fff. Hierarchy comes from
+                  scale and weight, not color.
+                </p>
+              </div>
+            </div>
+          </section>
+          <!-- SPACE & GEOMETRY -->
+          <section id="space" class="scroll-mt-8">
+            <div class="flex items-baseline gap-3">
+              <span class="eyebrow text-azure dark:text-azure-light tabular-nums">03</span>
+              <h2 class="text-title text-ink dark:text-ivory">Space &amp; Geometry</h2>
+            </div>
+            <p class="mt-3 text-body text-ink-light dark:text-ivory/70 max-w-2xl">
+              A 4px base unit, a 1280px editorial measure, square corners, and no shadows.
+              Elevation is a single hairline. Surfaces meet with rules, not drop-shadows.
+            </p>
+
+            <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <!-- Spacing -->
+              <div>
+                <h3 class="eyebrow text-ink-muted dark:text-ivory/40">Spacing — 4px base</h3>
+                <div class="mt-4 space-y-2.5">
+                  {[4, 8, 12, 16, 24, 32, 48].map((px) => (
+                    <div class="flex items-center gap-4">
+                      <span class="w-12 font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums">{px}px</span>
+                      <span class="h-3 bg-azure/80" style={`width:${px}px`}></span>
+                    </div>
+                  ))}
+                </div>
+                <p class="mt-4 text-caption text-ink-muted dark:text-ivory/40">
+                  Vary rhythm by hierarchy. Uniform padding everywhere reads as monotony.
+                </p>
+              </div>
+
+              <!-- Geometry & Elevation -->
+              <div>
+                <h3 class="eyebrow text-ink-muted dark:text-ivory/40">Geometry &amp; Elevation</h3>
+                <div class="mt-4 space-y-4">
+                  <div class="p-5 border border-rule dark:border-ivory/15">
+                    <p class="text-headline text-ink dark:text-ivory">Square, hairline</p>
+                    <p class="text-meta text-ink-light dark:text-ivory/60">Default surface. 0px radius, 1px rule, flat.</p>
+                  </div>
+                  <div class="grid grid-cols-[1fr_auto] items-center gap-4 py-4 border-t border-b border-rule dark:border-ivory/15">
+                    <p class="text-meta text-ink-light dark:text-ivory/60">Rows divide with a single rule</p>
+                    <span class="eyebrow text-azure dark:text-azure-light">No shadow</span>
+                  </div>
+                  <div class="flex items-center gap-3 text-meta text-ink-muted dark:text-ivory/40">
+                    <span class="inline-block size-4 border border-rule dark:border-ivory/20"></span>
+                    <span>Container <span class="font-mono text-ink dark:text-ivory">max-w-site</span> = 80rem · body measure ≤ 72ch</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <!-- COMPONENTS -->
+          <section id="components" class="scroll-mt-8">
+            <div class="flex items-baseline gap-3">
+              <span class="eyebrow text-azure dark:text-azure-light tabular-nums">04</span>
+              <h2 class="text-title text-ink dark:text-ivory">Components</h2>
+            </div>
+            <p class="mt-3 text-body text-ink-light dark:text-ivory/70 max-w-2xl">
+              The newsroom's working parts, built only from the tokens above. Cards are the
+              exception, not the default — most content is hairline-separated rows.
+            </p>
+
+            <div class="mt-8 space-y-12">
+              <!-- Labels -->
+              <div>
+                <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-3">Category Labels</p>
+                <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                  <div class="flex flex-wrap items-center gap-3">
+                    <span class="px-2.5 py-1 bg-azure text-ivory eyebrow">Breaking</span>
+                    <span class="px-2.5 py-1 bg-ink text-ivory eyebrow">Live</span>
+                    <span class="px-2.5 py-1 border border-azure text-azure dark:text-azure-light eyebrow">Exclusive</span>
+                    <span class="eyebrow text-azure dark:text-azure-light">Kerala</span>
+                    <span class="eyebrow text-ink-muted dark:text-ivory/40">Analysis</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section header -->
+              <div>
+                <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-3">Section Header</p>
+                <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                  <div class="flex items-baseline justify-between pb-3 border-b-2 border-ink dark:border-ivory/30">
+                    <h3 class="text-section text-ink dark:text-ivory">Kerala</h3>
+                    <a href="#components" class="eyebrow text-azure dark:text-azure-light hover:text-azure-dark transition-colors">View all</a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Feature lockup — now a shipping component, not a mock. This
+                   renders the same StoryListItem the desk listings use, so the
+                   spec can't drift from what /kerala and /sports serve. -->
+              <div>
+                <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-3">
+                  Feature Lockup <span class="text-azure dark:text-azure-light">· StoryListItem</span>
+                </p>
+                <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                  <ul class="flex flex-col divide-y divide-rule dark:divide-ivory/10">
+                    <StoryListItem
+                      story={{
+                        title: 'വയനാട്ടിൽ കാട്ടാന ആക്രമണം; ജാഗ്രതാ നിർദേശം',
+                        href: '#components',
+                        category: 'Kerala',
+                        date: '15 min ago',
+                        excerpt: 'തോട്ടം മേഖലയിൽ വനംവകുപ്പ് നിരീക്ഷണം ശക്തമാക്കി. നഷ്ടപരിഹാരം പ്രഖ്യാപിച്ചു.',
+                      }}
+                      class="pb-5"
+                    />
+                    <StoryListItem
+                      story={{
+                        title: 'ഫോഗട്ടിനെ വീഴ്ത്തിയതാര്? | Vinesh Phogat disqualified from Paris Olympics',
+                        href: '#components',
+                        date: '7 Aug 2024 9:01 PM',
+                        excerpt: 'Vinesh Phogat disqualified from Paris Olympics | Out Of Focus',
+                      }}
+                      kicker="Out Of Focus"
+                      kickerHref="#components"
+                      size="md"
+                      class="pt-5"
+                    />
+                  </ul>
+                </div>
+                <p class="mt-2 caption-text text-ink-muted dark:text-ivory/40">
+                  <code class="font-mono">size="lg"</code> leads a listing;
+                  <code class="font-mono">size="md"</code> runs denser. The kicker takes an optional
+                  href — a programme, a sub-section, whatever published it.
+                </p>
+              </div>
+
+              <!-- Card + Row -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                  <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-3">Story Card</p>
+                  <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                    <a href="#components" class="group block max-w-xs">
+                      <Placeholder class="aspect-[16/9] w-full" />
+                      <span class="mt-3 block eyebrow text-azure dark:text-azure-light">India</span>
+                      <h3 class="mt-1.5 text-headline text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+                        സ്വർണ്ണ വില റെക്കോർഡിൽ; പവൻ 75000 പിന്നിട്ടു
+                      </h3>
+                      <p class="mt-1.5 text-caption text-ink-muted dark:text-ivory/45 tabular-nums">1 hour ago</p>
+                    </a>
+                  </div>
+                </div>
+                <div>
+                  <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-3">Story Rows</p>
+                  <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                    {['ജി 7 ഉച്ചകോടി: കാലാവസ്ഥയിൽ നടപടി', 'ഖത്തറിൽ പുതിയ തൊഴിൽ നയം പ്രഖ്യാപനം'].map((t, i) => (
+                      <a href="#components" class={`group flex gap-4 py-4 ${i === 0 ? 'pt-0' : 'border-t border-rule dark:border-ivory/10'}`}>
+                        <Placeholder class="size-16 shrink-0" />
+                        <div>
+                          <h3 class="text-headline text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors">{t}</h3>
+                          <p class="mt-1 text-caption text-ink-muted dark:text-ivory/45 tabular-nums">2 hours ago</p>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Byline + Tags -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                  <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-3">Byline</p>
+                  <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                    <div class="flex items-center gap-3.5">
+                      <span class="size-11 rounded-full bg-ivory-dark dark:bg-brand-elevated flex items-center justify-center text-meta font-bold text-ink-light dark:text-ivory/70">SJ</span>
+                      <div>
+                        <p class="text-headline text-ink dark:text-ivory">Sarah Johnson</p>
+                        <p class="text-meta text-ink-muted dark:text-ivory/45">Senior Correspondent · Kerala Bureau</p>
+                        <p class="mt-0.5 text-caption text-ink-muted dark:text-ivory/40 tabular-nums">10 Jun 2026 · 5 min read</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-3">Tags</p>
+                  <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                    <div class="flex flex-wrap gap-2">
+                      {['Kerala', 'Wayanad', 'Forest', 'Latest'].map((tag) => (
+                        <a href="#components" class="px-2.5 py-1 border border-rule dark:border-ivory/20 text-meta text-ink-light dark:text-ivory/70 hover:border-azure hover:text-azure dark:hover:text-azure-light transition-colors">
+                          #{tag}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ad slot -->
+              <div>
+                <p class="eyebrow text-ink-muted dark:text-ivory/40 mb-3">Ad Slot</p>
+                <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                  <AdSlot format="leaderboard" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- COMPOSITION -->
+          <section id="composition" class="scroll-mt-8">
+            <div class="flex items-baseline gap-3">
+              <span class="eyebrow text-azure dark:text-azure-light tabular-nums">05</span>
+              <h2 class="text-title text-ink dark:text-ivory">Composition</h2>
+            </div>
+            <p class="mt-3 text-body text-ink-light dark:text-ivory/70 max-w-2xl">
+              The interface is built in three layers. <strong class="text-ink dark:text-ivory">Atoms</strong> set a
+              single decision (a kicker, a timestamp, one headline size). <strong class="text-ink dark:text-ivory">Blocks</strong>
+              compose atoms into a story unit. <strong class="text-ink dark:text-ivory">Patterns</strong> arrange blocks
+              into a page. Build by composing these — never re-style markup ad hoc. The full set is rendered live in the
+              <a href="/design/kitchen" class="text-azure dark:text-azure-light hover:text-azure-dark">kitchen sink →</a>
+            </p>
+
+            <!-- Layer ladder -->
+            <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-px bg-rule dark:bg-ivory/10 border border-rule dark:border-ivory/10">
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-azure dark:text-azure-light">Atoms · ui/</p>
+                <p class="mt-1 font-mono text-caption text-ink-muted dark:text-ivory/40">Kicker · MetaRow · Headline · Media · Badge · Pulse · SectionHeading</p>
+                <div class="group mt-4 space-y-2">
+                  <Kicker text="Kerala" />
+                  <Headline as="p" size="base" text="ഒരു തലക്കെട്ട് ആറ്റം" />
+                  <MetaRow category="India" date="2 hr" />
+                </div>
+              </div>
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-azure dark:text-azure-light">Blocks · news/</p>
+                <p class="mt-1 font-mono text-caption text-ink-muted dark:text-ivory/40">StoryCard · StoryRow · OverlayStory · NumberedList · Timeline · PromoGrid<br />Video: VideoThumb · VideoCard · VideoGrid · ShortsRail · VideoHero · VideoFeature · VideoPlayer</p>
+                <div class="mt-4">
+                  <StoryCard story={demoKerala.lead} />
+                </div>
+              </div>
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-azure dark:text-azure-light">Patterns · pages</p>
+                <p class="mt-1 font-mono text-caption text-ink-muted dark:text-ivory/40">Hero + rail · Featured band · Most read + live</p>
+                <div class="mt-4">
+                  <StoryList items={topStories.slice(0, 3)} />
+                </div>
+              </div>
+            </div>
+
+            <!-- Anatomy -->
+            <div class="mt-10">
+              <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mb-4">Anatomy · StoryCard = Media + Kicker + Headline + meta</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                <StoryCard story={demoKerala.items[0]} showExcerpt />
+                <ul class="space-y-2.5 text-meta text-ink-light dark:text-ivory/60">
+                  <li class="flex gap-2.5"><span class="font-mono text-azure dark:text-azure-light shrink-0">Media</span> 16/9 frame · square · optional zoom/overlay</li>
+                  <li class="flex gap-2.5"><span class="font-mono text-azure dark:text-azure-light shrink-0">Kicker</span> the one tracked label · azure</li>
+                  <li class="flex gap-2.5"><span class="font-mono text-azure dark:text-azure-light shrink-0">Headline</span> size token only · hover inherits group</li>
+                  <li class="flex gap-2.5"><span class="font-mono text-azure dark:text-azure-light shrink-0">meta</span> caption · tabular-nums timestamp</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- A live pattern -->
+            <div class="mt-10">
+              <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mb-4">Pattern · Hero + rail (as used on /home/ideal)</h3>
+              <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                <div class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
+                  <div class="lg:col-span-8 lg:border-r border-rule dark:border-ivory/10 lg:pr-8">
+                    <OverlayStory story={hero} ratio="16/9" size="lg" badge="Live" badgeVariant="live" />
+                  </div>
+                  <aside class="lg:col-span-4 mt-6 lg:mt-0">
+                    <NumberedList items={mostRead.slice(0, 4)} />
+                  </aside>
+                </div>
+              </div>
+            </div>
+
+            <!-- New Editorial Shelf patterns -->
+            <div class="mt-10">
+              <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mb-4">Pattern · Editorial Shelf — Columns Variant (as used for /shelf)</h3>
+              <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                <EditorialShelf
+                  title="Shelf"
+                  titleEn="In Depth"
+                  viewAllHref="/shelf"
+                  heroStory={shelfEditorialHero}
+                  gridStories={shelfEditorialGrid}
+                  gridVariant="columns"
+                />
+              </div>
+            </div>
+
+            <div class="mt-10">
+              <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mb-4">Pattern · Editorial Shelf — Lists Variant (as used for /kerala)</h3>
+              <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                <EditorialShelf
+                  title="Kerala"
+                  titleEn="Kerala News"
+                  viewAllHref="/kerala"
+                  heroStory={keralaEditorialHero}
+                  gridStories={keralaEditorialGrid}
+                  gridVariant="lists"
+                />
+              </div>
+            </div>
+
+            <div class="mt-10">
+              <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mb-4">Pattern · Asymmetric Shelf — Magazine Variant</h3>
+              <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                <AsymmetricShelf
+                  title="Top News"
+                  titleEn="Featured Features"
+                  viewAllHref="/latest-news"
+                  leadStory={keralaEditorialHero}
+                  bottomStories={keralaEditorialGrid.slice(0, 4)}
+                  sidebarStories={[topStories[0], topStories[1], topStories[2]]}
+                />
+              </div>
+            </div>
+
+            <div class="mt-10">
+              <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mb-4">Pattern · Category Columns Shelf — 4-Column Category Grid</h3>
+              <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark">
+                <CategoryColumnsShelf
+                  clusters={[
+                    demoKerala,
+                    cluster('india'),
+                    cluster('gulf'),
+                    cluster('sports')
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div class="mt-10">
+              <h3 class="eyebrow text-ink-muted dark:text-ivory/40 mb-4">Pattern · Top Videos Shelf — Full-Bleed Video Grid</h3>
+              <div class="border border-rule dark:border-ivory/10 p-6 bg-ivory dark:bg-brand-dark overflow-hidden">
+                <TopVideosShelf
+                  title="വീഡിയോ"
+                  titleEn="TOP VIDEOS"
+                  videos={videoItems}
+                />
+              </div>
+            </div>
+
+            <!-- Rules -->
+            <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-px bg-rule dark:bg-ivory/10 border border-rule dark:border-ivory/10">
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-azure dark:text-azure-light">Do</p>
+                <ul class="mt-2 space-y-1.5 text-meta text-ink-light dark:text-ivory/60">
+                  <li>Compose blocks; pass data in as a <span class="font-mono text-ink dark:text-ivory">story</span>.</li>
+                  <li>One type role → one size token, set in the atom.</li>
+                  <li>Square frames, hairline rules, flat surfaces.</li>
+                </ul>
+              </div>
+              <div class="bg-ivory dark:bg-brand-dark p-6">
+                <p class="eyebrow text-ink-muted dark:text-ivory/40">Don't</p>
+                <ul class="mt-2 space-y-1.5 text-meta text-ink-light dark:text-ivory/60">
+                  <li>Re-style a block inline or fork a near-duplicate.</li>
+                  <li>Set headline/​meta type ad hoc in markup.</li>
+                  <li>Nest a card link inside another link.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+</DesignShell>

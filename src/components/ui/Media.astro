@@ -1,0 +1,52 @@
+---
+// ATOM · Media — an aspect-ratio image frame. Square by system default. The
+// ratio is applied via inline `aspect-ratio` (not a Tailwind arbitrary class)
+// so any value is safe at build time. `zoom` adds the hover scale; `overlay`
+// lays a bottom-up scrim for text-over-image lockups.
+import DummyImage from '../DummyImage.astro';
+export interface Props {
+  seed?: string;
+  src?: string;
+  ratio?: string;          // e.g. '16/9', '4/3', '21/9'
+  overlay?: false | 'soft' | 'strong';
+  zoom?: boolean;
+  w?: number;              // intrinsic hint — should match the rendered box ratio
+  h?: number;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  class?: string;
+}
+const {
+  seed,
+  src,
+  ratio = '16/9',
+  overlay = false,
+  zoom = false,
+  w,
+  h,
+  loading,
+  fetchpriority,
+  class: className = '',
+} = Astro.props;
+
+// Derive the intrinsic hint from the ratio when the caller doesn't give one, so
+// an `img` never advertises 16:9 inside a 1:1 or 5:3 frame.
+const [rw, rh] = ratio.split('/').map((n) => Number(n.trim()));
+const width = w ?? 800;
+const height = h ?? (Number.isFinite(rw) && Number.isFinite(rh) && rw > 0 ? Math.round((width * rh) / rw) : 450);
+const overlayCls = overlay === 'strong'
+  ? 'bg-gradient-to-t from-ink via-ink/40 to-transparent'
+  : 'bg-gradient-to-t from-ink/80 via-ink/20 to-transparent';
+---
+<div class:list={['mc', 'relative overflow-hidden', className]} style={`aspect-ratio:${ratio}`}>
+  <DummyImage
+    seed={seed}
+    src={src}
+    w={width}
+    h={height}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    class:list={['w-full h-full', zoom && 'transition-transform duration-700 group-hover:scale-[1.03]']}
+  />
+  {overlay && <div class:list={['absolute inset-0', overlayCls]}></div>}
+</div>

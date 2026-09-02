@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="About Us — MediaOne" description="About MediaOne Online">
+  <Header />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto px-4 sm:px-6 md:px-8 py-10">
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">About Us</span>
+      </nav>
+
+      <h1 class="text-hero font-bold text-text-primary text-balance">About Us</h1>
+
+      <div class="mt-8 max-w-prose space-y-5 text-body text-text-primary">
+        <p>
+          MediaOne is a leading Malayalam news and current affairs platform reaching millions of viewers across Kerala, the Gulf, and beyond. Since our inception, we have been committed to independent journalism, in-depth reporting, and giving voice to the underrepresented.
+        </p>
+        <p>
+          We bring news as it happens — with context, analysis, and a perspective that matters to Malayalis everywhere. Our digital and broadcast teams work around the clock to keep our audience informed and engaged.
+        </p>
+        <p>
+          MediaOne is owned and operated by Madhyamam Broadcasting Limited. Our headquarters is in Kozhikode, Kerala, with bureaus across India and the Middle East.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

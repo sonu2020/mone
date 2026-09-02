@@ -1,0 +1,715 @@
+---
+import Logo from './Logo.astro';
+import { navLinks } from '../lib/site-sections';
+
+
+const today = new Date().toLocaleDateString('en-GB', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+export interface Props {
+  isBreaking?: boolean;
+}
+
+const { isBreaking = false } = Astro.props;
+
+const breakingNews = {
+  label: 'BREAKING',
+  text: 'കോഴിക്കോട്  മുട്ടായി മഴ; ജില്ലയിൽ സന്തോഷം',
+};
+
+const trendingTopics = [
+  { label: '#RainAlert', href: '/story/rain-alert' },
+  { label: '#GoldPrice', href: '/story/gold-price-record' },
+  { label: '#KeralaElection', href: '/story/pala-election' },
+  { label: '#Sabarimala', href: '/story/sabarimala-traffic' },
+  { label: '#KochiMetro', href: '/story/kochi-metro' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class:list={['mc', 'w-full sticky top-0 z-40 transition-all duration-300']} id="site-header">
+  <!-- Scroll reading progress bar container -->
+  <div class="w-full h-[3px] bg-transparent absolute bottom-0 left-0 z-50 overflow-hidden pointer-events-none">
+    <div id="reading-progress" class="h-full bg-azure w-0 transition-all duration-75"></div>
+  </div>
+
+  <!-- Desktop/Mobile Search Overlay (hidden by default) -->
+  <div
+    id="search-overlay"
+    class="fixed inset-x-0 top-0 bg-white/95 dark:bg-brand-dark/95 backdrop-blur-md border-b border-rule dark:border-ivory/10 transform -translate-y-full transition-transform duration-300 ease-in-out z-[60] shadow-lg hidden"
+  >
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div class="flex items-center justify-between gap-6 mb-6">
+        <h2 class="eyebrow text-azure">Search MediaOne</h2>
+        <button
+          id="search-close-btn"
+          type="button"
+          class="p-2 text-ink-light hover:text-ink dark:text-ivory/60 dark:hover:text-ivory transition-colors rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2"
+          aria-label="Close search"
+        >
+          <i class="ti ti-x text-2xl" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <form action="/latest-news" method="GET" class="relative max-w-3xl">
+        <div class="relative">
+          <input
+            type="search"
+            name="q"
+            id="search-input"
+            placeholder="വാർത്തകൾ തിരയുക... (Search news)"
+            class="w-full bg-bg-page border border-rule dark:border-ivory/10 px-5 py-4 pl-12 rounded text-base text-text-primary focus:outline-none focus:border-azure dark:focus:border-azure-light"
+          />
+          <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-xl text-ink-muted dark:text-ivory/40"></i>
+        </div>
+        <button
+          type="submit"
+          class="mt-4 px-6 py-2.5 bg-azure text-white hover:bg-azure-dark font-semibold text-sm rounded shadow transition-colors"
+        >
+          തിരയുക (Search)
+        </button>
+      </form>
+
+      <div class="mt-8 border-t border-rule/50 dark:border-ivory/5 pt-6">
+        <p class="text-caption text-text-muted mb-3">ട്രെൻഡിംഗ് വിഷയങ്ങൾ (Trending Topics):</p>
+        <div class="flex flex-wrap gap-2">
+          {trendingTopics.map((t) => (
+            <a
+              href={t.href}
+              class="px-3 py-1.5 bg-ivory-dark/40 dark:bg-white/5 hover:bg-azure hover:text-white dark:hover:bg-azure-light dark:hover:text-ink text-xs font-medium text-text-secondary rounded transition-colors"
+            >
+              {t.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile/Tablet compact header (hidden on lg+) -->
+  <div class="lg:hidden bg-header-bg" id="mobile-header-container">
+    <!-- Top bar: logo + search + hamburger — single compact row -->
+    <div id="mobile-top-bar" class="flex items-center justify-between px-4 py-2.5 sm:px-6 md:px-8 relative min-h-[48px]">
+      <a href="/" class="flex items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light focus-visible:outline-offset-2 shrink-0 z-10" aria-label="MediaOne home">
+        <Logo class="h-5 sm:h-6 w-auto fill-current text-white hover:text-azure-light transition-colors" />
+      </a>
+
+      <!-- Mobile Floating Title (shown on scroll, inner pages only) -->
+      <div id="mobile-floating-heading" class="flex-1 min-w-0 hidden items-center pl-3 ml-3 border-l border-white/20 opacity-0 transition-all duration-200 transform translate-x-2">
+        <span id="mobile-floating-title" class="text-sm font-semibold text-white truncate text-pretty pr-2"></span>
+      </div>
+
+      <!-- Right actions: search + hamburger -->
+      <div class="flex items-center gap-1 shrink-0 z-10">
+        <button
+          id="mobile-search-btn"
+          type="button"
+          class="p-2 text-ivory/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light focus-visible:outline-offset-2 rounded"
+          aria-label="Search"
+        >
+          <i class="ti ti-search text-xl" aria-hidden="true"></i>
+        </button>
+        <button
+          id="mobile-menu-btn"
+          type="button"
+          class="p-2 text-ivory/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light focus-visible:outline-offset-2 rounded"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="mobile-drawer"
+        >
+          <i class="ti ti-list-search text-xl" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Trending topics strip (always visible, collapses on scroll) -->
+    <div id="mobile-trending-bar" class="transition-all duration-200 overflow-hidden">
+      {isBreaking ? (
+        <div class="bg-accent-red px-4 py-1.5 sm:px-6 md:px-8 flex items-center gap-3 overflow-hidden">
+          <span class="text-[11px] font-bold tracking-wider uppercase text-white shrink-0">{breakingNews.label}</span>
+          <div class="flex-1 overflow-hidden">
+            <span class="text-xs font-semibold text-white whitespace-nowrap inline-block ticker-scroll">{breakingNews.text}</span>
+          </div>
+        </div>
+      ) : (
+        <div class="border-t border-white/8 px-4 py-1.5 sm:px-6 md:px-8 flex items-center gap-2.5 overflow-x-auto scrollbar-none">
+          <i class="ti ti-trending-up text-sm text-azure-light shrink-0" aria-hidden="true"></i>
+          <div class="flex items-center gap-3 text-[11px] font-medium text-ivory/50 whitespace-nowrap">
+            {trendingTopics.map((t) => (
+              <a href={t.href} class="hover:text-azure-light transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-1 rounded">{t.label}</a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <!-- Mobile full-screen navigation drawer -->
+  <div
+    id="mobile-drawer"
+    class="fixed inset-0 z-50 lg:hidden pointer-events-none"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigation menu"
+  >
+    <!-- Backdrop -->
+    <div id="mobile-drawer-backdrop" class="absolute inset-0 bg-header-bg/80 opacity-0 transition-opacity duration-200"></div>
+
+    <!-- Drawer panel -->
+    <div id="mobile-drawer-panel" class="absolute top-0 right-0 bottom-0 w-[280px] sm:w-[320px] bg-header-bg-deep transform translate-x-full transition-transform duration-200 ease-out flex flex-col overflow-y-auto">
+      <!-- Drawer header -->
+      <div class="flex items-center justify-between px-5 py-3 border-b border-white/10">
+        <span class="eyebrow text-ivory/40">MENU</span>
+        <button
+          id="mobile-drawer-close"
+          type="button"
+          class="p-2 text-ivory/60 hover:text-white transition-colors rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light focus-visible:outline-offset-2"
+          aria-label="Close menu"
+        >
+          <i class="ti ti-x text-xl" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- Nav links -->
+      <nav class="flex-1 px-2 py-3" aria-label="Sections">
+        <ul class="space-y-0.5">
+          {navLinks.map((link) => {
+            const isActive = currentPath === link.href || currentPath.startsWith(link.href + '/');
+            return (
+              <li>
+                <a
+                  href={link.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  class:list={[
+                    'flex items-center justify-between px-4 py-3 rounded transition-colors',
+                    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light focus-visible:outline-offset-2',
+                    isActive ? 'text-white bg-white/12' : 'text-ivory/70 hover:text-white hover:bg-white/8',
+                  ]}
+                >
+                  <span class="flex flex-col gap-0.5">
+                    <span class="text-sm font-semibold">{link.label}</span>
+                    <span class="text-[11px] text-ivory/40">{link.ml}</span>
+                  </span>
+                  {isActive && (
+                    <span class="w-1.5 h-1.5 rounded-full bg-azure-light shrink-0"></span>
+                  )}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <!-- Drawer footer: dark mode toggle -->
+      <div class="px-5 py-4 border-t border-white/10 mt-auto">
+        <button
+          id="theme-toggle-mobile"
+          type="button"
+          class="flex items-center gap-3 w-full text-ivory/60 hover:text-white transition-colors py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light focus-visible:outline-offset-2 rounded"
+          aria-label="Toggle dark mode"
+        >
+          <i class="ti ti-sun text-xl hidden dark:inline" aria-hidden="true"></i>
+          <i class="ti ti-moon text-xl inline dark:hidden" aria-hidden="true"></i>
+          <span class="text-sm font-medium dark:hidden">Dark mode</span>
+          <span class="text-sm font-medium hidden dark:inline">Light mode</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop header (lg+) -->
+  <div class="hidden lg:block bg-ivory dark:bg-brand-dark">
+    <!-- Masthead signature: a single azure rule -->
+    <div class="h-0.5 w-full bg-azure"></div>
+
+    <!-- Conditional Desktop Breaking News Banner -->
+    {isBreaking && (
+      <div class="bg-accent-red text-white py-2.5">
+        <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+          <span class="breaking-badge bg-white text-accent-red px-2.5 py-0.5 font-bold shrink-0 text-xs tracking-wider">{breakingNews.label}</span>
+          <a href="/breaking" class="text-sm lg:text-base font-semibold hover:text-white/80 transition-colors truncate">
+            {breakingNews.text}
+          </a>
+        </div>
+      </div>
+    )}
+
+    <!-- Desktop Logo Row (collapsible on scroll) -->
+    <div id="desktop-logo-row" class="max-h-28 opacity-100 transition-all duration-300 overflow-hidden border-b border-rule dark:border-ivory/10">
+      <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Masthead logo row -->
+        <div class="grid grid-cols-3 items-center py-4 lg:py-5">
+          <p class="meta-text text-ink-muted dark:text-ivory/50 tabular-nums">
+            {today}
+          </p>
+
+          <a href="/" class="justify-self-center group focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-4 rounded mt-5" aria-label="MediaOne home">
+            <Logo class="w-[10rem] h-[4.5rem] -mt-8 fill-current text-ink dark:text-ivory hover:text-azure dark:hover:text-azure-light transition-colors" />
+          </a>
+
+          <div class="justify-self-end flex items-center gap-3">
+            <!-- The Live TV control was removed sitewide; Live TV stays
+                 reachable from the nav. -->
+
+            <!-- 2. Search Button -->
+            <button
+              id="desktop-search-btn"
+              type="button"
+              class="p-2 text-ink-light hover:text-azure dark:text-ivory/60 dark:hover:text-azure-light transition-colors rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2"
+              aria-label="Search articles"
+            >
+              <i class="ti ti-search text-xl" aria-hidden="true"></i>
+            </button>
+
+            <!-- 3. Three-Dots Menu Button & Dropdown -->
+            
+
+            <!-- 2. Three-Dots Menu Button & Dropdown -->
+            <div class="relative inline-block text-left" id="desktop-menu-container">
+              <button
+                id="desktop-menu-btn"
+                type="button"
+                class="p-2 text-ink-light hover:text-azure dark:text-ivory/60 dark:hover:text-azure-light transition-colors rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2"
+                aria-label="More options"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="ti ti-dots-vertical text-xl" aria-hidden="true"></i>
+              </button>
+
+              <div
+                id="desktop-dropdown"
+                class="absolute right-0 mt-2 w-48 bg-white dark:bg-brand-elevated border border-rule dark:border-ivory/10 shadow-lg rounded-sm py-1 hidden focus:outline-none z-50 transform scale-95 opacity-0 transition-all duration-100 ease-out"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="desktop-menu-btn"
+              >
+                <button
+                  id="theme-toggle"
+                  type="button"
+                  class="flex items-center gap-2.5 w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-ivory-dark/40 dark:hover:bg-white/8 transition-colors"
+                  role="menuitem"
+                >
+                  <span class="dark:hidden flex items-center gap-2.5">
+                    <i class="ti ti-moon text-base text-ink-light" aria-hidden="true"></i>
+                    <span>Dark Mode</span>
+                  </span>
+                  <span class="hidden dark:flex items-center gap-2.5">
+                    <i class="ti ti-sun text-base text-ivory/60" aria-hidden="true"></i>
+                    <span>Light Mode</span>
+                  </span>
+                </button>
+
+                <a
+                  href="/design"
+                  class="flex items-center gap-2.5 px-4 py-2 text-sm text-text-primary hover:bg-ivory-dark/40 dark:hover:bg-white/8 transition-colors border-t border-rule/50 dark:border-ivory/5"
+                  role="menuitem"
+                >
+                  <i class="ti ti-settings text-base text-ink-light dark:text-ivory/60" aria-hidden="true"></i>
+                  <span>System Standards</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section nav & trending: hairline band -->
+    <nav class="border-y border-rule dark:border-ivory/10 bg-ivory/95 dark:bg-brand-dark/95 backdrop-blur shadow-sm transition-all duration-300" aria-label="Sections" id="desktop-nav-bar">
+      <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between gap-6 h-12 relative overflow-hidden">
+          <!-- Left side: Mini logo + Navigation links or Floating Heading -->
+          <div class="flex items-center flex-1 min-w-0 h-full relative">
+            <!-- Mini Logo (visible only when scrolled) -->
+            <a href="/" id="mini-logo" class="max-w-0 opacity-0 overflow-hidden transition-all duration-300 flex items-center shrink-0" aria-label="MediaOne home">
+              <Logo class="h-6 w-auto fill-current text-ink dark:text-ivory hover:text-azure dark:hover:text-azure-light transition-colors" />
+            </a>
+
+            <!-- Navigation Links wrapper (hidden on scroll) -->
+            <div id="desktop-nav-links-wrapper" class="flex items-center flex-1 min-w-0 transition-all duration-300 opacity-100 transform translate-y-0">
+              <ul class="flex items-center gap-6 overflow-x-auto scrollbar-none -mx-1 px-1 flex-1 min-w-0">
+                {navLinks.map((link) => {
+                  const isActive = currentPath === link.href || currentPath.startsWith(link.href + '/');
+                  return (
+                    <li class="shrink-0">
+                      <a
+                        href={link.href}
+                        aria-current={isActive ? 'page' : undefined}
+                        class:list={[
+                          'block py-3 nav-text transition-colors whitespace-nowrap border-b-2 -mb-px',
+                          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2',
+                          isActive
+                            ? 'text-azure dark:text-azure-light border-azure dark:border-azure-light'
+                            : 'text-ink-light hover:text-azure dark:text-ivory/70 dark:hover:text-azure-light border-transparent',
+                        ]}
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            <!-- Minimal Floating Heading Wrapper (shown on scroll) -->
+            <div id="desktop-floating-heading-wrapper" class="absolute left-0 right-0 flex items-center justify-between transition-all duration-300 opacity-0 transform translate-y-2 pointer-events-none pl-0 pr-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="h-4 w-px bg-rule dark:bg-ivory/10"></div>
+                <span id="desktop-floating-category" class="eyebrow text-azure shrink-0 hidden sm:inline text-xs">NEWS</span>
+                <span class="text-text-muted shrink-0 hidden sm:inline">·</span>
+                <span id="desktop-floating-title" class="text-sm font-semibold text-ink dark:text-ivory truncate text-pretty pr-4"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side: Trending topics (hidden when isBreaking is true) -->
+          {!isBreaking && (
+            <div id="desktop-trending-container" class="hidden lg:flex items-center gap-3 shrink-0 py-2.5 border-l border-rule dark:border-ivory/10 pl-6 my-1 transition-all duration-300">
+              <i class="ti ti-trending-up text-base text-azure shrink-0" aria-hidden="true"></i>
+              <div class="flex items-center gap-4 text-meta text-text-secondary dark:text-ivory/70 font-medium">
+                {trendingTopics.map((t) => (
+                  <a href={t.href} class="hover:text-azure transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-1 rounded">{t.label}</a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script is:inline>
+  (function () {
+    // ── Desktop Three-Dots Dropdown ───────────────────────────────────
+    var desktopMenuBtn = document.getElementById('desktop-menu-btn');
+    var desktopDropdown = document.getElementById('desktop-dropdown');
+    var desktopMenuContainer = document.getElementById('desktop-menu-container');
+
+    function openDropdown() {
+      if (!desktopDropdown) return;
+      desktopDropdown.classList.remove('hidden', 'scale-95', 'opacity-0');
+      desktopDropdown.classList.add('scale-100', 'opacity-100');
+      if (desktopMenuBtn) desktopMenuBtn.setAttribute('aria-expanded', 'true');
+      document.addEventListener('click', closeDropdownOnOutside);
+    }
+
+    function closeDropdown() {
+      if (!desktopDropdown) return;
+      desktopDropdown.classList.add('hidden', 'scale-95', 'opacity-0');
+      desktopDropdown.classList.remove('scale-100', 'opacity-100');
+      if (desktopMenuBtn) desktopMenuBtn.setAttribute('aria-expanded', 'false');
+      document.removeEventListener('click', closeDropdownOnOutside);
+    }
+
+    function closeDropdownOnOutside(e) {
+      if (desktopMenuContainer && !desktopMenuContainer.contains(e.target)) {
+        closeDropdown();
+      }
+    }
+
+    if (desktopMenuBtn) {
+      desktopMenuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var isOpen = desktopDropdown && !desktopDropdown.classList.contains('hidden');
+        if (isOpen) {
+          closeDropdown();
+        } else {
+          openDropdown();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDropdown();
+    });
+
+    // ── Search Overlay ────────────────────────────────────────────────
+    var desktopSearchBtn = document.getElementById('desktop-search-btn');
+    var mobileSearchBtn = document.getElementById('mobile-search-btn');
+    var searchOverlay = document.getElementById('search-overlay');
+    var searchCloseBtn = document.getElementById('search-close-btn');
+    var searchInput = document.getElementById('search-input');
+
+    function openSearch() {
+      if (!searchOverlay) return;
+      // Close mobile drawer if open
+      if (drawer && !drawer.classList.contains('pointer-events-none')) {
+        closeDrawer();
+      }
+      searchOverlay.classList.remove('hidden');
+      // Force reflow for transition
+      void searchOverlay.offsetHeight;
+      searchOverlay.classList.remove('-translate-y-full');
+      searchOverlay.classList.add('translate-y-0');
+      if (searchInput) {
+        setTimeout(function () { searchInput.focus(); }, 100);
+      }
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSearch() {
+      if (!searchOverlay) return;
+      searchOverlay.classList.remove('translate-y-0');
+      searchOverlay.classList.add('-translate-y-full');
+      document.body.style.overflow = '';
+      // Re-add hidden after transition to prevent focus / click-through
+      setTimeout(function () {
+        searchOverlay.classList.add('hidden');
+      }, 300);
+    }
+
+    if (desktopSearchBtn) desktopSearchBtn.addEventListener('click', openSearch);
+    if (mobileSearchBtn) mobileSearchBtn.addEventListener('click', openSearch);
+    if (searchCloseBtn) searchCloseBtn.addEventListener('click', closeSearch);
+
+    // Close search on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && searchOverlay && !searchOverlay.classList.contains('hidden')) {
+        var isVisible = !searchOverlay.classList.contains('-translate-y-full') && !searchOverlay.classList.contains('hidden');
+        if (isVisible) closeSearch();
+      }
+    });
+
+    // ── Theme toggle ──────────────────────────────────────────────────
+    function setupToggle(id) {
+      var toggle = document.getElementById(id);
+      if (!toggle) return;
+      toggle.addEventListener('click', function () {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      });
+    }
+    setupToggle('theme-toggle');
+    setupToggle('theme-toggle-mobile');
+
+    // ── Dynamic Title & Category ──────────────────────────────────────
+    // Resolve on DOMContentLoaded: this script runs during header parse,
+    // before <main> (h1, section eyebrow) exists — querying earlier would
+    // fall through to the leaderboard ad's eyebrow.
+    function resolveFloatingHeading() {
+      var h1 = document.querySelector('h1');
+      var categoryElem = document.querySelector('nav[aria-label="Breadcrumb"] a:last-of-type') || document.querySelector('main .eyebrow') || document.querySelector('.eyebrow');
+      var categoryText = categoryElem ? categoryElem.textContent.trim() : 'NEWS';
+      var titleText = h1 ? h1.textContent.trim() : document.title.split(' — ')[0];
+
+      var desktopFloatingTitle = document.getElementById('desktop-floating-title');
+      var desktopFloatingCategory = document.getElementById('desktop-floating-category');
+      var mobileFloatingTitle = document.getElementById('mobile-floating-title');
+
+      if (desktopFloatingTitle) desktopFloatingTitle.textContent = titleText;
+      if (desktopFloatingCategory) desktopFloatingCategory.textContent = categoryText;
+      if (mobileFloatingTitle) mobileFloatingTitle.textContent = titleText;
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', resolveFloatingHeading);
+    } else {
+      resolveFloatingHeading();
+    }
+
+    // ── Mobile Drawer ─────────────────────────────────────────────────
+    var menuBtn = document.getElementById('mobile-menu-btn');
+    var drawer = document.getElementById('mobile-drawer');
+    var drawerPanel = document.getElementById('mobile-drawer-panel');
+    var drawerBackdrop = document.getElementById('mobile-drawer-backdrop');
+    var drawerClose = document.getElementById('mobile-drawer-close');
+
+    function openDrawer() {
+      if (!drawer) return;
+      // Close search overlay if open
+      if (searchOverlay && !searchOverlay.classList.contains('-translate-y-full')) {
+        closeSearch();
+      }
+      drawer.classList.remove('pointer-events-none');
+      drawer.setAttribute('aria-hidden', 'false');
+      drawerBackdrop.classList.remove('opacity-0');
+      drawerBackdrop.classList.add('opacity-100');
+      drawerPanel.classList.remove('translate-x-full');
+      drawerPanel.classList.add('translate-x-0');
+      menuBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      if (!drawer) return;
+      drawerBackdrop.classList.remove('opacity-100');
+      drawerBackdrop.classList.add('opacity-0');
+      drawerPanel.classList.remove('translate-x-0');
+      drawerPanel.classList.add('translate-x-full');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      setTimeout(function () {
+        drawer.classList.add('pointer-events-none');
+        drawer.setAttribute('aria-hidden', 'true');
+      }, 200);
+    }
+
+    if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+    if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+    if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && drawer && !drawer.classList.contains('pointer-events-none')) {
+        closeDrawer();
+      }
+    });
+
+    // ── Scroll elements ───────────────────────────────────────────────
+    var header = document.getElementById('site-header');
+    var logoRow = document.getElementById('desktop-logo-row');
+    var miniLogo = document.getElementById('mini-logo');
+    var navLinksWrapper = document.getElementById('desktop-nav-links-wrapper');
+    var floatingHeadingWrapper = document.getElementById('desktop-floating-heading-wrapper');
+    var trendingContainer = document.getElementById('desktop-trending-container');
+    var mobileHeaderContainer = document.getElementById('mobile-header-container');
+    var mobileTrendingBar = document.getElementById('mobile-trending-bar');
+    var mobileFloatingHeading = document.getElementById('mobile-floating-heading');
+    var progressBar = document.getElementById('reading-progress');
+
+    var scrollThreshold = 80;
+    var mobileHideThreshold = 10; // minimum delta to trigger hide/show
+    var ticking = false;
+    var lastScrollY = 0;
+    var mobileHeaderHidden = false;
+    var isInnerPage = window.location.pathname !== '/' &&
+                      window.location.pathname !== '/breaking' &&
+                      window.location.pathname !== '/breaking/';
+
+    function handleScroll() {
+      var scrollY = window.scrollY;
+      var delta = scrollY - lastScrollY;
+
+      // 1. Progress Bar
+      if (progressBar) {
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        var progress = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
+        progressBar.style.width = progress + '%';
+      }
+
+      // 2. Mobile smart scroll: hide on down, show on up
+      if (mobileHeaderContainer) {
+        if (scrollY <= scrollThreshold) {
+          // Near top: always show full header
+          mobileHeaderContainer.style.transform = 'translateY(0)';
+          mobileHeaderHidden = false;
+          // Show trending bar
+          if (mobileTrendingBar) {
+            mobileTrendingBar.style.maxHeight = '40px';
+            mobileTrendingBar.style.opacity = '1';
+          }
+        } else if (delta > mobileHideThreshold && !mobileHeaderHidden) {
+          // Scrolling DOWN — hide header, keep trending hidden
+          mobileHeaderContainer.style.transform = 'translateY(-100%)';
+          mobileHeaderHidden = true;
+          if (mobileTrendingBar) {
+            mobileTrendingBar.style.maxHeight = '0';
+            mobileTrendingBar.style.opacity = '0';
+          }
+        } else if (delta < -mobileHideThreshold && mobileHeaderHidden) {
+          // Scrolling UP — show header (compact: no trending)
+          mobileHeaderContainer.style.transform = 'translateY(0)';
+          mobileHeaderHidden = false;
+          // Keep trending collapsed when scrolled past threshold
+          if (mobileTrendingBar) {
+            mobileTrendingBar.style.maxHeight = '0';
+            mobileTrendingBar.style.opacity = '0';
+          }
+        }
+
+        // Inner page floating title
+        if (isInnerPage) {
+          if (scrollY > scrollThreshold) {
+            if (mobileFloatingHeading) {
+              mobileFloatingHeading.classList.remove('hidden', 'opacity-0');
+              mobileFloatingHeading.classList.add('flex', 'opacity-100', 'translate-x-0');
+            }
+          } else {
+            if (mobileFloatingHeading) {
+              mobileFloatingHeading.classList.remove('flex', 'opacity-100', 'translate-x-0');
+              mobileFloatingHeading.classList.add('hidden', 'opacity-0');
+            }
+          }
+        }
+      }
+
+      // 3. Desktop scroll transitions (unchanged)
+      if (scrollY > scrollThreshold) {
+        if (logoRow) {
+          logoRow.classList.remove('max-h-28', 'opacity-100');
+          logoRow.classList.add('max-h-0', 'opacity-0');
+        }
+        if (miniLogo) {
+          miniLogo.classList.remove('max-w-0', 'opacity-0');
+          miniLogo.classList.add('max-w-[120px]', 'opacity-100', 'mr-4');
+        }
+
+        if (isInnerPage) {
+          if (navLinksWrapper) {
+            navLinksWrapper.classList.remove('opacity-100', 'translate-y-0');
+            navLinksWrapper.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
+          }
+          if (floatingHeadingWrapper) {
+            floatingHeadingWrapper.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+            floatingHeadingWrapper.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0', 'pl-4');
+          }
+        }
+
+        if (trendingContainer) {
+          trendingContainer.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        if (header) {
+          header.classList.add('shadow-md');
+        }
+      } else {
+        if (logoRow) {
+          logoRow.classList.remove('max-h-0', 'opacity-0');
+          logoRow.classList.add('max-h-28', 'opacity-100');
+        }
+        if (miniLogo) {
+          miniLogo.classList.remove('max-w-[120px]', 'opacity-100', 'mr-4');
+          miniLogo.classList.add('max-w-0', 'opacity-0');
+        }
+
+        if (isInnerPage) {
+          if (navLinksWrapper) {
+            navLinksWrapper.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
+            navLinksWrapper.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+          }
+          if (floatingHeadingWrapper) {
+            floatingHeadingWrapper.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0', 'pl-4');
+            floatingHeadingWrapper.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+          }
+        }
+
+        if (trendingContainer) {
+          trendingContainer.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        if (header) {
+          header.classList.remove('shadow-md');
+        }
+      }
+
+      lastScrollY = scrollY;
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        window.requestAnimationFrame(handleScroll);
+        ticking = true;
+      }
+    }, { passive: true });
+  })();
+</script>
+

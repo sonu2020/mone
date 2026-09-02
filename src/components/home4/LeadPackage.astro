@@ -1,0 +1,178 @@
+---
+// BLOCK · LeadPackage — the /home4 hero band on the site's 12-column grid.
+//
+//   col 1 (5)  full-bleed lead card, spanning both rows
+//   cols 2+3   a trending-topics strip across the pair, then beneath it the
+//              thumbed headline stack (4) and the live rail (3)
+//
+// Component boundaries are applied only to complete components:
+// lead article, topics strip, headline rows and live-rail items.
+
+import Art from "./Art.astro";
+import Kicker from "../ui/Kicker.astro";
+import ThumbRow from "./ThumbRow.astro";
+import TopicStrip from "./TopicStrip.astro";
+import type { LiveStory as Story } from "../../lib/home4-data";
+import type { NavLink } from "../../lib/mega-nav";
+
+export interface FeedItem extends Story {
+  time: string;
+}
+
+export interface Props {
+  lead: Story;
+  rows: Story[];
+  feed: FeedItem[];
+
+  /**
+   * Omit when the masthead already contains the trending strip.
+   */
+  topics?: NavLink[];
+
+  /**
+   * Off when the masthead carries the on-air strip.
+   */
+  onAir?: boolean;
+
+  /**
+   * Sit flush under the header instead of opening with top spacing.
+   */
+  flushTop?: boolean;
+
+  class?: string;
+}
+
+const {
+  lead,
+  rows,
+  feed,
+  topics = [],
+  onAir = true,
+  flushTop = false,
+  class: className = "",
+} = Astro.props;
+
+const STACK_ROWS = 5;
+const RAIL_ITEMS = 7;
+
+const stack = rows.slice(0, STACK_ROWS);
+
+const rail = [
+  ...feed.slice(0, RAIL_ITEMS),
+  ...rows.slice(STACK_ROWS).map((story) => ({
+    ...story,
+    time: "",
+  })),
+].slice(0, RAIL_ITEMS);
+---
+
+<section
+  class:list={[
+    "mc",
+    "grid grid-cols-1 gap-8 pb-6 md:grid-cols-2 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-5",
+    flushTop ? "pt-0" : "pt-6",
+    className,
+  ]}
+>
+  <!-- Complete lead-story component -->
+  <article
+    class:list={[
+      "mc",
+      "border-rule md:col-span-2 lg:col-span-5 lg:border-r lg:pr-6 dark:border-ivory/10",
+      topics.length > 0 && "lg:row-span-2",
+    ]}
+  >
+    <a
+      href={lead.href}
+      class="group block bg-ivory text-inherit no-underline dark:bg-brand-elevated"
+    >
+      <Art
+        story={lead}
+        ratio="5/3"
+        w={960}
+        zoom
+        loading="eager"
+        fetchpriority="high"
+      />
+
+      <div class="flex flex-col gap-1.5 px-3 pb-4 pt-2.5">
+        {lead.category && <Kicker text={lead.category} />}
+
+        <h2
+          class="headline-lead text-balance text-text-primary transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light"
+        >
+          {lead.title}
+        </h2>
+
+        {
+          lead.excerpt && (
+            <p class="line-clamp-5 font-malayalam-alt text-sm leading-tight text-text-secondary dark:text-ivory/70">
+              {lead.excerpt}
+            </p>
+          )
+        }
+
+        {
+          lead.date && (
+            <p class="caption-text pt-0.5 text-text-muted tabular-nums dark:text-ivory/45">
+              {lead.date}
+            </p>
+          )
+        }
+      </div>
+    </a>
+  </article>
+
+  <!-- Complete topics-strip component -->
+  {
+    topics.length > 0 && (
+      <TopicStrip topics={topics} class="-mb-1 md:col-span-2 lg:col-span-7" />
+    )
+  }
+
+  <!-- Complete headline-row components -->
+  <div class="flex flex-col gap-5 lg:col-span-4 lg:pr-6 lg:pt-2">
+    {stack.map((story) => <ThumbRow story={story} />)}
+  </div>
+
+  <!-- Live news rail -->
+  <aside class="lg:col-span-3">
+    <ol class:list={["relative pt-2", onAir && "mt-4"]}>
+      {
+        rail.map((item, i) => (
+          <li class="mc relative pb-3 pl-6 last:pb-0">
+            {i < rail.length - 1 && (
+              <span
+                class="absolute bottom-0 left-[3px] top-2 w-px bg-rule dark:bg-ivory/15"
+                aria-hidden="true"
+              />
+            )}
+
+            <span
+              class="absolute left-0 top-1.5 size-[7px] rounded-full bg-gray-300 ring-2 ring-bg-card"
+              aria-hidden="true"
+            />
+
+            <a href={item.href} class="group block text-inherit no-underline">
+              {item.time ? (
+                <time class="caption-text font-bold text-azure tabular-nums dark:text-azure-light">
+                  {item.time}
+                </time>
+              ) : (
+                item.category && (
+                  <span class="caption-text text-text-muted dark:text-ivory/45">
+                    {item.category}
+                  </span>
+                )
+              )}
+
+              <p class="mt-0.5 line-clamp-2 font-malayalam text-sm leading-5 text-text-primary transition-colors [font-variation-settings:'wdth'_95,'wght'_550] group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light">
+                {item.title}
+              </p>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </aside>
+</section>

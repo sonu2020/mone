@@ -1,0 +1,60 @@
+---
+// COMPONENT · EpisodeCard — one episode, credited to the programme it came from.
+//
+// For surfaces that mix episodes from across the slate, where the programme
+// name is what stops the list reading as noise. Same flat, square, hairline
+// treatment as ArticleCard — this exists rather than reusing ArticleCard only
+// because a video frame must stay 16:9, and these posters carry burnt-in
+// Malayalam text that a 4:3 crop cuts through.
+//
+// The card is an <a> to the programme and also carries data-video-open, so it
+// plays in the modal when JS is up and still navigates when it isn't.
+import type { CatalogueEpisode } from '../../lib/program-catalogue';
+
+export interface Props {
+  item: CatalogueEpisode;
+  /** Modal id, when this episode is playable in the page's VideoModal. */
+  modalId?: string;
+  class?: string;
+}
+
+const { item, modalId, class: className = '' } = Astro.props;
+const { episode, program, duration, views, publishDate } = item;
+---
+
+<article class:list={['mc', className]}>
+  <a href={program.href} data-video-open={modalId} class="group block">
+    <div class="relative aspect-[16/9] overflow-hidden bg-placeholder">
+      <img
+        src={episode.thumbnail.small}
+        alt=""
+        width="320"
+        height="180"
+        loading="lazy"
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+      <span class="absolute inset-0 flex items-center justify-center bg-ink/0 group-hover:bg-ink/20 transition-colors">
+        <span class="size-11 bg-azure text-ivory flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <i class="ti ti-player-play text-lg ml-0.5" aria-hidden="true"></i>
+        </span>
+      </span>
+      <span class="absolute bottom-0 right-0 bg-ink/85 text-ivory eyebrow px-2 py-1 tabular-nums">
+        {duration}
+      </span>
+    </div>
+
+    <div class="mt-3">
+      <div class="flex items-center gap-2 meta-text text-text-muted">
+        <span class="eyebrow text-azure dark:text-azure-light">{program.title}</span>
+        <span aria-hidden="true">·</span>
+        <span class="tabular-nums">{publishDate}</span>
+      </div>
+      {/* English is the standard for card headings — the paired
+          Malayalam-over-English title made every card two headlines deep. */}
+      <h3 class="mt-1.5 article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2">
+        {episode.titleEn || episode.title}
+      </h3>
+      <p class="mt-1.5 caption-text text-text-muted tabular-nums">{views} views</p>
+    </div>
+  </a>
+</article>

@@ -1,0 +1,211 @@
+---
+// COMPONENT · StoryArticle — the story page on the /article/ready shape.
+//
+// Ready's trade, applied to real stories: the opener and the measure are the
+// centred reading case, the frame around them is the commercial one. The
+// masthead unit sits above the header (Layout's `topAd`), the tool rail is
+// sticky to the left of the prose, and the rail to the right carries what to
+// read next. Nothing is interleaved with the paragraphs — the rails hold the
+// commerce so the prose doesn't have to.
+//
+// Two things this page keeps that the article lab does not: the "More from
+// {section}" rail and the full-width "Recommended for you" grid below it, so
+// the two are never the same list twice, and the floating footer unit, which
+// the page owner supplies.
+//
+// House standards throughout: square corners, hairline rules, no shadows.
+import Placeholder from '../Placeholder.astro';
+import AdSlot from '../AdSlot.astro';
+import ArticleCard from '../ArticleCard.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import ArticleBreadcrumb from '../article/ArticleBreadcrumb.astro';
+import ArticleHeadline from '../article/ArticleHeadline.astro';
+import ArticleByline from '../article/ArticleByline.astro';
+import ArticleToolRail from '../article/ArticleToolRail.astro';
+import TopicChips from '../article/TopicChips.astro';
+import ShareBar from '../article/ShareBar.astro';
+import ContentGridAd from '../ads/ContentGridAd.astro';
+
+export interface StoryCardItem {
+  title: string;
+  href: string;
+  date?: string;
+  image?: string;
+  category?: string;
+}
+
+export interface PromotedAd {
+  containerId: string;
+  scriptSrc: string;
+}
+
+const {
+  title,
+  lead,
+  image,
+  date,
+  sectionName,
+  sectionId,
+  body,
+  bodyAfter = [],
+  tags = [],
+  quote,
+  author = { name: 'MediaOne Web Desk', role: 'Newsroom' },
+  published,
+  updated,
+  related = [],
+  recommended = [],
+  promotedAd,
+} = Astro.props;
+
+// Measured, not asserted: 200wpm over the words actually on the page, so the
+// figure moves when the copy does instead of being a decorative "4 min read".
+const WORDS_PER_MINUTE = 200;
+const wordCount = [lead, ...body, ...bodyAfter].join(' ').trim().split(/\s+/).length;
+const readingTime = Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE));
+
+const publishedAt = published ?? date ?? '';
+---
+<div class="mc bg-bg-card">
+  <div
+    id="read-progress"
+    class="fixed inset-x-0 top-0 z-50 h-0.5 bg-azure origin-left scale-x-0"
+    aria-hidden="true"
+  ></div>
+
+  <!-- ══ Opener — one centred measure ════════════════════════════════════ -->
+  <header class="max-w-3xl mx-auto px-4 sm:px-6 pt-10 lg:pt-14">
+    <ArticleBreadcrumb section={sectionName} sectionHref={`/${sectionId}`} />
+    <ArticleHeadline kicker={sectionName} title={title} dek={lead} class="mt-5" />
+    <ArticleByline
+      author={author}
+      published={publishedAt}
+      updated={updated}
+      readingTime={readingTime}
+      layout="stack"
+      class="mt-7"
+    />
+
+    {image !== undefined && (
+      <figure class="mt-8">
+        <Placeholder class="aspect-[16/9] w-full" src={image} alt={title} />
+        <figcaption class="pt-2 caption-text text-text-muted">
+          പ്രതീകാത്മക ചിത്രം · MediaOne
+        </figcaption>
+      </figure>
+    )}
+  </header>
+
+  <!-- ══ Body — tools · prose · rail ═════════════════════════════════════ -->
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 xl:gap-x-10 pt-8">
+      <ArticleToolRail class="hidden lg:block lg:col-span-2" />
+
+      <article id="article-body" class="lg:col-span-7 min-w-0">
+        {body.map((p) => (
+          <p class="text-lg lg:text-body text-text-primary leading-relaxed mb-5">{p}</p>
+        ))}
+
+        {quote && (
+          <blockquote class="my-8 py-6 border-y border-ink/10 dark:border-ivory/15">
+          <p class="section-header text-text-primary text-balance">{quote.text}</p>
+            {quote.cite && (
+              <cite class="mt-3 block eyebrow text-azure dark:text-azure-light not-italic">{quote.cite}</cite>
+            )}
+          </blockquote>
+        )}
+
+        {bodyAfter.length > 0 && (
+          <>
+            <h2 class="section-header text-text-primary pt-2 pb-3">തുടർന്നുള്ള നടപടികൾ</h2>
+            {bodyAfter.map((p) => (
+              <p class="text-lg lg:text-body text-text-primary leading-relaxed mb-5">{p}</p>
+            ))}
+          </>
+        )}
+
+        {tags.length > 0 && (
+          <div class="mt-10 pt-6 border-t border-rule dark:border-ivory/10 flex flex-wrap items-center justify-between gap-4">
+            <TopicChips topics={tags} />
+            <!-- Redundant with the tool rail on desktop; the only share
+                 affordance below lg, where that rail is hidden. -->
+            <ShareBar class="lg:hidden" />
+          </div>
+        )}
+      </article>
+
+      <!-- Sticky, so "more from this desk" stays in reach the whole way down a
+           long story rather than being a reward for finishing it. -->
+      <aside class="lg:col-span-3 min-w-0 mt-10 lg:mt-0" aria-label={`More from ${sectionName}`}>
+        <div class="lg:sticky lg:top-20 flex flex-col gap-8">
+          {related.length > 0 && (
+            <section>
+              <SectionHeading title={`More from ${sectionName}`} href={`/${sectionId}`} viewAllHref={`/${sectionId}`} />
+              <ul class="divide-y divide-rule/60 dark:divide-ivory/[0.07]">
+                {related.slice(0, 5).map((a) => (
+                  <li>
+                    <a href={a.href} class="group flex items-start gap-3 py-3">
+                      <span class="relative w-24 shrink-0 aspect-[4/3] overflow-hidden bg-black/10 dark:bg-black/40">
+                        <Placeholder class="w-full h-full" src={a.image} alt="" />
+                      </span>
+                      <span class="min-w-0 flex-1">
+                        <span class="block article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light line-clamp-3 transition-colors">
+                          {a.title}
+                        </span>
+                        {a.date && (
+                          <span class="mt-1 block caption-text tabular-nums text-text-muted">{a.date}</span>
+                        )}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <AdSlot slot="story-rail" format="rectangle" lazy={true} />
+        </div>
+      </aside>
+    </div>
+
+    <!-- ══ Recommendations, full width ═══════════════════════════════════ -->
+    {recommended.length > 0 && (
+      <section class="mt-14 pt-10 pb-14 border-t border-rule dark:border-ivory/10">
+        <SectionHeading title="Recommended for you" />
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
+          {recommended.slice(0, 4).map((a) => (
+            <ArticleCard variant="standard" title={a.title} href={a.href} date={a.date} image={a.image} category={a.category} />
+          ))}
+        </div>
+      </section>
+    )}
+    {promotedAd && (
+      <section class="mt-14 pt-10 pb-14 border-t border-rule dark:border-ivory/10">
+        <!-- Full-width, the size the wide measure earns: a billboard banner,
+             not the rail's square rectangle. -->
+        <AdSlot slot="story-promoted-banner" format="billboard" lazy={true} class="mb-10" />
+        <ContentGridAd containerId={promotedAd.containerId} scriptSrc={promotedAd.scriptSrc} />
+      </section>
+    )}
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var bar = document.getElementById('read-progress');
+    var article = document.getElementById('article-body');
+    if (!bar || !article) return;
+    var ticking = false;
+    function update() {
+      var rect = article.getBoundingClientRect();
+      var total = rect.height - window.innerHeight;
+      var progress = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
+      bar.style.transform = 'scaleX(' + progress + ')';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  })();
+</script>

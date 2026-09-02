@@ -1,0 +1,112 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/nav/HeaderBar.astro';
+import Footer from '../../components/Footer.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import StickyFooterAd from '../../components/ads/StickyFooterAd.astro';
+import StoryArticle from '../../components/story/StoryArticle.astro';
+import { sections } from '../../lib/sections';
+import { getArticleImage } from '../../lib/images';
+
+export function getStaticPaths() {
+  const seen = new Map();
+  for (const s of sections) {
+    for (const a of s.articles) {
+      const slug = a.href.replace('/story/', '');
+      if (!seen.has(slug)) {
+        seen.set(slug, { article: a, sectionName: s.name, sectionId: s.id });
+      }
+    }
+  }
+  return [...seen.entries()].map(([slug, props]) => ({ params: { slug }, props }));
+}
+
+const { article, sectionName, sectionId } = Astro.props;
+
+const section = sections.find((s) => s.id === sectionId);
+
+// "More from {section}" — same-section stories.
+const related = (section?.articles ?? [])
+  .filter((a) => a.href !== article.href)
+  .slice(0, 8)
+  .map((a) => ({ title: a.title, href: a.href, date: a.date, image: a.image, category: sectionName }));
+
+// "Recommended for you" — a spread across other sections for the full-width row.
+const recommended = sections
+  .filter((s) => s.id !== sectionId)
+  .flatMap((s) => s.articles.slice(0, 2).map((a) => ({
+    title: a.title, href: a.href, date: a.date, image: a.image, category: s.name,
+  })))
+  .filter((a) => a.href !== article.href)
+  .slice(0, 8);
+
+// MGID content-grid slot — leave scriptSrc/containerId unset to show the
+// dummy grid; fill them in with the real widgets.mgid.com embed to go live.
+const promotedAd = {};
+
+const lead =
+  article.excerpt ||
+  'വാർത്തയുടെ പ്രധാന വിശദാംശങ്ങൾ ഇവിടെ ലഭ്യമാകും. ബന്ധപ്പെട്ട അധികൃതരുടെ പ്രതികരണവും തുടർനടപടികളും ഉൾപ്പെടെ.';
+
+// Placeholder copy, shared across every /story/* page until per-article
+// bodies exist. Extended ~5x (2 → 10 paragraphs each side of the quote) as
+// dummy long-form content — a deliberate stress test for the reading
+// progress bar, sticky tool rail, and ad placement on a genuinely long page.
+const body = [
+  'സംഭവത്തിന്റെ പശ്ചാത്തലത്തിൽ അധികൃതർ വിശദമായ അന്വേഷണം ആരംഭിച്ചു. പ്രാദേശിക ഭരണകൂടവും ബന്ധപ്പെട്ട വകുപ്പുകളും സ്ഥിതിഗതികൾ സൂക്ഷ്മമായി നിരീക്ഷിച്ചുവരികയാണ്. പ്രാഥമിക വിവരങ്ങൾ പ്രകാരം സ്ഥിതി നിയന്ത്രണവിധേയമാണ്.',
+  'വിഷയത്തിൽ വിവിധ കോണുകളിൽ നിന്ന് പ്രതികരണങ്ങൾ ഉയർന്നു. ജനങ്ങളുടെ ആശങ്കകൾ പരിഹരിക്കാൻ ആവശ്യമായ എല്ലാ നടപടികളും സ്വീകരിക്കുമെന്ന് ഉത്തരവാദപ്പെട്ടവർ അറിയിച്ചു.',
+  'സംഭവസ്ഥലത്ത് നിന്നുള്ള ദൃശ്യങ്ങളും വിവരങ്ങളും അധികൃതർ ശേഖരിച്ചു വരികയാണ്. ഇത് സംബന്ധിച്ച വിശദമായ റിപ്പോർട്ട് ഉന്നത ഉദ്യോഗസ്ഥർക്ക് കൈമാറും.',
+  'പ്രദേശവാസികളും ദൃക്സാക്ഷികളും സംഭവത്തെക്കുറിച്ചുള്ള തങ്ങളുടെ അനുഭവങ്ങൾ മാധ്യമങ്ങളോട് പങ്കുവെച്ചു. ഇവരുടെ മൊഴികളും അന്വേഷണത്തിന്റെ ഭാഗമായി രേഖപ്പെടുത്തും.',
+  'ബന്ധപ്പെട്ട വകുപ്പ് മേധാവികൾ അടിയന്തര യോഗം വിളിച്ചുചേർത്ത് സ്ഥിതിഗതികൾ വിലയിരുത്തി. ആവശ്യമായ മുൻകരുതൽ നടപടികൾ സ്വീകരിക്കാൻ ഉദ്യോഗസ്ഥർക്ക് നിർദേശം നൽകി.',
+  'സമാന സംഭവങ്ങൾ ആവർത്തിക്കാതിരിക്കാൻ ദീർഘകാല പദ്ധതികൾ ആവിഷ്കരിക്കുമെന്ന് ബന്ധപ്പെട്ട അധികൃതർ അറിയിച്ചു. ഇതിന്റെ രൂപരേഖ അടുത്ത ദിവസങ്ങളിൽ പുറത്തുവിടും.',
+  'വിഷയത്തിൽ പ്രതിപക്ഷ കക്ഷികളും സാമൂഹിക സംഘടനകളും വിശദീകരണം ആവശ്യപ്പെട്ടു. സർക്കാർ ഇത് സംബന്ധിച്ച് നിയമസഭയിൽ മറുപടി നൽകുമെന്നാണ് സൂചന.',
+  'സാമ്പത്തിക പ്രത്യാഘാതങ്ങളും ഇതുമായി ബന്ധപ്പെട്ട് ചർച്ചയാകുന്നുണ്ട്. വിദഗ്ധസമിതി ഇത് സംബന്ധിച്ച പഠനം നടത്തി റിപ്പോർട്ട് സമർപ്പിക്കും.',
+  'സാമൂഹ്യ മാധ്യമങ്ങളിലും വിഷയം സജീവമായി ചർച്ച ചെയ്യപ്പെടുന്നു. വ്യാജ വിവരങ്ങൾ പ്രചരിക്കുന്നതിനെതിരെ ജാഗ്രത പാലിക്കണമെന്ന് അധികൃതർ അഭ്യർത്ഥിച്ചു.',
+  'നിയമപരമായ വശങ്ങൾ പരിശോധിക്കാൻ പ്രത്യേക സംഘത്തെ നിയോഗിച്ചതായി ഔദ്യോഗിക വൃത്തങ്ങൾ അറിയിച്ചു. അന്വേഷണ റിപ്പോർട്ടിന്റെ അടിസ്ഥാനത്തിൽ തുടർനടപടികൾ സ്വീകരിക്കും.',
+];
+
+const bodyAfter = [
+  'വരും ദിവസങ്ങളിൽ കൂടുതൽ വ്യക്തത കൈവരുമെന്നാണ് പ്രതീക്ഷിക്കുന്നത്. തുടർനടപടികൾ സംബന്ധിച്ച ഔദ്യോഗിക വിവരങ്ങൾ യഥാസമയം പുറത്തുവിടുമെന്ന് അധികൃതർ വ്യക്തമാക്കി.',
+  'സംഭവവികാസങ്ങൾ മീഡിയവൺ സൂക്ഷ്മമായി പിന്തുടരുന്നു. പുതിയ വിവരങ്ങൾ ലഭ്യമാകുന്ന മുറയ്ക്ക് ഈ റിപ്പോർട്ട് പുതുക്കും.',
+  'ബന്ധപ്പെട്ട എല്ലാ വിഭാഗങ്ങളുമായും ചർച്ച നടത്തി പൊതുസമ്മതമുള്ള പരിഹാരം കണ്ടെത്താനാണ് ശ്രമമെന്ന് ഉദ്യോഗസ്ഥർ വ്യക്തമാക്കി. ഇതിനായി ഒരു ഏകോപന സമിതി രൂപീകരിച്ചു.',
+  'സ്ഥലം സന്ദർശിച്ച ജനപ്രതിനിധികൾ അടിയന്തര സഹായം ഉറപ്പുനൽകി. ആവശ്യമായ ഫണ്ട് അനുവദിക്കുന്ന കാര്യം സർക്കാരിന്റെ പരിഗണനയിലാണ്.',
+  'തുടർച്ചയായ നിരീക്ഷണത്തിനായി പ്രത്യേക സെല്‍ രൂപീകരിക്കുമെന്ന് അധികൃതർ അറിയിച്ചു. ഇത് ദിവസേനയുള്ള റിപ്പോർട്ട് ബന്ധപ്പെട്ട വകുപ്പിന് കൈമാറും.',
+  'വിദഗ്ധരുടെ അഭിപ്രായത്തിൽ, ദീർഘകാല അടിസ്ഥാനത്തിലുള്ള നടപടികളാണ് ഇനി ആവശ്യമായി വരിക. ഇത് സംബന്ധിച്ച നിർദേശങ്ങൾ ഉടൻ സമർപ്പിക്കും.',
+  'ബാധിക്കപ്പെട്ടവർക്ക് ആവശ്യമായ എല്ലാ പിന്തുണയും ഉറപ്പാക്കുമെന്ന് ജില്ലാ ഭരണകൂടം അറിയിച്ചു. പരാതികൾ അറിയിക്കാൻ പ്രത്യേക ഹെൽപ്‌ലൈൻ ആരംഭിച്ചു.',
+  'അടുത്ത ഘട്ട നടപടികളുടെ സമയക്രമം ബന്ധപ്പെട്ട വകുപ്പ് പുറത്തുവിട്ടു. നിശ്ചിത കാലയളവിനുള്ളിൽ പുരോഗതി വിലയിരുത്തുമെന്നും അറിയിച്ചു.',
+  'വിഷയത്തിൽ കോടതി ഇടപെടൽ ഉണ്ടായേക്കുമെന്ന സൂചനകളും പുറത്തുവരുന്നുണ്ട്. ഇത് സംബന്ധിച്ച നിയമോപദേശം തേടിയതായി അധികൃതർ സ്ഥിരീകരിച്ചു.',
+  'കൂടുതൽ വിവരങ്ങൾക്കായി ഈ റിപ്പോർട്ട് തുടർച്ചയായി അപ്ഡേറ്റ് ചെയ്യുന്നതാണ്. ഔദ്യോഗിക സ്ഥിരീകരണം ലഭിക്കുന്ന മുറയ്ക്ക് കൂടുതൽ വിശദാംശങ്ങൾ ചേർക്കും.',
+];
+
+const quote = {
+  text: 'സുതാര്യമായ അന്വേഷണത്തിലൂടെ മാത്രമേ സത്യം പുറത്തുവരൂ.',
+  cite: 'പ്രതികരണം',
+};
+
+const tags = [sectionName, 'MediaOne', 'Latest News'];
+---
+
+<Layout title={`${article.title} — MediaOne`} description={lead} topAdFormat="masthead">
+  <Header />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page">
+    <StoryArticle
+      title={article.title}
+      lead={lead}
+      image={getArticleImage(article.image)}
+      date={article.date}
+      sectionName={sectionName}
+      sectionId={sectionId}
+      body={body}
+      bodyAfter={bodyAfter}
+      quote={quote}
+      tags={tags}
+      promotedAd={promotedAd}
+      recommended={recommended}
+    />
+  </main>
+
+  <Footer />
+  <StickyFooterAd />
+</Layout>

@@ -1,0 +1,22 @@
+---
+// BLOCK · StoryRow — horizontal thumb + headline. The rail / list workhorse.
+import Media from '../ui/Media.astro';
+import Headline from '../ui/Headline.astro';
+import MetaRow from '../ui/MetaRow.astro';
+import type { Story } from '../../lib/home-data';
+export interface Props {
+  story: Story;
+  size?: 'base' | 'lg';
+  thumbRatio?: string;
+  showMeta?: boolean;
+  class?: string;
+}
+const { story, size = 'base', thumbRatio = '4/3', showMeta = true, class: className = '' } = Astro.props;
+---
+<a href={story.href} class:list={['mc', 'group flex gap-4 py-4 first:pt-0', className]}>
+  <Media seed={story.href} ratio={thumbRatio} class="w-24 sm:w-28 shrink-0" />
+  <div class="min-w-0 flex flex-col justify-center">
+    <Headline as="h3" size={size} text={story.title} clamp={2} />
+    {showMeta && <MetaRow category={story.category} date={story.date} class="mt-1.5" />}
+  </div>
+</a>

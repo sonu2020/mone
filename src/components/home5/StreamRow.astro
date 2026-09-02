@@ -1,0 +1,57 @@
+---
+// BLOCK · StreamRow — the workhorse of the /home5 feed: one news block. Text
+// left, a 3:2 still right, a hairline beneath. Wider and taller than the
+// homepage's ThumbRow because here it is the page rather than a rail item —
+// the headline gets room to run to two or three lines and carries a standfirst
+// under it.
+//
+// The desk is a kicker on the block, not a heading above a group of them. That
+// is the whole difference between this page and the homepage: the reader can
+// still see a story is from Gulf, but nothing asks them to read Gulf as a set.
+import Art from '../home4/Art.astro';
+import Kicker from '../ui/Kicker.astro';
+import type { StreamStory } from '../../lib/home5-stream';
+
+export interface Props {
+  story: StreamStory;
+  class?: string;
+}
+const { story, class: className = '' } = Astro.props;
+---
+
+<a
+  href={story.href}
+  class:list={['mc', 'group grid grid-cols-[1fr_auto] items-start gap-4 sm:gap-6 py-4 sm:py-5', className]}
+>
+  <div class="min-w-0 flex flex-col gap-1.5">
+    <p class="flex items-baseline gap-2.5">
+      {story.category && <Kicker text={story.category} />}
+      <span class="row-meta text-text-light dark:text-ivory/40 tabular-nums">{story.time}</span>
+    </p>
+
+    <h2 class="article-title text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance line-clamp-3">
+      {story.title}
+    </h2>
+
+    <!-- A story's own standfirst where the snapshot has one, and nothing at
+         all where it does not. The homepage can fall back to lib/dummy-text
+         because it renders four or five standfirsts a page; a feed of forty
+         rows would run the eight-line placeholder pool five times over, and a
+         reader scrolling past the same sentence every fourth story learns to
+         distrust the column. Headline-only rows also scan faster, which is the
+         argument for this page in the first place. -->
+    {story.excerpt && (
+      <p class="hidden sm:block body-small text-text-secondary dark:text-ivory/65 line-clamp-2 pt-0.5">
+        {story.excerpt}
+      </p>
+    )}
+  </div>
+
+  <!-- Sized so the still lands within a few pixels of the text beside it: a
+       meta line plus a two-line headline is about 90px, and 3:2 at 144px wide
+       is 96. A larger thumb scans no better and leaves the tall side of every
+       row half empty, which over forty rows is most of the page. -->
+  <div class="w-24 sm:w-32 md:w-36 shrink-0">
+    <Art story={story} ratio="3/2" w={400} class="rounded-md" zoom loading="lazy" />
+  </div>
+</a>

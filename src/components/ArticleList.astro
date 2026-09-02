@@ -1,0 +1,32 @@
+---
+import ArticleCard from './ArticleCard.astro';
+
+export interface ArticleListItem {
+  title: string;
+  category?: string;
+  href: string;
+  date?: string;
+  excerpt?: string;
+  image?: string;
+}
+
+export interface Props {
+  items: ArticleListItem[];
+  class?: string;
+}
+
+const { items, class: className = '' } = Astro.props;
+---
+
+<div class:list={['mc', className]}>
+  {items.map((item) => (
+    <ArticleCard
+      variant="compact"
+      title={item.title}
+      category={item.category}
+      href={item.href}
+      date={item.date}
+      image={item.image}
+    />
+  ))}
+</div>

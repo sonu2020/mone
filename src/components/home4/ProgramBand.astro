@@ -1,0 +1,161 @@
+---
+// BLOCK · ProgramBand — a single programme's shelf: the latest episode as a
+// large still on the left, the rest of the run as a numbered playlist on the
+// right. Built for the flagship shows, where the draw is the programme itself
+// rather than any one story, so the band leads with the show's identity.
+import Media from "../ui/Media.astro";
+import Kicker from "../ui/Kicker.astro";
+import BandHeading from "./BandHeading.astro";
+import { ytThumbnail } from "../../lib/videos";
+import type { Program, ProgramEpisode } from "../../lib/programs";
+
+export interface Props {
+  program: Program;
+  episodes: ProgramEpisode[]; // newest first
+  href?: string;
+  popular?: boolean;
+  class?: string;
+}
+const {
+  program,
+  episodes,
+  href,
+  popular = false,
+  class: className = "",
+} = Astro.props;
+
+const programHref = href ?? `/programs/${program.slug}`;
+const [latest, ...rest] = episodes;
+// Episode numbering runs down from the latest, matching the playlist slugs.
+const latestNumber = episodes.length;
+---
+
+<section
+  class:list={[
+    "mc",
+    "py-12 border-b border-rule dark:border-ivory/10",
+    className,
+  ]}
+>
+  <BandHeading
+    label={program.title}
+    href={programHref}
+    viewAllHref={programHref}
+    badge={popular ? "Popular" : undefined}
+    class="mb-6"
+  />
+
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
+    <!-- Latest episode -->
+    <a href={programHref} class="group lg:col-span-7 xl:col-span-8 block">
+      <div class="relative">
+        <Media
+          seed={latest.seed}
+          src={latest.thumbnailUrl ?? ytThumbnail(latest.youtubeId)}
+          ratio="16/9"
+          w={960}
+          zoom
+        />
+        <span
+          class="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent"
+        ></span>
+
+        <span
+          class="absolute left-3 top-3 inline-flex items-center gap-1.5 bg-accent-red px-2 py-1 text-white"
+        >
+          <span class="eyebrow">Latest episode</span>
+        </span>
+
+        <span
+          class="absolute right-3 bottom-3 bg-ink/80 px-1.5 py-0.5 caption-text tabular-nums text-white"
+        >
+          {latest.duration}
+        </span>
+
+        <span
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 grid size-14 place-items-center rounded-full bg-white/90 text-ink transition-transform duration-200 group-hover:scale-110"
+        >
+          <i class="ti ti-player-play text-2xl" aria-hidden="true"></i>
+        </span>
+      </div>
+
+      <div class="pt-3">
+        <p class="flex items-baseline gap-2 flex-wrap">
+          <Kicker text={`Episode ${latestNumber}`} />
+          <span
+            class="caption-text text-text-muted dark:text-ivory/45 tabular-nums"
+            >{latest.publishDate}</span
+          >
+          <span class="caption-text text-text-light dark:text-ivory/30">·</span>
+          <span
+            class="caption-text text-text-muted dark:text-ivory/45 tabular-nums"
+            >{latest.views} views</span
+          >
+        </p>
+        <h3
+          class="mt-1 headline-feature text-text-navy-deep dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance"
+        >
+          {latest.title}
+        </h3>
+      </div>
+    </a>
+
+    <!-- Playlist -->
+    <aside class="lg:col-span-5 xl:col-span-4 flex flex-col">
+      <div
+        class="flex items-baseline justify-between gap-3 pb-2.5 mb-1 border-b border-rule dark:border-ivory/10"
+      >
+        <p class="eyebrow text-text-muted dark:text-ivory/40">More episodes</p>
+        {
+          program.schedule && (
+            <p class="caption-text text-text-muted dark:text-ivory/40">
+              {program.schedule}
+            </p>
+          )
+        }
+      </div>
+
+      <ol class="divide-y divide-rule dark:divide-ivory/10">
+        {
+          rest.slice(0, 4).map((episode, i) => (
+            <li>
+              <a href={programHref} class="group flex items-start gap-3.5 py-3">
+                <span class="w-6 shrink-0 pt-0.5 text-right caption-text tabular-nums text-text-light dark:text-ivory/30">
+                  {latestNumber - 1 - i}
+                </span>
+
+                <div class="relative w-24 shrink-0">
+                  <Media
+                    seed={episode.seed}
+                    src={episode.thumbnailUrl ?? ytThumbnail(episode.youtubeId)}
+                    ratio="16/9"
+                    w={240}
+                    zoom
+                  />
+                  <span class="absolute right-1 bottom-1 bg-ink/80 px-1 caption-text tabular-nums text-white">
+                    {episode.duration}
+                  </span>
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <h4 class="headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2">
+                    {episode.title}
+                  </h4>
+                  <p class="mt-1 caption-text text-text-muted dark:text-ivory/45 tabular-nums">
+                    {episode.publishDate}
+                  </p>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+
+      <a
+        href={programHref}
+        class="mt-auto pt-3 eyebrow text-azure hover:text-azure-dark dark:hover:text-azure-light transition-colors"
+        >All episodes →</a
+      >
+    </aside>
+  </div>
+</section>

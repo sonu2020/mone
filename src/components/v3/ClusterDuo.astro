@@ -1,0 +1,18 @@
+---
+// SECTION · ClusterDuo — two SectionColumns side by side, rule-divided. The
+// homepage's "duo rows" for beats that pair naturally: Gulf + India, Entertainment
+// + Sports. Each column is a heading + lead StoryCard + a short StoryList.
+import SectionColumn from '../news/SectionColumn.astro';
+import type { SectionCluster } from '../../lib/home-data';
+
+export interface Props {
+  left: SectionCluster;
+  right: SectionCluster;
+  class?: string;
+}
+const { left, right, class: className = '' } = Astro.props;
+---
+<section class:list={['mc', 'grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 py-7 lg:py-10 border-t border-rule', className]}>
+  <SectionColumn cluster={left} class="lg:border-r border-rule lg:pr-10" />
+  <SectionColumn cluster={right} />
+</section>

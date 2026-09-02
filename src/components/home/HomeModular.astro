@@ -1,0 +1,168 @@
+---
+// ── Modular (current homepage — NYT + BBC 3-Col + Sky synthesis) ───────────
+// Combines: BBC's asymmetric 3-column hero package and parallel section-strip
+// columns, NYT's rule-divided text-forward rails, and Sky's timestamp-driven
+// live rail. Deliberately dense — headlines never exceed `lg` (article-title-lg,
+// 30px max desktop), never `hero`/`display`, so the page reads packed and
+// filled rather than airy. See HomeMagazine.astro for the prior direction.
+import AdSlot from '../AdSlot.astro';
+import PhotoGallery from '../PhotoGallery.astro';
+import AsymmetricShelf from '../news/AsymmetricShelf.astro';
+import CategoryColumnsShelf from '../news/CategoryColumnsShelf.astro';
+import SectionColumn from '../news/SectionColumn.astro';
+import StoryCard from '../news/StoryCard.astro';
+import PromoGrid from '../news/PromoGrid.astro';
+import NumberedList from '../news/NumberedList.astro';
+import Timeline from '../news/Timeline.astro';
+import TopVideosShelf from '../news/TopVideosShelf.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Pulse from '../ui/Pulse.astro';
+
+import {
+  hero,
+  topStories,
+  latest,
+  mostRead,
+  cluster,
+  galleryItems,
+  shelfEditorialHero,
+  shelfEditorialGrid
+} from '../../lib/home-data';
+import VideoModal from '../VideoModal.astro';
+import { allVideos } from '../../lib/videos';
+import { toModalVideos } from '../../lib/video-modal';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+const gulf = cluster('gulf');
+const entertainment = cluster('entertainment');
+const sports = cluster('sports');
+
+// Homepage Top Videos: same real YouTube videos as /videos, opened in the
+// shared VideoModal overlay (data-video-open) instead of navigating away.
+const topVideoItems = allVideos.slice(0, 4).map((v) => ({
+  title: v.title,
+  href: '/videos',
+  category: v.category,
+  duration: v.duration,
+  views: v.views,
+  date: v.publishDate,
+  seed: v.thumbnail,
+  imageUrl: v.thumbnailUrl,
+  modalId: v.slug,
+}));
+
+// Sky-style timestamped rail for the hero package's right column.
+const latestFeed = [
+  { time: '21:14', ...topStories[0] },
+  { time: '20:40', ...latest[1] },
+  { time: '20:12', ...kerala.items[0] },
+  { time: '19:47', ...india.items[0] },
+  { time: '19:20', ...topStories[2] },
+];
+---
+
+<div class:list={['mc', 'w-full max-w-site mx-auto bg-bg-card']}>
+  <div class="px-4 sm:px-6 lg:px-8">
+
+    <!-- 1 · LEAD PACKAGE — BBC asymmetric 3-col + Sky timestamp rail, headline capped at `lg` -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-6 py-5 lg:py-6 border-b border-rule">
+
+      <div class="lg:col-span-3 lg:border-r border-rule lg:pr-6 order-2 lg:order-1 flex flex-col gap-5 mt-6 lg:mt-0">
+      {[latest[0], latest[2]].map((s) => <StoryCard story={s} ratio="4/3" />)}
+      </div>
+
+
+      <div class="lg:col-span-6 lg:border-r border-rule lg:pr-6 order-1 lg:order-2">
+        <StoryCard story={hero} ratio="16/9" size="lg" showExcerpt />
+      </div>
+
+      <aside class="lg:col-span-3 order-3 mt-6 lg:mt-0">
+        <div class="flex items-center gap-2 pb-2 mb-3 border-b-2 border-ink">
+          <Pulse />
+          <h2 class="section-header text-ink">തത്സമയം</h2>
+        </div>
+        <Timeline items={latestFeed} />
+      </aside>
+    </section>
+  </div>
+
+  <AdSlot slot="home-1" format="leaderboard" />
+
+  <div class="px-4 sm:px-6 lg:px-8">
+    <!-- 2 · LATEST + POPULAR -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-6 py-5 lg:py-6 border-b border-rule">
+      <div class="lg:col-span-8 lg:border-r border-rule lg:pr-6">
+        <SectionHeading title="ഏറ്റവും പുതിയത്" titleEn="Latest" viewAllHref="/latest-news" />
+        <PromoGrid items={latest.slice(0, 6)} cols={3} />
+      </div>
+      <aside class="lg:col-span-4 mt-8 lg:mt-0">
+        <SectionHeading title="ജനപ്രിയം" titleEn="Popular" />
+        <NumberedList items={mostRead} />
+      </aside>
+    </section>
+  </div>
+
+  <!-- 3 · SHELF (branded in-depth) -->
+  <div class="px-4 sm:px-6 lg:px-8 border-b border-rule dark:border-ivory/10">
+    <AsymmetricShelf
+      title="ഷെൽഫ്"
+      titleEn="Shelf"
+      viewAllHref="/shelf"
+      leadStory={shelfEditorialHero}
+      bottomStories={[...shelfEditorialGrid, topStories[3]]}
+      sidebarStories={[mostRead[0], mostRead[1], mostRead[2]]}
+    />
+  </div>
+</div>
+
+<!-- 4 · TOP VIDEOS (Full-bleed Blue Band) -->
+<TopVideosShelf
+  title="വീഡിയോ"
+  titleEn="TOP VIDEOS"
+  viewAllHref="/videos"
+  videos={topVideoItems}
+/>
+
+<div class:list={['mc', 'w-full max-w-site mx-auto bg-bg-card']}>
+  <AdSlot slot="home-2" format="leaderboard" />
+
+  <div class="px-4 sm:px-6 lg:px-8">
+    <!-- 5 · KERALA / GULF / INDIA — BBC section-strip: 3 parallel dense columns -->
+    <section class="py-6 lg:py-7 border-b border-rule">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-9">
+        <SectionColumn cluster={kerala} leadSize="base" class="lg:border-r border-rule lg:pr-8" />
+        <SectionColumn cluster={gulf} leadSize="base" class="lg:border-r border-rule lg:pr-8" />
+        <SectionColumn cluster={india} leadSize="base" />
+      </div>
+    </section>
+
+  </div>
+
+  <AdSlot slot="home-3" format="leaderboard" />
+
+  <div class="px-4 sm:px-6 lg:px-8">
+    <!-- 6 · CATEGORY COLUMNS -->
+    <CategoryColumnsShelf
+      clusters={[kerala, gulf, entertainment, sports]}
+      class="border-b border-rule dark:border-ivory/10 py-6 lg:py-7"
+    />
+
+    <!-- 7 · PHOTO STORY -->
+    <section class="py-5 lg:py-6 border-b border-rule">
+      <SectionHeading title="ചിത്രങ്ങൾ" titleEn="Photo Story" viewAllHref="/" />
+      <PhotoGallery items={galleryItems} />
+    </section>
+
+    <!-- 8 · MORE ACROSS MEDIAONE -->
+    <section class="py-5 lg:py-6">
+      <SectionHeading title="കൂടുതൽ" titleEn="More from MediaOne" />
+      <PromoGrid items={[...mostRead.slice(0, 4)]} cols={4} />
+    </section>
+  </div>
+
+  <AdSlot slot="home-4" format="rectangle" />
+</div>
+
+<!-- Theater overlay for the Top Videos shelf (same player as /videos) -->
+<VideoModal videos={toModalVideos(allVideos)} />

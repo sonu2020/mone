@@ -1,0 +1,21 @@
+---
+// BLOCK · PromoGrid — a disciplined grid of StoryCards. The "more news" module.
+import StoryCard from './StoryCard.astro';
+import type { Story } from '../../lib/home-data';
+export interface Props {
+  items: Story[];
+  cols?: 2 | 3 | 4;
+  ratio?: string;
+  showExcerpt?: boolean;
+  class?: string;
+}
+const { items, cols = 3, ratio = '16/9', showExcerpt = false, class: className = '' } = Astro.props;
+const colCls = {
+  2: 'lg:grid-cols-2',
+  3: 'sm:grid-cols-2 lg:grid-cols-3',
+  4: 'sm:grid-cols-2 lg:grid-cols-4',
+}[cols];
+---
+<div class:list={['mc', 'grid grid-cols-2 gap-x-8 gap-y-8', colCls, className]}>
+  {items.map((s) => <StoryCard story={s} ratio={ratio} showExcerpt={showExcerpt} />)}
+</div>

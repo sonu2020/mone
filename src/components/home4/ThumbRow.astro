@@ -1,0 +1,45 @@
+---
+// BLOCK · ThumbRow — the rail workhorse: headline left, fixed 88px square thumb
+// right. The thumb slot is a fixed-width, non-shrinking column so every row in
+// a rail shares one vertical lane regardless of headline length.
+// `metaBelow` moves the category/time line under the headline (author rows).
+import Art from './Art.astro';
+import type { LiveStory as Story } from '../../lib/home4-data';
+
+export interface Props {
+  story: Story;
+  time?: string;
+  metaBelow?: boolean;
+  clamp?: 0 | 2 | 3;
+  class?: string;
+}
+const { story, time, metaBelow = false, clamp = 3, class: className = '' } = Astro.props;
+const stamp = time ?? story.date;
+const clampCls = clamp === 2 ? 'line-clamp-2' : clamp === 3 ? 'line-clamp-3' : '';
+---
+
+<a href={story.href} class:list={['mc', 'group flex items-start gap-3.5 xl:gap-[18px]', className]}>
+  <div class="min-w-0 flex-1 flex flex-col gap-1">
+    {!metaBelow && (story.category || stamp) && (
+      <p class="row-meta flex items-baseline gap-2">
+        {story.category && <span class="text-text-primary dark:text-ivory">{story.category}</span>}
+        {stamp && <span class="text-text-light dark:text-ivory/40 tabular-nums">{stamp}</span>}
+      </p>
+    )}
+
+    <h3 class:list={['headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors', clampCls]}>
+      {story.title}
+    </h3>
+
+    {metaBelow && (story.category || stamp) && (
+      <p class="row-meta mt-0.5 flex items-baseline gap-2 text-text-light dark:text-ivory/40">
+        {story.category && <span>{story.category}</span>}
+        {stamp && <span class="tabular-nums">{stamp}</span>}
+      </p>
+    )}
+  </div>
+
+  <div class="w-18 xl:w-22 shrink-0">
+    <Art story={story} ratio="1/1" w={176} class="rounded-md" zoom />
+  </div>
+</a>

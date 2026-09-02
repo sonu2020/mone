@@ -1,0 +1,12 @@
+---
+// ATOM · AdDisclaimer — the paid-content notice that closes the page. Caption
+// type, muted, held to the reading measure so it never competes with the story.
+export interface Props {
+  text: string;
+  class?: string;
+}
+const { text, class: className = '' } = Astro.props;
+---
+<p class:list={['mc mx-auto max-w-prose caption-text text-text-muted text-center', className]}>
+  {text}
+</p>

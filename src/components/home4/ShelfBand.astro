@@ -1,0 +1,143 @@
+---
+// BLOCK · ShelfBand — a labelled section band with a wide editorial lead,
+// three promotional cards and a right-side story rail.
+import Art from "./Art.astro";
+import DummyImage from "../DummyImage.astro";
+import Kicker from "../ui/Kicker.astro";
+import AdSlot from "../AdSlot.astro";
+import BandHeading from "./BandHeading.astro";
+import ThumbRow from "./ThumbRow.astro";
+import { blurbFor } from "../../lib/dummy-text";
+import type { LiveStory as Story } from "../../lib/home4-data";
+
+export interface Props {
+  label: string;
+  href?: string;
+  viewAllHref?: string;
+  lead: Story;
+  cards: Story[];
+  rail: Story[];
+  adSlot?: string;
+  class?: string;
+}
+
+const {
+  label,
+  href,
+  viewAllHref,
+  lead,
+  cards,
+  rail,
+  adSlot,
+  class: className = "",
+} = Astro.props;
+---
+
+<section class:list={["mc", "py-12", className]}>
+  <BandHeading
+    label={label}
+    href={href}
+    viewAllHref={viewAllHref}
+    class="mb-6"
+  />
+
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
+    <!-- Main column -->
+    <div class="flex flex-col gap-6 lg:col-span-8 lg:pr-8 xl:col-span-9">
+      <!-- Complete lead story boundary -->
+      <a
+        href={lead.href}
+        class="mc group grid grid-cols-1 bg-light-gray sm:grid-cols-12 dark:bg-brand-elevated"
+      >
+        <!-- Lead image -->
+        <div
+          class="relative aspect-[5/3] overflow-hidden sm:col-span-5 sm:aspect-auto sm:min-h-full"
+        >
+          {
+            lead.image ? (
+              <DummyImage
+                seed={lead.href}
+                src={lead.image}
+                w={800}
+                h={480}
+                class="absolute inset-0 h-full w-full transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div class="absolute inset-0 bg-light-gray dark:bg-brand-elevated" />
+            )
+          }
+        </div>
+
+        <!-- Lead content -->
+        <div
+          class="flex flex-col justify-center gap-3 px-6 py-5 sm:col-span-7 lg:px-8"
+        >
+          <div class="flex flex-col gap-2">
+            {lead.category && <Kicker text={lead.category} />}
+
+            <h3
+              class="headline-feature text-balance text-text-navy-deep transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light"
+            >
+              {lead.title}
+            </h3>
+          </div>
+
+          <p
+            class="body-small line-clamp-4 text-text-secondary dark:text-ivory/70"
+          >
+            {blurbFor(lead)}
+          </p>
+
+          {
+            lead.date && (
+              <p class="caption-text pt-1 text-text-muted tabular-nums dark:text-ivory/45">
+                {lead.date}
+              </p>
+            )
+          }
+        </div>
+      </a>
+
+      <!-- Separator -->
+      <!-- <div class="border-t border-rule dark:border-ivory/10"></div> -->
+
+      <!-- Three promotional cards -->
+      <div class="grid grid-cols-2 gap-6 md:grid-cols-3">
+        {
+          cards.slice(0, 3).map((story) => (
+            <a href={story.href} class="mc group block">
+              <Art story={story} ratio="15/7" w={600} zoom />
+
+              <div class="flex flex-col gap-1 pt-1.5">
+                {story.category && <Kicker text={story.category} />}
+
+                <h3 class="headline-deck line-clamp-2 text-text-primary transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light">
+                  {story.title}
+                </h3>
+
+                {story.date && (
+                  <p class="caption-text text-text-muted tabular-nums dark:text-ivory/45">
+                    {story.date}
+                  </p>
+                )}
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Right rail -->
+    <aside class="flex flex-col gap-6 lg:col-span-4 xl:col-span-3">
+      {rail.slice(0, 3).map((story) => <ThumbRow story={story} />)}
+
+      {
+        adSlot && (
+          <div class="mt-auto pt-2">
+            <AdSlot slot={adSlot} format="rectangle" lazy />
+          </div>
+        )
+      }
+    </aside>
+  </div>
+</section>

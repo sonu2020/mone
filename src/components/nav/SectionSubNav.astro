@@ -1,0 +1,46 @@
+---
+// NAV · SectionSubNav — a desk's sub-links, rendered by the desk's own pages.
+//
+// The flat mastheads drop the mega panels, so these links can't hang off the
+// masthead any more. They surface here instead: contextual, in place, and only
+// where they apply. Resolved from the same IA the header reads
+// (src/lib/mega-nav.ts), so there is still one source for the navigation.
+//
+// No desk label in front of them — the breadcrumb and the H1 below already name
+// the desk twice, and inner pages drop the trending band so this strip is the
+// one thing under the header. It should read as the sub-sections, not as a
+// caption for them.
+//
+// This file is only the resolution; SubNavBar is the strip. A section with a
+// real taxonomy of its own that the top-level IA doesn't carry (Shelf) hands
+// its links to SubNavBar directly and skips this.
+//
+// Renders nothing when the current path belongs to no desk, or to a desk with
+// no panel — a plain link like Home has nothing to show.
+import SubNavBar from './SubNavBar.astro';
+import { subNavFor } from '../../lib/mega-nav';
+
+export interface Props {
+  /** Defaults to the page being rendered. */
+  pathname?: string;
+  class?: string;
+}
+const { pathname = Astro.url.pathname, class: className = '' } = Astro.props;
+
+const sub = subNavFor(pathname);
+
+// Some desks point at one of their own sub-links (News → /kerala, which is also
+// its "Kerala" link). Drop the "All" tab there rather than print the same URL
+// twice and mark two things current.
+const showAll = sub ? !sub.links.some((l) => l.href === sub.item.href) : false;
+---
+
+{sub && (
+  <SubNavBar
+    links={sub.links}
+    allHref={showAll ? sub.item.href : undefined}
+    pathname={pathname}
+    label={`${sub.item.label} sections`}
+    class:list={['mc', className]}
+  />
+)}

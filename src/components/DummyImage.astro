@@ -1,0 +1,84 @@
+---
+export interface Props {
+  class?: string;
+  seed?: string;
+  w?: number;
+  h?: number;
+  src?: string;
+  /** `eager` + fetchpriority `high` for above-the-fold LCP art; lazy otherwise. */
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+}
+
+const {
+  class: className = '',
+  seed,
+  w = 800,
+  h = 450,
+  src: customSrc,
+  loading = 'lazy',
+  fetchpriority = 'auto',
+} = Astro.props;
+
+const realImages = [
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557623-untitled-1-recovered.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557609-trump-1.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557606-untitled-1-recovered.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557579-ram-charan.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557575-1000507312.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557546-mammootyyyt.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557519-neww.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557505-sanjeev-kapoor-reveals-rejecting-masterchef-india-for-not-being-paid-more-than-akshay-kumar.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557590-whatsapp-image-2026-06-24-at-151433.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557560-kldfhb.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557552-fdbvb.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557547-fgfg.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557520-colombia.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557618-riyadh.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557604-sharjah.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557582-alain.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/01/500x300_1552422-midday-break-oman.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557562-hip.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x500_1557645-passport1.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/19/500x500_1556567-uddav-2.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x500_1557639-untitled-1.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/14/500x500_1555314-ayodhya-temple.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x500_1557601-mahuva-1.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x500_1557572-bnk.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557569-caption.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557563-john.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557549-fcra.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557670-untitled-1.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557675-text-thumb.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557666-untitled-1.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557663-beef-1.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557661-untitled-1.webp",
+  "https://www.mediaoneonline.com/h-upload/2026/06/23/500x300_1557413-untitled-1-recovered-recovered-recovered-recovered-recovered-recovered.webp"
+];
+
+// Determine a stable index based on seed/w/h to distribute images consistently
+const getStableIndex = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash);
+};
+
+const imageKey = seed || `${w}x${h}`;
+const index = getStableIndex(imageKey) % realImages.length;
+const src = customSrc || realImages[index];
+---
+
+<div class:list={['mc', `overflow-hidden bg-placeholder ${className}`]}>
+  <img
+    src={src}
+    alt=""
+    loading={loading}
+    fetchpriority={fetchpriority}
+    decoding={loading === 'eager' ? 'sync' : 'async'}
+    class="w-full h-full object-cover"
+    width={w}
+    height={h}
+  />
+</div>

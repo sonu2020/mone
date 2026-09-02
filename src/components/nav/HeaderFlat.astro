@@ -1,0 +1,380 @@
+---
+// HEADER · HeaderFlat — the packed, dropdown-free masthead.
+//
+// The alternative to Header.astro (which keeps the mega panels). Same navy,
+// same IA, four differences:
+//
+//   · No dropdowns. Every desk is a plain link; its sub-links surface on the
+//     desk's own pages via SectionSubNav, contextually, where they apply.
+//   · The section bar is a scrollable rail at every width, not a desktop-only
+//     row. On a phone the desks are swipeable instead of buried in a drawer.
+//   · Packed. A 24px trending bar and a 36px section bar sit directly on the
+//     masthead with no breathing room between them, so the page starts higher.
+//   · A taller brand mark — 4.25rem — carrying the weight the dropped chrome
+//     used to.
+//
+// Scrolling: the masthead is tall, so it scrolls away and a 48px floating bar
+// takes over — revealed on scroll up, hidden on scroll down, never shown while
+// the real header is still on screen. It is `inert` whenever hidden, so its
+// links can't be tabbed into from behind.
+//
+// Swappable with Header.astro: same props, same OnAirNow integration, so a page
+// changes one import to switch. Both stay in the repo.
+import Logo from '../Logo.astro';
+import Pulse from '../ui/Pulse.astro';
+import SearchOverlay from './SearchOverlay.astro';
+import { navItems, trendingTopics } from '../../lib/mega-nav';
+import { LIVE_CHANNEL } from '../../lib/live-tv';
+
+export interface Props {
+  isBreaking?: boolean;
+  date?: string;
+  /** Pages carrying the topics themselves turn the masthead strip off. */
+  showTopics?: boolean;
+  /** Promote the masthead's Live link to the full on-air strip (lg and up). */
+  liveUnit?: boolean;
+  /** Where the trending topics sit.
+   *  'bar'      — a white band under the section bar, closing the navy; the
+   *               date keeps the middle of the masthead (the default).
+   *  'masthead' — in the masthead's middle column, taking the date's slot and
+   *               dropping the band. Buys back the row, at the cost of the
+   *               date; kept as the alternative that experiment produced. */
+  topicsPlacement?: 'bar' | 'masthead';
+}
+const {
+  isBreaking = false, date, showTopics = true, liveUnit = false,
+  topicsPlacement = 'bar',
+} = Astro.props;
+
+const topicsVisible = showTopics && !isBreaking;
+const topicsInMasthead = topicsVisible && topicsPlacement === 'masthead';
+
+const today =
+  date ??
+  new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+// Both the masthead rail and the floating bar render the same desks.
+const deskLink =
+  'flex items-center whitespace-nowrap text-white/90 hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-azure-light transition-colors';
+---
+
+<header id="site-header" class="bg-nav-bg text-white">
+  <!-- ══ MASTHEAD ══ -->
+  <div class="border-b border-nav-rule/60">
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:gap-4 h-14 lg:h-[5.75rem]">
+        <a href="/" class="shrink-0" aria-label="MediaOne — home">
+          <Logo class="h-8 lg:h-[4.25rem] w-auto text-white" />
+        </a>
+
+        {topicsInMasthead ? (
+          <nav class="hidden md:block min-w-0" aria-label="Trending topics">
+            <ul class="flex items-center justify-center gap-2.5 overflow-x-auto scrollbar-none">
+              <li class="shrink-0 eyebrow text-[0.625rem] text-white/35">Trending</li>
+              {trendingTopics.map((t) => (
+                <li class="shrink-0">
+                  <a
+                    href={t.href}
+                    class="inline-block rounded-full border border-white/15 px-2.5 py-[3px] caption-text whitespace-nowrap text-white/75 hover:border-azure-light hover:text-azure-light transition-colors"
+                  >{t.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ) : (
+          <p class="hidden md:block text-center text-meta text-white/70 tabular-nums">{today}</p>
+        )}
+
+        <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 justify-self-end">
+
+          <!-- `data-video-open` opens the shared player where the page carries
+               it, exactly as desktop's Watch Live does; the href is the
+               fallback for a page without the modal. -->
+          <a
+            href={LIVE_CHANNEL.href}
+            data-video-open={LIVE_CHANNEL.id}
+            class:list={[
+              'inline-flex h-9 items-center gap-2 rounded-xs px-3 bg-accent-red text-white hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-[filter]',
+              liveUnit && 'lg:hidden',
+            ]}
+            aria-label={`Watch ${LIVE_CHANNEL.title}`}
+          >
+            <Pulse tone="white" beat />
+            <span class="eyebrow text-[0.8125rem] leading-none tracking-[0.06em]">Live</span>
+          </a>
+
+          <button
+            type="button"
+            data-search-open
+            class="inline-flex size-11 lg:size-9 items-center justify-center text-white/80 hover:text-white transition-colors"
+            aria-label="Search"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="site-search"
+          >
+            <i class="ti ti-search text-xl" aria-hidden="true"></i>
+          </button>
+
+          <button
+            type="button"
+            data-drawer-open
+            class="lg:hidden -mr-2 inline-flex size-11 items-center justify-center text-white"
+            aria-label="Open menu"
+            aria-controls="flat-drawer"
+            aria-expanded="false"
+          >
+            <i class="ti ti-menu-2 text-2xl" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION BAR — flat links, scrollable at every width ══ -->
+  <div class="border-b border-black/20">
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+      <nav aria-label="Sections">
+        <ul class="flex items-stretch overflow-x-auto scrollbar-none -mx-1">
+          {navItems.map((item) => (
+            <li class="shrink-0">
+              <a href={item.href} class:list={[deskLink, 'h-9 px-2.5 nav-text']}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ══ TRENDING — a white band closing the navy, directly under the section
+       bar. Reads as the first line of the page rather than the last line of
+       the chrome, which is what topics are. Dropped when they have moved up
+       into the masthead. ══ -->
+  {topicsVisible && !topicsInMasthead && (
+    <div class="bg-bg-card dark:bg-brand-elevated border-b border-rule dark:border-ivory/10">
+      <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- font-sans: Latin topics, stated rather than inherited so no
+             Malayalam-family utility can quietly take the band over. -->
+        <div class="font-sans flex items-center gap-2.5 h-7 overflow-x-auto scrollbar-none">
+          <span class="inline-flex items-center gap-1 shrink-0 eyebrow text-[0.625rem] leading-none text-accent-red">
+            <i class="ti ti-trending-up text-xs" aria-hidden="true"></i>
+            Trending
+          </span>
+          <ul class="flex items-center gap-2.5 shrink-0">
+            {trendingTopics.map((t, i) => (
+              <li class="flex items-center gap-2.5">
+                {i > 0 && <span class="text-rule dark:text-ivory/20 leading-none" aria-hidden="true">|</span>}
+                <a
+                  href={t.href}
+                  class="caption-text leading-none text-text-secondary dark:text-ivory/70 hover:text-azure dark:hover:text-azure-light transition-colors whitespace-nowrap"
+                >{t.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )}
+</header>
+
+<!-- ══ FLOATING BAR — takes over once the masthead has scrolled away ══ -->
+<div
+  id="flat-float"
+  class="fixed inset-x-0 top-0 z-40 -translate-y-full transition-transform duration-200 ease-out bg-nav-bg/95 backdrop-blur-sm border-b border-black/25 shadow-lg"
+  inert
+>
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-2 sm:gap-3 h-12">
+      <a href="/" class="shrink-0" aria-label="MediaOne — home">
+        <Logo class="h-6 w-auto text-white" />
+      </a>
+
+      <nav class="min-w-0 flex-1" aria-label="Sections">
+        <ul class="flex items-stretch overflow-x-auto scrollbar-none">
+          {navItems.map((item) => (
+            <li class="shrink-0">
+              <a href={item.href} class:list={[deskLink, 'h-12 px-2 caption-text font-semibold']}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <a
+        href={LIVE_CHANNEL.href}
+        data-video-open={LIVE_CHANNEL.id}
+        aria-label={`Watch ${LIVE_CHANNEL.title}`}
+        class="shrink-0 inline-flex items-center gap-1.5 rounded-xs bg-accent-red px-2 py-1 text-white hover:brightness-110 transition-[filter]"
+      >
+        <Pulse tone="white" beat />
+        <span class="eyebrow text-[0.625rem] tracking-[0.08em]">Live</span>
+      </a>
+
+      <button
+        type="button"
+        data-drawer-open
+        class="lg:hidden shrink-0 inline-flex size-9 items-center justify-center text-white"
+        aria-label="Open menu"
+        aria-controls="flat-drawer"
+        aria-expanded="false"
+      >
+        <i class="ti ti-menu-2 text-xl" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MOBILE DRAWER — a flat list, since there are no panels to expand ══ -->
+<div
+  id="flat-drawer"
+  class="lg:hidden fixed inset-0 z-50 hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Menu"
+>
+  <div class="absolute inset-0 bg-black/50" data-drawer-close></div>
+  <div class="absolute inset-y-0 right-0 w-[min(20rem,90vw)] bg-nav-bg overflow-y-auto overscroll-contain">
+    <div class="sticky top-0 flex items-center justify-between h-14 px-4 bg-nav-bg border-b border-nav-rule/60">
+      <Logo class="h-7 w-auto text-white" />
+      <button type="button" class="size-9 inline-flex items-center justify-center text-white" aria-label="Close menu" data-drawer-close>
+        <i class="ti ti-x text-2xl" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <ul class="divide-y divide-white/10">
+      {navItems.map((item) => (
+        <li>
+          <a href={item.href} class="block px-4 py-3 nav-text text-white active:bg-white/10">{item.label}</a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="p-4 border-t border-white/10">
+      <p class="eyebrow text-white/45 mb-2">Trending</p>
+      <ul class="font-sans flex flex-wrap gap-x-3 gap-y-2">
+        {trendingTopics.map((t) => (
+          <li><a href={t.href} class="meta-text text-white/70 hover:text-white transition-colors">{t.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEARCH — the sheet the masthead's search button opens ══ -->
+<SearchOverlay />
+
+<script is:inline>
+  (function () {
+    var drawer = document.getElementById('flat-drawer');
+    var float = document.getElementById('flat-float');
+    var header = document.getElementById('site-header');
+    var openers = Array.prototype.slice.call(document.querySelectorAll('[data-drawer-open]'));
+
+    // ── Drawer ────────────────────────────────────────────────────────────
+    var lastFocused = null;
+
+    function focusable() {
+      return Array.prototype.slice.call(
+        drawer.querySelectorAll('a[href], button:not([disabled])')
+      ).filter(function (el) { return el.offsetParent !== null; });
+    }
+
+    function setDrawer(isOpen) {
+      if (!drawer) return;
+      // No-op when already in that state, so a stray close can't yank focus
+      // back to the opener while the reader is somewhere else on the page.
+      if (isOpen === !drawer.classList.contains('hidden')) return;
+      drawer.classList.toggle('hidden', !isOpen);
+      openers.forEach(function (b) { b.setAttribute('aria-expanded', String(isOpen)); });
+      // Lock the page behind the drawer without losing the scroll position.
+      document.documentElement.style.overflow = isOpen ? 'hidden' : '';
+
+      if (isOpen) {
+        lastFocused = document.activeElement;
+        var f = focusable();
+        if (f.length) f[0].focus();
+      } else if (lastFocused && lastFocused.focus) {
+        lastFocused.focus();
+      }
+    }
+
+    openers.forEach(function (b) {
+      b.addEventListener('click', function () { setDrawer(true); });
+    });
+
+    if (drawer) {
+      drawer.addEventListener('click', function (e) {
+        if (e.target.closest('[data-drawer-close]')) setDrawer(false);
+      });
+
+      // Escape closes; Tab cycles inside rather than escaping to the page.
+      document.addEventListener('keydown', function (e) {
+        if (drawer.classList.contains('hidden')) return;
+        if (e.key === 'Escape') { setDrawer(false); return; }
+        if (e.key !== 'Tab') return;
+        var f = focusable();
+        if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+
+      // A desk link inside the drawer navigates — leave it usable if the
+      // browser restores this page from bfcache with the drawer still open.
+      window.addEventListener('pageshow', function () { setDrawer(false); });
+
+      // The drawer is lg:hidden. Rotating a tablet to landscape past that
+      // breakpoint would hide it via CSS while the page stayed scroll-locked,
+      // so close it properly on the way through.
+      if (window.matchMedia) {
+        var wide = window.matchMedia('(min-width: 1024px)');
+        var onWide = function (e) { if (e.matches) setDrawer(false); };
+        if (wide.addEventListener) wide.addEventListener('change', onWide);
+        else if (wide.addListener) wide.addListener(onWide);
+      }
+    }
+
+    // ── Floating bar ──────────────────────────────────────────────────────
+    if (!float || !header) return;
+
+    var lastY = window.scrollY;
+    var shown = false;
+    var ticking = false;
+    var DELTA = 4;   // ignore sub-pixel jitter and rubber-band bounce
+
+    function reveal(on) {
+      if (on === shown) return;
+      shown = on;
+      float.classList.toggle('-translate-y-full', !on);
+      // inert while off-screen so nothing behind the page is tabbable.
+      if (on) float.removeAttribute('inert');
+      else float.setAttribute('inert', '');
+    }
+
+    function update() {
+      ticking = false;
+      var y = window.scrollY;
+      if (y < 0) y = 0;                                   // iOS overscroll
+      var past = y > header.offsetHeight;
+      var delta = y - lastY;
+
+      if (!past) reveal(false);
+      else if (Math.abs(delta) > DELTA) reveal(delta < 0);
+
+      lastY = y;
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }, { passive: true });
+
+    // Re-measure after a resize changes the masthead's height.
+    window.addEventListener('resize', update, { passive: true });
+    update();
+  })();
+</script>

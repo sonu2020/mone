@@ -1,0 +1,64 @@
+---
+import { homeLayouts } from '../lib/home-layouts';
+
+export interface Props {
+  current: string;
+}
+const { current } = Astro.props;
+---
+
+<!-- Fixed "Layout Lab" switcher — preview-only chrome, never part of a layout itself.
+     Segmented control + 1–5 keyboard shortcuts. Sits above all page content. -->
+<div
+  id="layout-lab"
+  class:list={['mc', 'fixed inset-x-0 bottom-4 z-[70] flex justify-center px-4 pointer-events-none']}
+  aria-label="Homepage layout switcher"
+>
+  <div class="pointer-events-auto flex items-center gap-1 rounded-full border border-rule bg-bg-card/95 backdrop-blur-md shadow-[0_8px_30px_rgba(0,8,19,0.18)] p-1.5 pl-3.5 max-w-[calc(100vw-2rem)] overflow-x-auto scrollbar-none">
+    <span class="hidden sm:flex items-center gap-1.5 shrink-0 pr-1.5 mr-1 border-r border-rule/70">
+      <span class="inline-block size-1.5 rounded-full bg-azure animate-pulse"></span>
+      <span class="eyebrow text-text-muted">Layout Lab</span>
+    </span>
+    {homeLayouts.map((l, i) => {
+      const isActive = l.id === current;
+      return (
+        <a
+          href={`/home/${l.id}`}
+          data-layout-link={l.id}
+          aria-current={isActive ? 'true' : undefined}
+          title={l.signature}
+          class:list={[
+            'group relative shrink-0 flex items-center gap-2 rounded-full px-3 py-1.5 transition-colors',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2',
+            isActive ? 'bg-azure text-white' : 'text-text-secondary hover:bg-bg-page',
+          ]}
+        >
+          <kbd
+            class:list={[
+              'grid place-items-center size-4 rounded text-[10px] font-bold tabular-nums leading-none',
+              isActive ? 'bg-white/25 text-white' : 'bg-bg-page text-text-muted group-hover:bg-bg-card',
+            ]}
+          >{i + 1}</kbd>
+          <span class="nav-text whitespace-nowrap">{l.label}</span>
+        </a>
+      );
+    })}
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    // 1–5 jump straight to a layout. Skip when typing in a field.
+    var links = Array.from(document.querySelectorAll('[data-layout-link]'));
+    document.addEventListener('keydown', function (e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable)) return;
+      var n = parseInt(e.key, 10);
+      if (n >= 1 && n <= links.length) {
+        var href = links[n - 1].getAttribute('href');
+        if (href) window.location.href = href;
+      }
+    });
+  })();
+</script>

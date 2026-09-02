@@ -1,0 +1,49 @@
+---
+import Placeholder from './Placeholder.astro';
+import { getArticleImage } from '../lib/images';
+
+export interface Props {
+  title: string;
+  category?: string;
+  href: string;
+  date?: string;
+  excerpt?: string;
+  image?: string;
+  aspect?: string;
+  class?: string;
+}
+
+const {
+  title,
+  category,
+  href,
+  date,
+  excerpt,
+  image,
+  aspect = '16/10',
+  class: className = '',
+} = Astro.props;
+
+const imageUrl = getArticleImage(image);
+---
+
+<article class:list={['mc', `relative rounded-md overflow-hidden ${className}`]}>
+  <a href={href} class="group block">
+    <div class={`relative aspect-[${aspect}]`}>
+      <Placeholder class="w-full h-full" src={imageUrl} alt={title} />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 lg:p-6">
+      {category && (
+        <div class="flex items-center gap-2 caption-text text-white/70 mb-2">
+          <span class="eyebrow text-azure-light">{category}</span>
+          {date && <><span>·</span><span class="tabular-nums">{date}</span></>}
+        </div>
+      )}
+      <h2 class="text-headline font-semibold text-white leading-snug group-hover:text-azure-light transition-colors text-balance">
+        {title}
+      </h2>
+      {excerpt && <p class="hidden sm:block mt-2 body-small text-white/70 line-clamp-2 max-w-prose">{excerpt}</p>}
+    </div>
+  </a>
+</article>

@@ -1,0 +1,67 @@
+---
+export interface Props {
+  title: string;
+  titleEn?: string;
+  href?: string;
+  viewAllHref?: string;
+  sticky?: boolean;
+  variant?: 'default' | 'gradient' | 'minimal';
+  class?: string;
+}
+
+const {
+  title,
+  titleEn,
+  href = '#',
+  viewAllHref,
+  sticky = false,
+  variant = 'default',
+  class: className = '',
+} = Astro.props;
+---
+
+{variant === 'gradient' ? (
+  <div class:list={['mc', `relative bg-bg-card border-b border-rule ${sticky ? 'sticky top-0 z-30' : ''} ${className}`]}>
+    <!-- Reserved-accent masthead: azure kicker over a navy Malayalam wordmark, aligned to page content -->
+    <div class="max-w-site mx-auto px-4 sm:px-6 md:px-8">
+      <div class="flex items-end justify-between gap-4 py-5 sm:py-6 md:py-7">
+        <a href={href} class="group flex flex-col min-w-0">
+          {titleEn && <span class="eyebrow text-azure mb-2">{titleEn}</span>}
+          <h2 class="category-label text-ink group-hover:text-azure transition-colors">{title}</h2>
+        </a>
+        {viewAllHref && (
+          <a href={viewAllHref} class="hidden sm:inline-flex items-center shrink-0 eyebrow text-azure hover:text-azure-dark transition-colors pb-1">
+            View all →
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+) : (
+  <div
+    class:list={[
+      'mc',
+      'flex items-baseline justify-between pb-3 border-b-2 border-ink dark:border-ivory/30',
+      sticky && 'lg:sticky lg:top-0 lg:z-30 lg:bg-ivory lg:dark:bg-brand-dark lg:py-3',
+      'transition-all duration-200 ease-out',
+      className,
+    ]}
+  >
+    <a href={href} class="group flex items-baseline gap-3">
+      <h2 class="section-header text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+        {title}
+      </h2>
+      {titleEn && (
+        <span class="hidden sm:inline eyebrow text-ink-muted dark:text-ivory/40">{titleEn}</span>
+      )}
+    </a>
+    {viewAllHref && (
+      <a
+        href={viewAllHref}
+        class="eyebrow text-azure dark:text-azure-light hover:text-azure-dark dark:hover:text-azure transition-colors"
+      >
+        View all →
+      </a>
+    )}
+  </div>
+)}

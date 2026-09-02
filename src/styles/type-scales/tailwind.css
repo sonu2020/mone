@@ -1,0 +1,24 @@
+/* PUBLIC_TYPE_SCALE=tailwind — Tailwind's default size ladder, mapped onto the
+   semantic tokens. Static rem (no fluid clamps) so the scale is easy to A/B
+   against the current one at any viewport. Line-heights and weights stay the
+   system's own — only sizes swap. Applied via .type-scale-tailwind on <html>
+   (or on any wrapper for a scoped comparison). */
+.type-scale-tailwind {
+  --text-display: 3.75rem;    /* 6xl */
+  --text-hero: 3rem;          /* 5xl */
+  --text-title: 2.25rem;      /* 4xl */
+  --text-section: 1.875rem;   /* 3xl */
+  --text-headline: 1.125rem;  /* lg */
+  --text-lead: 1.125rem;      /* lg */
+  --text-body: 1rem;          /* base */
+  --text-meta: 0.875rem;      /* sm */
+  --text-nav: 1rem;           /* base */
+  --text-eyebrow: 0.75rem;    /* xs */
+  --text-caption: 0.75rem;    /* xs */
+  --text-category: 3rem;      /* 5xl */
+  --text-body-small: 0.875rem; /* sm */
+  --text-deck: 1rem;          /* base */
+  --text-feature: 1.25rem;    /* xl */
+  --text-lead-story: 1.5rem;  /* 2xl */
+  --text-band: 1.125rem;      /* lg */
+}

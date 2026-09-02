@@ -1,0 +1,27 @@
+---
+// BLOCK · VideoCard — landscape video promo: thumb + caption beneath. The unit
+// for video grids and lists.
+import VideoThumb from './VideoThumb.astro';
+import Headline from '../ui/Headline.astro';
+import type { VideoItem } from '../../lib/video-data';
+export interface Props {
+  item: VideoItem;
+  ratio?: string;
+  size?: 'base' | 'lg';
+  class?: string;
+}
+const { item, ratio = '16/9', size = 'base', class: className = '' } = Astro.props;
+---
+<a href={item.href} class:list={['mc', 'group block', className]}>
+  <VideoThumb item={item} ratio={ratio} />
+  <div class="pt-3">
+    <Headline as="h3" size={size} text={item.title} clamp={2} />
+    {(item.views || item.date) && (
+      <div class="mt-1.5 flex items-center gap-2 caption-text text-text-muted tabular-nums">
+        {item.views && <span>{item.views} views</span>}
+        {item.views && item.date && <span>·</span>}
+        {item.date && <span>{item.date}</span>}
+      </div>
+    )}
+  </div>
+</a>

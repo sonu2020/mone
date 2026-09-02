@@ -1,0 +1,29 @@
+---
+// BLOCK · ShortsRail — vertical (9/16) videos in a horizontal scroll. The reels
+// strip. Title overlays each thumb. Snap scrolling, hidden scrollbar.
+import VideoThumb from './VideoThumb.astro';
+import Pulse from '../ui/Pulse.astro';
+import type { VideoItem } from '../../lib/video-data';
+export interface Props {
+  items: VideoItem[];
+  title?: string;
+  class?: string;
+}
+const { items, title = 'മീഡിയവൺ ഷോർട്സ്', class: className = '' } = Astro.props;
+---
+<section class:list={['mc', '', className]}>
+  <div class="flex items-baseline justify-between mb-5">
+    <div class="flex items-center gap-2.5">
+      <Pulse tone="red" />
+      <h2 class="section-header text-ink">{title}</h2>
+      <span class="eyebrow text-accent-red bg-accent-red/10 px-1.5 py-0.5">Reels</span>
+    </div>
+    <span class="hidden sm:block meta-text text-text-muted">Swipe to view all →</span>
+  </div>
+
+  <div class="flex gap-4 overflow-x-auto scrollbar-none pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+    {items.map((v) => (
+      <VideoThumb item={v} href={v.href} ratio="9/16" showTitle playSize="md" class="shrink-0 w-[170px] sm:w-[190px] snap-start" />
+    ))}
+  </div>
+</section>

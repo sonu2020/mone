@@ -1,0 +1,183 @@
+---
+// ── /features/lsg-elections-2025 · Kerala's local bodies, ward by ward ─────
+//
+// An internal election explorer built on OpenDataKerala's LSG2025 portal and
+// its LSGD2025-Results-Data results CSV. Real data: bodies, voters and
+// geometry from the portal (itself SEC Kerala + OSM), winners from the
+// candidate-level results CSV. Everything is processed at build time by
+// scripts/build-lsg-data.mjs and committed under src/data/lsg/ and
+// public/lsg-data/; the page never talks to a live API.
+//
+// Interaction: the overview (desk, state map, district table) is server
+// rendered; the drill-down below it is client-driven by src/lib/lsg-explorer.ts
+// against lazy per-district JSON + GeoJSON, with the same Leaflet boot the
+// route HUD uses (MapBase) and the choropleth runtime in election-map.ts.
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+import LsgDesk from '../../components/lsg/LsgDesk.astro';
+import ElectionMap from '../../components/map/ElectionMap.astro';
+import FrontChip from '../../components/lsg/FrontChip.astro';
+import { LSG, DISTRICT_ML, FRONTS, fmt, frontLabel } from '../../lib/lsg';
+
+const s = LSG.state;
+const updated = new Date(LSG.attribution.builtAt).toLocaleDateString('en-IN', {
+  day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+});
+---
+
+<Layout
+  title="2025 തദ്ദേശ തിരഞ്ഞെടുപ്പ് — ഫലം | Kerala LSG Election Explorer | MediaOne"
+  description="All 23,573 wards of Kerala's 2025 local body elections mapped by front — district by district, ward by ward. Internal data feature."
+  topAd={false}
+  noindex
+>
+  <main class="flex-1">
+    <LsgDesk />
+
+    <!-- ══ STATE MAP + DISTRICTS ═════════════════════════════════════════ -->
+    <section class="border-b border-rule bg-bg-card dark:bg-brand-dark" aria-labelledby="state-map-heading">
+      <div class="mx-auto max-w-site px-4 py-10 sm:py-12">
+        <p class="eyebrow text-azure dark:text-azure-light">THE STATE</p>
+        <h2 id="state-map-heading" class="mt-2 font-malayalam text-title text-ink dark:text-ivory">
+          ജില്ലകൾ ഭൂപടത്തിൽ
+        </h2>
+        <p class="mt-1 max-w-2xl body-small text-ink-muted text-pretty">
+          Each district shaded by the front that won the most seats. Click a district
+          — on the map or in the table — to drill into its local bodies.
+        </p>
+
+        <div data-ls-explorer class="mt-6">
+          <div class="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+            <!-- Static map: one Leaflet instance, data swapped by the controller.
+                 self-start keeps the item at content height so it can stick
+                 within the tall sidebar column. -->
+            <div class="lg:sticky lg:top-[4.5rem] lg:self-start">
+              <ElectionMap
+                id="lsg-state-map"
+                url="/lsg-data/districts.geojson"
+                label="Kerala districts shaded by the front leading each district"
+                class="h-[20rem] sm:h-[24rem] lg:h-[calc(100dvh-9.5rem)] lg:max-h-[44rem]"
+              />
+              <ul class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+                {FRONTS.map((f) => (
+                  <li><FrontChip front={f} size="sm" /></li>
+                ))}
+                <li class="flex items-center gap-1.5">
+                  <span aria-hidden="true" class="size-2.5 bg-ink-light"></span>
+                  <span class="caption-text text-ink-muted">{frontLabel('TIE')}</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Stacked sidebar: district list, then the drill panels below it. -->
+            <div>
+              <p class="eyebrow text-azure dark:text-azure-light">DISTRICTS</p>
+              <ul class="mt-3 grid grid-cols-1 border-t border-rule lg:grid-cols-2 lg:gap-x-8">
+                {s.districts.map((d, i) => (
+                  <li class:list={['lg:[&:nth-child(n+8)]:border-l lg:[&:nth-child(n+8)]:pl-8']}>
+                    <button
+                      type="button"
+                      data-ls-district-row={d.slug}
+                      class="group grid w-full grid-cols-1 items-center gap-x-4 gap-y-1 border-b border-rule py-3.5 text-left transition-colors hover:bg-light-gray dark:hover:bg-brand-overlay"
+                    >
+                      <span>
+                        <span class="block font-malayalam text-section font-semibold text-ink dark:text-ivory">
+                          {DISTRICT_ML[d.name] ?? d.name}
+                        </span>
+                        <span class="mt-0.5 block caption-text text-ink-muted">
+                          {d.name} · {fmt(d.declared)} വാർഡുകൾ · {fmt(d.voters)} വോട്ടർമാർ
+                        </span>
+                      </span>
+                      <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span class="caption-text tabular-nums text-ink-muted">
+                          {['LDF', 'UDF', 'NDA'].map((f) => `${frontLabel(f as never)} ${fmt(d.seats[f as keyof typeof d.seats])}`).join(' · ')}
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                          <FrontChip front={d.leading} size="sm" />
+                        </span>
+                        <i class="ti ti-chevron-right text-ink-muted transition-transform group-hover:translate-x-0.5" aria-hidden="true"></i>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <!-- Drill-down stack: filled by src/lib/lsg-explorer.ts on district
+                   select. District panel, then the local-body panel beneath it. -->
+              <div data-ls-drill hidden aria-live="polite" class="mt-8 border-t border-rule pt-6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ METHODOLOGY ═══════════════════════════════════════════════════ -->
+    <section class="border-b border-rule bg-bg-page dark:bg-brand-dark" aria-labelledby="method-heading">
+      <div class="mx-auto max-w-site px-4 py-10 sm:py-12">
+        <p class="eyebrow text-azure dark:text-azure-light">ABOUT THE DATA</p>
+        <h2 id="method-heading" class="mt-2 font-malayalam text-title text-ink dark:text-ivory">ഡാറ്റയെ കുറിച്ച്</h2>
+
+        <div class="mt-5 grid gap-8 lg:grid-cols-2">
+          <div class="space-y-4 text-body text-ink dark:text-ivory text-pretty">
+            <p>
+              This explorer is built on the candidate-level results of Kerala's
+              December 2025 local body elections, as compiled by{' '}
+              <a class="text-azure hover:underline" href="https://opendatakerala.org/LSG2025/" rel="noopener">OpenDataKerala's LSG portal</a>{' '}
+              and its results repository. Every winner, party, ward and vote
+              count comes from those CSVs; nothing here is estimated.
+            </p>
+            <p>
+              Registered voters are the SEC's ward-level elector lists from the
+              portal. Block and district panchayat wards re-aggregate the same
+              electors as the grama wards beneath them, so state and district
+              voter totals count only the ground tier — grama panchayats,
+              municipalities and corporations — to avoid triple counting.
+            </p>
+            <p>
+              Wards where a winner was declared are shown as seats. Uncontested
+              wards (16 in this snapshot) return a winner on 0 votes and are
+              labelled ഏകകക്ഷി. Where votes are tied and the result was decided
+              by lot, the margin can read +0.
+            </p>
+          </div>
+
+          <div class="border-t border-rule pt-4 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+            <p class="eyebrow text-ink-muted">SOURCES</p>
+            <ul class="mt-3 space-y-2 text-body text-ink dark:text-ivory">
+              <li>
+                <a class="text-azure hover:underline" href="https://github.com/opendatakerala/LSG2025" rel="noopener"
+                  >opendatakerala/LSG2025</a>{' '}
+                — local bodies, wards, party groups, map geometry (OSM)
+              </li>
+              <li>
+                <a class="text-azure hover:underline" href="https://github.com/opendatakerala/LSGD2025-Results-Data" rel="noopener"
+                  >opendatakerala/LSGD2025-Results-Data</a>{' '}
+                — candidate-level results CSV
+              </li>
+              <li>State Election Commission, Kerala — original results and rolls</li>
+              <li>Map tiles © OpenStreetMap contributors, © CARTO</li>
+            </ul>
+            <p class="mt-4 text-caption text-ink-muted">
+              Data snapshot built {updated}. The portal's code is GPL-3.0; the
+              underlying data is credited to SEC Kerala via OpenDataKerala.
+              Internal design feature — the numbers are real, the presentation
+              is a prototype.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  import { initLsExplorer } from '../../lib/lsg-explorer';
+
+  const root = document.querySelector<HTMLElement>('[data-ls-explorer]');
+  if (root) initLsExplorer(root);
+  document.addEventListener('astro:page-load', () => {
+    const el = document.querySelector<HTMLElement>('[data-ls-explorer]');
+    if (el && el !== root) initLsExplorer(el);
+  });
+</script>

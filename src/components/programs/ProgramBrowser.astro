@@ -1,0 +1,117 @@
+---
+// COMPONENT · ProgramBrowser — a programme filter over real episodes.
+//
+// The chip row is the catalogue (lib/program-catalogue.ts), ranked freshest
+// first, so the filter and the /programs directory and the modal's Programmes
+// tab are all reading one list. Filtering is client-side over already-rendered
+// cards: the whole slate is a few dozen episodes, so a round trip per chip
+// would be slower than the DOM work and would lose the modal's open state.
+//
+// House standard throughout: square, hairline, no filled chips except the
+// selected one, which uses the system's solid azure label.
+import EpisodeCard from './EpisodeCard.astro';
+import SectionHeader from '../SectionHeader.astro';
+import { allRecentEpisodes, catalogueProgams, type CatalogueEpisode } from '../../lib/program-catalogue';
+import { programEpisodeId } from '../../lib/video-modal';
+
+export interface Props {
+  /** Episodes to render. Defaults to every programme's recent run, so the chip
+      row offers the whole slate rather than only the programmes still shipping. */
+  items?: CatalogueEpisode[];
+  title?: string;
+  /** Play in the page's VideoModal rather than navigating. */
+  playable?: boolean;
+  class?: string;
+}
+
+const {
+  items = allRecentEpisodes(6),
+  title = 'By Programme',
+  playable = false,
+  class: className = '',
+} = Astro.props;
+
+// Only offer a chip for a programme that actually has cards behind it.
+const present = new Set(items.map((i) => i.program.slug));
+const chips = [
+  { slug: 'all', label: 'All', count: items.length },
+  ...catalogueProgams
+    .filter((p) => present.has(p.slug))
+    .map((p) => ({
+      slug: p.slug,
+      label: p.title,
+      count: items.filter((i) => i.program.slug === p.slug).length,
+    })),
+];
+---
+
+<section class:list={['mc', className]} data-program-browser>
+  <SectionHeader title={title} href="/programs" viewAllHref="/programs" sticky={false} />
+
+  <div
+    role="tablist"
+    aria-label="Filter by programme"
+    class="mt-4 flex items-center gap-1 overflow-x-auto scrollbar-none border-y border-rule dark:border-ivory/10 py-2.5"
+  >
+    {chips.map((chip, i) => (
+      <button
+        type="button"
+        role="tab"
+        data-program-chip={chip.slug}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        class="shrink-0 inline-flex items-baseline gap-1.5 px-3 py-1.5 nav-text whitespace-nowrap border border-transparent text-ink-light hover:text-azure dark:text-ivory/65 dark:hover:text-azure-light aria-selected:bg-azure aria-selected:text-ivory aria-selected:font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2"
+      >
+        {chip.label}
+        <span class="caption-text tabular-nums opacity-60">{chip.count}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-9" data-program-grid>
+    {/* The wrapper carries the filter key — Astro doesn't forward stray
+        attributes onto a component, and hiding a wrapper keeps the grid's
+        column flow intact. */}
+    {items.map((item) => (
+      <div data-program={item.program.slug}>
+        <EpisodeCard
+          item={item}
+          modalId={playable ? programEpisodeId(item.episode.youtubeId) : undefined}
+        />
+      </div>
+    ))}
+  </div>
+
+  <p data-program-empty hidden class="mt-6 py-10 text-center text-body text-text-muted border border-rule dark:border-ivory/10">
+    No episodes from this programme.
+  </p>
+</section>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('[data-program-browser]').forEach(function (root) {
+      var chips = Array.prototype.slice.call(root.querySelectorAll('[data-program-chip]'));
+      var cards = Array.prototype.slice.call(root.querySelectorAll('[data-program]'));
+      var empty = root.querySelector('[data-program-empty]');
+      if (!chips.length || !cards.length) return;
+
+      function apply(slug) {
+        var shown = 0;
+        cards.forEach(function (card) {
+          var on = slug === 'all' || card.getAttribute('data-program') === slug;
+          card.hidden = !on;
+          if (on) shown++;
+        });
+        chips.forEach(function (c) {
+          c.setAttribute('aria-selected', c.getAttribute('data-program-chip') === slug ? 'true' : 'false');
+        });
+        if (empty) empty.hidden = shown > 0;
+      }
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          apply(chip.getAttribute('data-program-chip'));
+        });
+      });
+    });
+  })();
+</script>

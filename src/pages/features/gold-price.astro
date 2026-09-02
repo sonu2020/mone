@@ -1,0 +1,78 @@
+---
+// ── /features/gold-price · the rate, and how it got here ──────────────────
+// The first instance of the price-series engine (src/lib/price-series.ts).
+// Silver, fuel, plantation crops and currency reuse these components unchanged
+// — a new material is a new data module and a new page, not a new chart.
+//
+// Prices are real: scraped from keralagoldrates.com, 2010 to present, by
+// scripts/scrape-gold.py. The narration in the story rail is sourced and its
+// direction is asserted against the data in src/lib/gold-prices.test.ts. The
+// news headlines are prototype copy and are labelled as such on the page.
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+import PriceDesk from '../../components/price/PriceDesk.astro';
+import PriceChart from '../../components/price/PriceChart.astro';
+import PriceStoryRail from '../../components/price/PriceStoryRail.astro';
+import { GOLD_ATTRIBUTION, goldActs, goldReports, goldSeries } from '../../lib/gold-prices';
+
+const updated = new Date(GOLD_ATTRIBUTION.scrapedAt).toLocaleDateString('en-IN', {
+  day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+});
+
+const markers = goldReports.map((r) => ({ id: r.id, date: r.date, label: r.headline }));
+
+const reportDate = (iso: string) => new Date(`${iso}T00:00:00Z`)
+  .toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+---
+
+<Layout
+  title="ഇന്നത്തെ സ്വർണവില | Today's gold rate in Kerala | MediaOne"
+  description="Kerala's daily gold rate, compared across a week, a month, a year and sixteen years."
+  noindex
+>
+  <main class="flex-1">
+    <div class="mx-auto max-w-site px-4">
+      <PriceDesk
+        series={goldSeries}
+        label="GOLD RATE · KERALA"
+        labelML="ഇന്നത്തെ സ്വർണവില"
+      />
+
+      <section class="py-8" aria-labelledby="chart-heading">
+        <h2 id="chart-heading" class="sr-only">Price history</h2>
+        <PriceChart series={goldSeries} unitId="gram" markers={markers} id="main-chart" />
+        <p class="mt-3 text-caption text-ink-muted">
+          Source: <a href={GOLD_ATTRIBUTION.sourceUrl} rel="nofollow noopener"
+            class="text-azure hover:underline">{GOLD_ATTRIBUTION.source}</a>.
+          Rupees per gram, Kerala. Last read {updated}.
+          Markers on the all-time view link to the reports below.
+        </p>
+      </section>
+
+      <PriceStoryRail series={goldSeries} acts={goldActs} />
+
+      <section class="border-t border-rule py-10" aria-labelledby="reports-heading">
+        <p class="eyebrow text-eyebrow text-azure">IN THE NEWS</p>
+        <h2 id="reports-heading" class="font-malayalam text-title text-ink">വാർത്തകളിൽ</h2>
+
+        <ul class="mt-4">
+          {goldReports.map((r) => (
+            <li id={`report-${r.id}`} class="border-b border-rule py-6 scroll-mt-24">
+              <p class="eyebrow text-eyebrow text-ink-muted">{r.eyebrow} · {reportDate(r.date)}</p>
+              <h3 class="mt-1 font-malayalam text-section text-ink">
+                <a href={r.href} class="hover:text-azure">{r.headlineML}</a>
+              </h3>
+              <p class="text-meta text-ink-muted">{r.headline}</p>
+              <p class="mt-2 text-body text-ink">{r.dek}</p>
+            </li>
+          ))}
+        </ul>
+
+        <p class="mt-5 text-caption text-ink-muted">
+          Prototype headlines on a design page. The rates and dates they sit against are real.
+        </p>
+      </section>
+    </div>
+  </main>
+  <Footer />
+</Layout>

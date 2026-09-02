@@ -1,0 +1,205 @@
+---
+// ── /kit ──────────────────────────────────────────────────────────────────────
+// A developer-facing reference: copy-paste HTML, stylesheet setup, and the
+// font branch this site ships. Kept minimal so it stays useful.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Kit — MediaOne" description="Copy-paste HTML, stylesheet setup, and font links for MediaOne.">
+  <Header />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto px-4 sm:px-6 md:px-8 py-10">
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">Kit</span>
+      </nav>
+
+      <h1 class="text-hero font-bold text-text-primary text-balance">Kit</h1>
+      <p class="mt-3 text-lead text-text-secondary max-w-prose text-pretty">
+        Copy-paste fragments for embedding MediaOne elsewhere: the stylesheet, the font branch, and the minimal HTML shell.
+      </p>
+
+      <div class="mt-10 space-y-10">
+        <!-- 01 -->
+        <section>
+          <p class="eyebrow text-azure mb-2">01 · Stylesheet</p>
+          <h2 class="text-title font-semibold text-text-primary">One CSS file</h2>
+          <p class="mt-2 text-body text-text-secondary max-w-prose">
+            The entire design system lives in <code class="text-eyebrow font-mono">app.css</code> — tokens, components, dark mode, and type scales. Link it in the head.
+          </p>
+          <div class="mt-4 relative">
+            <button
+              type="button"
+              class="copy-btn absolute top-3 right-3 meta-text text-text-muted hover:text-azure transition-colors"
+              data-target="css-block"
+              aria-label="Copy stylesheet link"
+            >
+              Copy
+            </button>
+            <pre id="css-block" class="overflow-x-auto rounded-sm border border-rule bg-bg-card p-4 text-sm leading-relaxed"><code>&lt;link rel="stylesheet" href="/styles/app.css"&gt;</code></pre>
+          </div>
+        </section>
+
+        <!-- 02 -->
+        <section>
+          <p class="eyebrow text-azure mb-2">02 · Fonts</p>
+          <h2 class="text-title font-semibold text-text-primary">Anek Latin + Anek Malayalam</h2>
+          <p class="mt-2 text-body text-text-secondary max-w-prose">
+            This site uses a metrically matched superfamily with variable <code class="text-eyebrow font-mono">wght</code> and <code class="text-eyebrow font-mono">wdth</code> axes. Noto Sans Malayalam is carried as an alt branch for fallback.
+          </p>
+          <div class="mt-4 relative">
+            <button
+              type="button"
+              class="copy-btn absolute top-3 right-3 meta-text text-text-muted hover:text-azure transition-colors"
+              data-target="font-block"
+              aria-label="Copy font link"
+            >
+              Copy
+            </button>
+            <pre id="font-block" class="overflow-x-auto rounded-sm border border-rule bg-bg-card p-4 text-sm leading-relaxed"><code>&lt;link rel="preconnect" href="https://fonts.googleapis.com" /&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /&gt;
+&lt;link
+  href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,100..800&family=Anek+Malayalam:wdth,wght@75..125,100..800&family=Noto+Sans+Malayalam:wght@400;700&display=swap"
+  rel="stylesheet"
+/&gt;</code></pre>
+          </div>
+          <div class="mt-4 grid gap-4 sm:grid-cols-3">
+            <div class="border border-rule bg-bg-card p-4">
+              <p class="text-eyebrow font-semibold text-text-primary">Anek Latin</p>
+              <p class="mt-1 text-body-sm text-text-secondary">Latin-first stack. Default UI, navigation, metadata.</p>
+            </div>
+            <div class="border border-rule bg-bg-card p-4">
+              <p class="text-eyebrow font-semibold text-text-primary">Anek Malayalam</p>
+              <p class="mt-1 text-body-sm text-text-secondary">Malayalam-first stack. Body, headlines, editorials.</p>
+            </div>
+            <div class="border border-rule bg-bg-card p-4">
+              <p class="text-eyebrow font-semibold text-text-primary">Noto Sans Malayalam</p>
+              <p class="mt-1 text-body-sm text-text-secondary">Alt branch. Used when Anek Malayalam is unavailable.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 03 -->
+        <section>
+          <p class="eyebrow text-azure mb-2">03 · HTML shell</p>
+          <h2 class="text-title font-semibold text-text-primary">Minimal page</h2>
+          <p class="mt-2 text-body text-text-secondary max-w-prose">
+            The smallest valid document that loads the system. It sets Malayalam before paint, applies dark mode from <code class="text-eyebrow font-mono">localStorage</code>, and uses the design tokens from the stylesheet.
+          </p>
+          <div class="mt-4 relative">
+            <button
+              type="button"
+              class="copy-btn absolute top-3 right-3 meta-text text-text-muted hover:text-azure transition-colors"
+              data-target="shell-block"
+              aria-label="Copy HTML shell"
+            >
+              Copy
+            </button>
+            <pre id="shell-block" class="overflow-x-auto rounded-sm border border-rule bg-bg-card p-4 text-sm leading-relaxed"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="ml" dir="ltr"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+    &lt;title&gt;Page title&lt;/title&gt;
+    &lt;link rel="preconnect" href="https://fonts.googleapis.com" /&gt;
+    &lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /&gt;
+    &lt;link
+      href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,100..800&family=Anek+Malayalam:wdth,wght@75..125,100..800&family=Noto+Sans+Malayalam:wght@400;700&display=swap"
+      rel="stylesheet"
+    /&gt;
+    &lt;link rel="stylesheet" href="/styles/app.css"&gt;
+  &lt;/head&gt;
+  &lt;body class="min-h-dvh flex flex-col"&gt;
+    &lt;main class="flex-1"&gt;
+      &lt;h1 class="text-hero font-bold text-ink"&gt;Heading&lt;/h1&gt;
+      &lt;p class="text-body text-ink"&gt;Body text.&lt;/p&gt;
+    &lt;/main&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+        </section>
+
+        <!-- 04 -->
+        <section>
+          <p class="eyebrow text-azure mb-2">04 · Tokens</p>
+          <h2 class="text-title font-semibold text-text-primary">What to reach for</h2>
+          <p class="mt-2 text-body text-text-secondary max-w-prose">
+            Use the named utilities and CSS custom properties. Do not hardcode colors or font sizes — they live in <code class="text-eyebrow font-mono">app.css</code> and will drift otherwise.
+          </p>
+          <div class="mt-4 overflow-x-auto border border-rule bg-bg-card">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-rule bg-bg-page/60">
+                  <th class="px-4 py-2 text-eyebrow font-semibold text-text-primary">Token</th>
+                  <th class="px-4 py-2 text-eyebrow font-semibold text-text-primary">Use</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-rule">
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">text-ink</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Headlines and body text</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">text-azure</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Links, eyebrows, accents</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">bg-bg-page</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Page canvas</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">bg-bg-card</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Cards and surfaces</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">border-rule</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Hairline dividers</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">text-hero</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Display headlines</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">text-body</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Reading text</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">font-sans</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Latin-first stack</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 font-mono text-xs text-azure">font-malayalam</td>
+                  <td class="px-4 py-2 text-body-sm text-text-secondary">Malayalam-first stack</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+
+  <script is:inline>
+    (function () {
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var target = document.getElementById(btn.getAttribute('data-target'));
+          if (!target) return;
+          var text = target.innerText;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              btn.textContent = 'Copied';
+              setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+            });
+          }
+        });
+      });
+    })();
+  </script>
+</Layout>

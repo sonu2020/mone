@@ -1,0 +1,59 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/nav/HeaderBar.astro';
+import Footer from '../../components/Footer.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import DeskMasthead from '../../components/desk/DeskMasthead.astro';
+import DummyImage from '../../components/DummyImage.astro';
+import { shows } from '../../lib/videos';
+
+const totalEpisodes = shows.reduce((acc, s) => acc + s.episodeCount, 0);
+---
+
+<Layout title="Shows & Programs — MediaOne Videos" description="Browse all MediaOne TV shows and programs: Face to Face interviews, Life Story documentaries, Eyecatcher, Magazine, Analysis, and more.">
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1">
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+      <DeskMasthead
+        title="Shows & Programmes"
+        description="From hard-hitting interviews to heartwarming life stories, the full lineup of MediaOne originals. New episodes every week."
+        crumbs={[{ label: 'Videos', href: '/videos' }]}
+        class="mb-6"
+      />
+    </div>
+
+
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+        {shows.map((show) => (
+          <a href={`/videos/shows/${show.slug}`} class="group block">
+            <DummyImage class="aspect-[16/10] w-full" w={640} h={400} seed={show.slug} />
+            <div class="mt-3.5">
+              <span class="eyebrow text-azure dark:text-azure-light">{show.category}</span>
+              <h2 class="mt-1.5 text-section-mobile text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+                {show.titleML}
+              </h2>
+              <p class="text-meta text-ink-muted dark:text-ivory/45">{show.title}</p>
+              <p class="mt-2 text-meta text-ink-light dark:text-ivory/60 line-clamp-2">{show.descriptionML}</p>
+              <div class="mt-3 flex items-center gap-3 pt-3 border-t border-rule dark:border-ivory/10">
+                {show.host && (
+                  <span class="size-7 rounded-full bg-ivory-dark dark:bg-brand-elevated flex items-center justify-center text-caption font-bold text-ink-light dark:text-ivory/70">
+                    {show.host.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+                <div class="min-w-0">
+                  {show.host && <p class="text-caption font-semibold text-ink-light dark:text-ivory/60 truncate">{show.host}</p>}
+                  <p class="text-caption text-ink-muted dark:text-ivory/40 tabular-nums">{show.episodeCount} Episodes</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

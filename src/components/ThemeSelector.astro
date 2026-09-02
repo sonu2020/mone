@@ -1,0 +1,153 @@
+---
+import { themes } from '../lib/themes';
+---
+
+<div class="relative inline-block text-left" id="theme-selector-container">
+  <div>
+      <button
+        type="button"
+        id="theme-menu-button"
+        class="inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-ink dark:text-ivory hover:bg-ivory-dark dark:hover:bg-brand-dark rounded-none border border-rule transition-colors focus:outline-none uppercase tracking-widest"
+        aria-expanded="false"
+        aria-haspopup="true"
+      >
+        <span class="w-2 h-2 rounded-full bg-azure" id="current-theme-color"></span>
+        <span id="current-theme-name">Theme</span>
+      <svg class="w-4 h-4 ml-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+  </div>
+
+    <div
+      id="theme-dropdown"
+      class="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-none bg-ivory dark:bg-brand-dark border border-rule shadow-none focus:outline-none hidden transform opacity-0 scale-95 transition-all duration-100"
+      role="menu"
+      aria-orientation="vertical"
+      aria-labelledby="theme-menu-button"
+      tabindex="-1"
+    >
+      <div class="p-1 space-y-0.5" role="none">
+        {themes.map((theme) => (
+          <button
+            type="button"
+            class="flex items-center w-full px-3 py-2 text-xs font-semibold text-ink dark:text-ivory hover:bg-ivory-dark dark:hover:bg-ivory/10 transition-colors group cursor-pointer uppercase tracking-widest"
+            role="menuitem"
+            data-theme-id={theme.id}
+          >
+            <span class="w-2 h-2 rounded-full mr-3" style={`background-color: ${theme.primary};`}></span>
+            <span class="flex-grow text-left group-hover:text-azure transition-colors">
+              {theme.name}
+            </span>
+            <span class="check-mark hidden text-azure">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+</div>
+
+<script>
+  import { themes } from '../lib/themes';
+
+  const container = document.getElementById('theme-selector-container');
+  const button = document.getElementById('theme-menu-button');
+  const dropdown = document.getElementById('theme-dropdown');
+  const currentThemeColor = document.getElementById('current-theme-color');
+  const currentThemeName = document.getElementById('current-theme-name');
+
+  if (button && dropdown && container) {
+    // Toggle dropdown
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isExpanded = button.getAttribute('aria-expanded') === 'true';
+      if (isExpanded) {
+        closeDropdown();
+      } else {
+        openDropdown();
+      }
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!container.contains(e.target as Node)) {
+        closeDropdown();
+      }
+    });
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeDropdown();
+      }
+    });
+  }
+
+  function openDropdown() {
+    button?.setAttribute('aria-expanded', 'true');
+    dropdown?.classList.remove('hidden');
+    // Force reflow for transitions
+    dropdown?.offsetHeight;
+    dropdown?.classList.remove('opacity-0', 'scale-95');
+    dropdown?.classList.add('opacity-100', 'scale-100');
+  }
+
+  function closeDropdown() {
+    button?.setAttribute('aria-expanded', 'false');
+    dropdown?.classList.add('opacity-0', 'scale-95');
+    dropdown?.classList.remove('opacity-100', 'scale-100');
+    setTimeout(() => {
+      dropdown?.classList.add('hidden');
+    }, 100);
+  }
+
+  // Handle theme option selection
+  const themeButtons = dropdown?.querySelectorAll('[data-theme-id]');
+  themeButtons?.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const themeId = btn.getAttribute('data-theme-id');
+      if (themeId && (window as any).__setTheme) {
+        (window as any).__setTheme(themeId);
+        updateSelectorUI(themeId);
+        closeDropdown();
+      }
+    });
+  });
+
+  function updateSelectorUI(activeThemeId: string) {
+    const theme = themes.find((t) => t.id === activeThemeId);
+    if (!theme) return;
+
+    if (currentThemeName) currentThemeName.textContent = theme.name;
+    if (currentThemeColor) {
+      currentThemeColor.style.backgroundColor = theme.primary;
+    }
+
+    // Update active state checkmarks in dropdown
+    themeButtons?.forEach((btn) => {
+      const btnId = btn.getAttribute('data-theme-id');
+      const checkMark = btn.querySelector('.check-mark');
+      if (btnId === activeThemeId) {
+        checkMark?.classList.remove('hidden');
+        btn.classList.add('bg-ivory-dark', 'dark:bg-ivory/10', 'text-azure');
+      } else {
+        checkMark?.classList.add('hidden');
+        btn.classList.remove('bg-ivory-dark', 'dark:bg-ivory/10', 'text-azure');
+      }
+    });
+  }
+
+  // Initialize selector UI
+  const initialTheme = localStorage.getItem('news-theme') || 'mediaone';
+  updateSelectorUI(initialTheme);
+
+  // Listen to custom theme change event in case it is changed elsewhere
+  window.addEventListener('theme-changed', (e: any) => {
+    if (e.detail && e.detail.themeId) {
+      updateSelectorUI(e.detail.themeId);
+    }
+  });
+</script>

@@ -1,0 +1,523 @@
+{
+  "desk": "travel",
+  "label": "MediaOne Destinations",
+  "blurb": "Where the travel desk has been — road trips, food streets and the places a Malayali passport actually reaches.",
+  "handle": "@MediaOneDestinations",
+  "channelUrl": "https://www.youtube.com/@MediaOneDestinations",
+  "social": [],
+  "avatarSource": "https://yt3.googleusercontent.com/TK4dH05loSEmsjpI9kKE2733DtMQJchjCBswcGAxA7j07jfi1D9fh50spWeql13p44K3DHc33w=s900-c-k-c0x00ffffff-no-rj",
+  "avatar": "/images/channels/travel.jpg",
+  "subscribersText": "17.5K subscribers",
+  "videoCountText": "660 videos",
+  "shows": [
+    {
+      "playlistId": "PLsrjA6NXMOvi05KEsj2KbM6tq_i0BFkRX",
+      "title": "Destinations Food Vlog",
+      "videoCountText": "7 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvi05KEsj2KbM6tq_i0BFkRX",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvi05KEsj2KbM6tq_i0BFkRX",
+      "thumbnail": "https://i.ytimg.com/vi/E_NicQko_-Y/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOviF9MWyif1x6MLeHigKukxG",
+      "title": "Destinations Auto Review",
+      "videoCountText": "27 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOviF9MWyif1x6MLeHigKukxG",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOviF9MWyif1x6MLeHigKukxG",
+      "thumbnail": "https://i.ytimg.com/vi/uBNHE5XkgA8/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvjzWteWL5lQ2mZ4kNB9fP9E",
+      "title": "Thailand Diary",
+      "videoCountText": "6 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvjzWteWL5lQ2mZ4kNB9fP9E",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvjzWteWL5lQ2mZ4kNB9fP9E",
+      "thumbnail": "https://i.ytimg.com/vi/8gSfmIXhzss/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvhoVgrQHmDFaGdPpP0pXYs6",
+      "title": "WINTER TEEN PACKING",
+      "videoCountText": "2 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvhoVgrQHmDFaGdPpP0pXYs6",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvhoVgrQHmDFaGdPpP0pXYs6",
+      "thumbnail": "https://i.ytimg.com/vi/qD4O_fO_xNo/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvjvUdxHkuKwcg1xd0P8OFIW",
+      "title": "MediaOne Archives",
+      "videoCountText": "18 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvjvUdxHkuKwcg1xd0P8OFIW",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvjvUdxHkuKwcg1xd0P8OFIW",
+      "thumbnail": "https://i.ytimg.com/vi/Fb-FTyZzCBo/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvjGwyxZkTdc-tZywV0v_dOt",
+      "title": "FLY TO LAKSHA DWEEP",
+      "videoCountText": "12 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvjGwyxZkTdc-tZywV0v_dOt",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvjGwyxZkTdc-tZywV0v_dOt",
+      "thumbnail": "https://i.ytimg.com/vi/XlNDyXKnfdc/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvgJid2_GamPsVfSjqqqEPij",
+      "title": "RAJASTHAN SHE PACKING",
+      "videoCountText": "6 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvgJid2_GamPsVfSjqqqEPij",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvgJid2_GamPsVfSjqqqEPij",
+      "thumbnail": "https://i.ytimg.com/vi/CBYXEOPjy00/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvgq08WTQ18_ms_AKMFwdwrg",
+      "title": "Travel in Kerala",
+      "videoCountText": "2 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvgq08WTQ18_ms_AKMFwdwrg",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvgq08WTQ18_ms_AKMFwdwrg",
+      "thumbnail": "https://i.ytimg.com/vi/es5XDPOJCWA/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvieQ5SC293YtdJpkDBN9BES",
+      "title": "Oman Khareef Stories",
+      "videoCountText": "14 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvieQ5SC293YtdJpkDBN9BES",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvieQ5SC293YtdJpkDBN9BES",
+      "thumbnail": "https://i.ytimg.com/vi/o6ubMVNK6LA/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvjgTM7CWidC1aefZkKSNCXc",
+      "title": "Journey to World",
+      "videoCountText": "2 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvjgTM7CWidC1aefZkKSNCXc",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvjgTM7CWidC1aefZkKSNCXc",
+      "thumbnail": "https://i.ytimg.com/vi/FJo6yyx9ngU/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvgG-7B2Ne8beVOBJAB98ACn",
+      "title": "Wayanad Archive",
+      "videoCountText": "17 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvgG-7B2Ne8beVOBJAB98ACn",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvgG-7B2Ne8beVOBJAB98ACn",
+      "thumbnail": "https://i.ytimg.com/vi/GTZkR5SIif8/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvi9WZ9FJ_YyCxKROziQep9q",
+      "title": "Amazing Andaman",
+      "videoCountText": "4 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvi9WZ9FJ_YyCxKROziQep9q",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvi9WZ9FJ_YyCxKROziQep9q",
+      "thumbnail": "https://i.ytimg.com/vi/C3MvuJNW87s/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvgr6g7eB9oTRSp709RdzH41",
+      "title": "Saudi Story Archive",
+      "videoCountText": "90 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvgr6g7eB9oTRSp709RdzH41",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvgr6g7eB9oTRSp709RdzH41",
+      "thumbnail": "https://i.ytimg.com/vi/uu6YwNiwInc/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvh8C2pDTMAA5iV_S3fw1Phr",
+      "title": "ALPINE AURA MEDIAONE",
+      "videoCountText": "40 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvh8C2pDTMAA5iV_S3fw1Phr",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvh8C2pDTMAA5iV_S3fw1Phr",
+      "thumbnail": "https://i.ytimg.com/vi/GNzKH2SHn3E/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLsrjA6NXMOvgx9c36JhrbqNw7ntbKFdig",
+      "title": "Travellers Cafe",
+      "videoCountText": "42 videos",
+      "href": "https://www.youtube.com/playlist?list=PLsrjA6NXMOvgx9c36JhrbqNw7ntbKFdig",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLsrjA6NXMOvgx9c36JhrbqNw7ntbKFdig",
+      "thumbnail": "https://i.ytimg.com/vi/tMyrFYYvmAw/mqdefault.jpg"
+    }
+  ],
+  "capturedAt": "2026-08-07",
+  "featured": [
+    {
+      "youtubeId": "KIdL_Uo2xUs",
+      "title": "സ്കൈ ഡൈവർ അജ്മൽ അബ്ദുറഹ്മാൻ ട്രാവലേഴ്സ് കഫെയിൽ | AjmalAbdurahman | SkyDiving | MediaOneTravelCafe",
+      "durationText": "26:33",
+      "viewsText": "964 views",
+      "publishedText": "7 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/KIdL_Uo2xUs/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/KIdL_Uo2xUs/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=KIdL_Uo2xUs",
+      "durationSeconds": 1593,
+      "viewCount": 964,
+      "publishedAt": "2026-07-31T13:32:27Z"
+    },
+    {
+      "youtubeId": "IIqr8eMkwY0",
+      "title": "ടൂറിസം വരുമാന വളർച്ച; സൗദി ഒന്നാമത്, ജി.ഡി.പിയിലേക്ക് 78 ബില്യൺ റിയാൽ | SaudiArabia | SaudiTourism",
+      "durationText": "1:20",
+      "viewsText": "217 views",
+      "publishedText": "12 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/IIqr8eMkwY0/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/IIqr8eMkwY0/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=IIqr8eMkwY0",
+      "durationSeconds": 80,
+      "viewCount": 217,
+      "publishedAt": "2026-07-26T13:33:40Z"
+    },
+    {
+      "youtubeId": "sH8CxTvWPTU",
+      "title": "നീലയുടുപ്പിട്ട് മിടുക്കിയായി ഇടുക്കിയുടെ മലനിരകൾ; പൂത്തൊരുങ്ങി മേട്ടുക്കുറിഞ്ഞി | Idukki Hills",
+      "durationText": "1:40",
+      "viewsText": "2K views",
+      "publishedText": "12 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/sH8CxTvWPTU/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/sH8CxTvWPTU/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=sH8CxTvWPTU",
+      "durationSeconds": 99,
+      "viewCount": 2011,
+      "publishedAt": "2026-07-25T14:28:55Z"
+    },
+    {
+      "youtubeId": "5l5t7XRC6SM",
+      "title": "നീലയിൽ കുളിച്ച് നീല​ഗിരി..പൂത്തുലഞ്ഞ് കുറിഞ്ഞി.. നീലവസന്തം കാണാൻ സഞ്ചാരികളുടെ പ്രവാഹം | Neelakurinji",
+      "durationText": "1:53",
+      "viewsText": "1.5K views",
+      "publishedText": "13 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/5l5t7XRC6SM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/5l5t7XRC6SM/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=5l5t7XRC6SM",
+      "durationSeconds": 112,
+      "viewCount": 1517,
+      "publishedAt": "2026-07-24T15:00:06Z"
+    },
+    {
+      "youtubeId": "ENmldTbN5dc",
+      "title": "ഹിമാലയത്തിന്റെ മടിത്തട്ടിൽ ഒളിഞ്ഞിരിക്കുന്ന വാലി ഓഫ് ഫ്ലവേഴ്സ് | ValleyOfFlowers | Himalayas",
+      "durationText": "8:43",
+      "viewsText": "692 views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/ENmldTbN5dc/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/ENmldTbN5dc/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=ENmldTbN5dc",
+      "durationSeconds": 522,
+      "viewCount": 692,
+      "publishedAt": "2026-07-17T13:53:29Z"
+    },
+    {
+      "youtubeId": "xQ0CupIs8rk",
+      "title": "മുഖം മിനുക്കാനൊരുങ്ങി ദമ്മാം ഗ്ലോബല്‍ സിറ്റി; പവലിയനുകളുടെ എണ്ണം 17 നിന്നും 23 ആക്കും",
+      "durationText": "1:28",
+      "viewsText": "170 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/xQ0CupIs8rk/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/xQ0CupIs8rk/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=xQ0CupIs8rk",
+      "durationSeconds": 88,
+      "viewCount": 170,
+      "publishedAt": "2026-07-14T15:30:06Z"
+    },
+    {
+      "youtubeId": "-mnR-XVyWbI",
+      "title": "സൗദിയിലെ ഏറ്റവും വലിയ വാട്ടർ ഫൗണ്ടൈൻ സന്ദർശകർക്കായി തുറന്നുകൊടുത്തു | SaudiArabia | SaudiTourism",
+      "durationText": "1:26",
+      "viewsText": "362 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/-mnR-XVyWbI/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/-mnR-XVyWbI/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=-mnR-XVyWbI",
+      "durationSeconds": 85,
+      "viewCount": 362,
+      "publishedAt": "2026-07-14T14:28:04Z"
+    },
+    {
+      "youtubeId": "xqx9gdoq89I",
+      "title": "വിനോദ സഞ്ചാര കേന്ദ്രങ്ങളായ കാന്തല്ലൂർ വട്ടവട വനപാത തുറക്കാൻ നീക്കം | Kanthalloor | Vattavada",
+      "durationText": "1:09",
+      "viewsText": "303 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/xqx9gdoq89I/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/xqx9gdoq89I/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=xqx9gdoq89I",
+      "durationSeconds": 69,
+      "viewCount": 303,
+      "publishedAt": "2026-07-12T15:30:06Z"
+    }
+  ],
+  "more": [
+    {
+      "youtubeId": "hB0G4K4DCOo",
+      "title": "കേരളത്തിലെ മിനി സ്വിറ്റ്സർലാൻഡ്; തട്ടേക്കാട് പക്ഷി സങ്കേതത്തിലെ പുൽത്തകിടി വൈറലാവുന്നു | Thattekad",
+      "durationText": "2:00",
+      "viewsText": "450 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/hB0G4K4DCOo/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/hB0G4K4DCOo/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=hB0G4K4DCOo"
+    },
+    {
+      "youtubeId": "Zq_pWfH3DqM",
+      "title": "യാത്രാനടപടികൾ ലളിതമാക്കുന്ന ടൂറിസ്റ്റ് പാക്കേജ് വിസ പദ്ധതിയുമായി സൗദി അറേബ്യ | SaudiArabia",
+      "durationText": "1:07",
+      "viewsText": "617 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Zq_pWfH3DqM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Zq_pWfH3DqM/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Zq_pWfH3DqM"
+    },
+    {
+      "youtubeId": "1jemIAgYJO0",
+      "title": "മികച്ച കാലാവസ്ഥയും പ്രകൃതിഭംഗിയും; സൗദി അബഹയിലെ ആർട്ട് സ്ട്രീറ്റിലേക്ക് സന്ദർശകരുടെ ഒഴുക്ക് | Abha",
+      "durationText": "1:32",
+      "viewsText": "81 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/1jemIAgYJO0/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/1jemIAgYJO0/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=1jemIAgYJO0"
+    },
+    {
+      "youtubeId": "U0xwP8os-8Q",
+      "title": "ഗംഗാ ആരതി കാണാനെത്തുന്നവർ സന്ദർശിക്കാറുള്ള ലക്ഷ്മൺ ജൂലയിലെ കാഴ്ചകൾ | Rishikesh | LakshmanJhula",
+      "durationText": "4:10",
+      "viewsText": "547 views",
+      "publishedText": "4 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/U0xwP8os-8Q/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/U0xwP8os-8Q/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=U0xwP8os-8Q"
+    },
+    {
+      "youtubeId": "AysUCN4tbD8",
+      "title": "ഖരീഫ് സീസണിനോടനുബന്ധിച്ച് സഞ്ചാരികളുടെ സുരക്ഷ ശക്തമാക്കാൻ സജ്ജീകരണവുമായി ഒമാൻ പോലീസ് | Khareefe",
+      "durationText": "1:15",
+      "viewsText": "221 views",
+      "publishedText": "4 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/AysUCN4tbD8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/AysUCN4tbD8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=AysUCN4tbD8"
+    },
+    {
+      "youtubeId": "LcZi-sBU6LE",
+      "title": "ചങ്ങനാശ്ശേരിയിലെ ആമ്പൽ വസന്തം കാണാൻ സഞ്ചാരികളുടെ ഒഴുക്ക് | Changanassery | WaterLily | KeralaTravel",
+      "durationText": "1:25",
+      "viewsText": "453 views",
+      "publishedText": "4 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/LcZi-sBU6LE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/LcZi-sBU6LE/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=LcZi-sBU6LE"
+    },
+    {
+      "youtubeId": "siPiB8sadTM",
+      "title": "കുട്ടികൾക്കും മുതിർന്ന പൗരൻമാർക്കുമുള്ള ടിക്കറ്റ് നിരക്കിളവ് പ്രഖ്യാപിച്ച് യുഎഇയിലെ ഇത്തിഹാദ് റെയിൽ",
+      "durationText": "1:30",
+      "viewsText": "121 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/siPiB8sadTM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/siPiB8sadTM/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=siPiB8sadTM"
+    },
+    {
+      "youtubeId": "I2jJscHkOzI",
+      "title": "ഖസീമിൽ മുന്തിരി വിളവെടുപ്പ് തുടങ്ങി: പ്രതിവർഷം 30,875 ടൺ ഉൽപാദനം, അൽ ഖസീം പ്രധാന കാർഷിക കേന്ദ്രം",
+      "durationText": "1:05",
+      "viewsText": "239 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/I2jJscHkOzI/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/I2jJscHkOzI/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=I2jJscHkOzI"
+    },
+    {
+      "youtubeId": "a-b5wB82bQU",
+      "title": "യുഎഇയിലെ അജ്മാൻ ലോകത്തിലെ ഏറ്റവും സുരക്ഷിതമായ നഗരം | Ajman | UAE | UnitedArabEmirates",
+      "durationText": "1:03",
+      "viewsText": "172 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/a-b5wB82bQU/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/a-b5wB82bQU/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=a-b5wB82bQU"
+    },
+    {
+      "youtubeId": "5F17O6Ts67k",
+      "title": "വിനോദസഞ്ചാര ഭൂപടത്തിൽ വിസ്മയമായ ജബൽ ഷംസിൽ അഗ്രി ടൂറിസം മേഖലയിൽ വിവിധ പദ്ധതികളാണ് വരുന്നത്",
+      "durationText": "1:07",
+      "viewsText": "33 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/5F17O6Ts67k/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/5F17O6Ts67k/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=5F17O6Ts67k"
+    },
+    {
+      "youtubeId": "XzvVcWp3fU8",
+      "title": "കാലവർഷം ശക്തമായതോടെ ഇടുക്കിയുടെ മല നിരകൾ ജലസമൃദ്ധിയിലേക്ക് | Idukki | KeralaMonsoon",
+      "durationText": "2:46",
+      "viewsText": "138 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/XzvVcWp3fU8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/XzvVcWp3fU8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=XzvVcWp3fU8"
+    },
+    {
+      "youtubeId": "tn5XipT9Xrs",
+      "title": "സൗദിയുടെ പല ഭാഗങ്ങളിലും കടുത്ത ചൂട് തുടരുമ്പോഴും ഹൈറേഞ്ച് മേഖലകളിൽ മികച്ച കാലാവസ്ഥ | SaudiArabia",
+      "durationText": "1:27",
+      "viewsText": "147 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/tn5XipT9Xrs/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/tn5XipT9Xrs/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=tn5XipT9Xrs"
+    },
+    {
+      "youtubeId": "VImY8PqmD-g",
+      "title": "ലോകത്ത് ആദ്യമായി AI ഡിസൈൻ ചെയ്ത പാർക്ക് ദുബൈയിൽ | Dubai | ArtificialIntelligence",
+      "durationText": "0:59",
+      "viewsText": "177 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/VImY8PqmD-g/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/VImY8PqmD-g/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=VImY8PqmD-g"
+    },
+    {
+      "youtubeId": "SKhR5SJrtxA",
+      "title": "ഒമാനിൽ കർഷകർക്ക് സമൃദ്ധിയുടെയും കാലം... പഴങ്ങൾ വിളവെടുത്ത് കർഷകർ | Oman | OmanAgriculture",
+      "durationText": "1:08",
+      "viewsText": "870 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/SKhR5SJrtxA/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/SKhR5SJrtxA/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=SKhR5SJrtxA"
+    },
+    {
+      "youtubeId": "RTkuNFlzcuk",
+      "title": "സലാല 'മൂന്നാറിലെ' കോട | ഖരീഫിനെ വരവേറ്റ് ഒമാൻ | Salalah | Khareef",
+      "durationText": "1:53",
+      "viewsText": "255 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/RTkuNFlzcuk/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/RTkuNFlzcuk/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=RTkuNFlzcuk"
+    },
+    {
+      "youtubeId": "KVLtAFeMeGk",
+      "title": "മക്കഹറമിലെ ഹിജ്ർ ഇസ്മാഈൽ സന്ദർശനത്തിനുള്ള പുതിയ സമയക്രമം പ്രഖ്യാപിച്ച് ഇരുഹറം കാര്യാലയം | HijrIsmail",
+      "durationText": "0:57",
+      "viewsText": "866 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/KVLtAFeMeGk/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/KVLtAFeMeGk/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=KVLtAFeMeGk"
+    },
+    {
+      "youtubeId": "eOA4paRPhDQ",
+      "title": "ഒമാനിലെ സലാലയിൽ നിന്നും കോട കാണണോ? ഖരീഫിനെ വരവേറ്റ് പ്രദേശവാസികൾ | Salalah | SalalahKhareef",
+      "durationText": "2:06",
+      "viewsText": "642 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/eOA4paRPhDQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/eOA4paRPhDQ/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=eOA4paRPhDQ"
+    },
+    {
+      "youtubeId": "JGSP7NYM2gA",
+      "title": "'സഞ്ചാരികളെ ഇതിലേ...' ഒമാനിലെ മലയോര സഞ്ചാര പാത വികസിപ്പിക്കാനുള്ള പദ്ധതി വരുന്നു | Oman",
+      "durationText": "1:06",
+      "viewsText": "157 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/JGSP7NYM2gA/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/JGSP7NYM2gA/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=JGSP7NYM2gA"
+    },
+    {
+      "youtubeId": "Vva1fmh80jM",
+      "title": "യുനെസ്കോയുടെ ലോക പൈതൃക പദവി പട്ടികയിലേക്ക് കുട്ടനാടും: | Kuttanad | UNESCO | WorldHeritage",
+      "durationText": "2:14",
+      "viewsText": "274 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Vva1fmh80jM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Vva1fmh80jM/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Vva1fmh80jM"
+    },
+    {
+      "youtubeId": "PGBG0CIRcVY",
+      "title": "'ഓള് ഒരു തലശ്ശേരിക്കാരി...',ഇത്തവണ ലോകകപ്പ് ആവേശം പേറി നാജി നൗഷി ലഡാക്കിലേക്ക് | NajiNoushi | Ladakh",
+      "durationText": "7:47",
+      "viewsText": "60 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/PGBG0CIRcVY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/PGBG0CIRcVY/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=PGBG0CIRcVY"
+    },
+    {
+      "youtubeId": "SDStBkvOaw8",
+      "title": "മലയാളി കുടുംബങ്ങളുടെ സംഗമ കേന്ദ്രമായി സൗദി യാമ്പുവിലെ മാനാഞ്ചിറ | YanbuWaterfront | SaudiArabia",
+      "durationText": "2:34",
+      "viewsText": "552 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/SDStBkvOaw8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/SDStBkvOaw8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=SDStBkvOaw8"
+    },
+    {
+      "youtubeId": "XjUPauB8HTw",
+      "title": "'സഞ്ചാരികളെ ഇതിലേ...' ഒമാനിലെ മലയോര സഞ്ചാര പാത വികസിപ്പിക്കാനുള്ള പദ്ധതി വരുന്നു | OmanTourism",
+      "durationText": "1:06",
+      "viewsText": "60 views",
+      "publishedText": "1 month ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/XjUPauB8HTw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/XjUPauB8HTw/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=XjUPauB8HTw"
+    }
+  ]
+}

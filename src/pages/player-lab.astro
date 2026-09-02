@@ -1,0 +1,108 @@
+---
+// PAGE · /player-lab — the MediaOne player system, on real content. Two
+// surfaces of the SAME reusable component (MediaPlayer.astro):
+//   • file  → a real MediaOne report downloaded as MP4 (H.264, ≤720p) and
+//             served from public/videos/ — Video.js v10 behind the MediaOne skin
+//   • youtube → the raw iframe fallback, for any report not yet mirrored locally
+// Data comes from the flat record src/data/youtube-videos.json (see
+// src/lib/video-alt.ts) — the same source that drives /video-alt, so the two
+// pages can never drift apart. Facades load zero player JS until clicked.
+import Layout from '../layouts/Layout.astro';
+import MediaPlayer from '../components/MediaPlayer.astro';
+import { altVideos, featuredVideo, youtubeRecord } from '../lib/video-alt';
+import { ytThumbnail } from '../lib/videos';
+
+const hero = featuredVideo();
+const grid = altVideos.filter((v) => v.youtubeId !== hero.youtubeId);
+
+// A real report that has NOT been mirrored locally — the YouTube fallback
+// still plays it. (jeHILGPRNJw is region-locked; 4B9pqFW0nRM plays.)
+const ytDemo = youtubeRecord.videos.find((v) => v.youtubeId === '4B9pqFW0nRM')!;
+---
+
+<Layout title="Player Lab — MediaOne" description="Video.js v10 branded player demo on real MediaOne reports" noindex topAd={false}>
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-12">
+    <header class="space-y-2">
+      <p class="eyebrow text-azure flex items-center gap-2">
+        <span class="inline-block size-1.5 bg-azure" aria-hidden="true"></span>
+        Player Lab · v0
+      </p>
+      <h1 class="text-title font-bold text-ink dark:text-ivory">The MediaOne player</h1>
+      <p class="body-text text-ink-muted dark:text-ivory/60 max-w-2xl">
+        One reusable <code class="font-mono text-meta">&lt;MediaPlayer&gt;</code> — the same
+        component on <a href="/video-alt" class="text-azure hover:underline">/video-alt</a>.
+        Click a facade to lazy-mount the real player: Video.js v10 for local MP4s, a raw
+        YouTube iframe for anything not mirrored yet. Nothing but the poster loads until
+        you press play.
+      </p>
+    </header>
+
+    <section class="space-y-3">
+      <h2 class="section-header text-ink dark:text-ivory flex items-center gap-2">
+        <i class="ti ti-player-play text-azure" aria-hidden="true"></i>
+        File source · Video.js v10 skin
+      </h2>
+      <p class="meta-text text-ink-muted dark:text-ivory/50">
+        MP4 from <code class="font-mono">public/videos/</code> → mounts{' '}
+        <code class="font-mono">&lt;video-player&gt;</code> tinted to azure/ivory.
+      </p>
+      <MediaPlayer
+        src={hero.local!.src}
+        poster={hero.local!.poster}
+        title={hero.title}
+        category={hero.category}
+        duration={hero.durationText ?? undefined}
+      />
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="section-header text-ink dark:text-ivory flex items-center gap-2">
+        <i class="ti ti-brand-youtube text-azure" aria-hidden="true"></i>
+        YouTube source · iframe fallback
+      </h2>
+      <p class="meta-text text-ink-muted dark:text-ivory/50">
+        <code class="font-mono">youtubeId</code> → raw autoplay iframe (v10 has no YouTube
+        provider yet). Example: {ytDemo.title.slice(0, 48)}…
+      </p>
+      <MediaPlayer
+        youtubeId={ytDemo.youtubeId}
+        poster={ytThumbnail(ytDemo.youtubeId)}
+        title={ytDemo.title}
+        category={ytDemo.category}
+        duration={ytDemo.durationText ?? undefined}
+      />
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="section-header text-ink dark:text-ivory flex items-center gap-2">
+        <i class="ti ti-grid-3x3 text-azure" aria-hidden="true"></i>
+        Grid · many facades, one listener
+      </h2>
+      <p class="meta-text text-ink-muted dark:text-ivory/50">
+        All {altVideos.length} mirrored reports — identical markup to the /video-alt grid.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {
+          grid.map((v) => (
+            <MediaPlayer
+              src={v.local!.src}
+              poster={v.local!.poster}
+              title={v.title}
+              category={v.category}
+              duration={v.durationText ?? undefined}
+            />
+          ))
+        }
+      </div>
+      <p class="meta-text text-ink-muted dark:text-ivory/50 flex items-center gap-1.5">
+        <i class="ti ti-download" aria-hidden="true"></i>
+        Mirrored with yt-dlp from{' '}
+        <a href="https://www.youtube.com/@MediaoneTVLive" target="_blank" rel="noopener" class="text-azure hover:underline">
+          MediaOne News
+        </a>{' '}
+        · metadata in{' '}
+        <code class="font-mono">src/data/youtube-videos.json</code> ({youtubeRecord.capturedAt}).
+      </p>
+    </section>
+  </main>
+</Layout>

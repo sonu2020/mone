@@ -1,0 +1,21 @@
+---
+// ATOM · StreamMarker — a centred label on a rule, dropped into the feed every
+// few screens.
+//
+// It is deliberately not a section heading. It names no desk and claims
+// nothing about the stories under it; it exists so a reader thirty items deep
+// gets a small confirmation that the page still knows where they are. The
+// homepage's BandHeading does the opposite job — it opens a group — so this
+// does not reuse it.
+export interface Props {
+  label: string;
+  class?: string;
+}
+const { label, class: className = '' } = Astro.props;
+---
+
+<div class:list={['mc', 'flex items-center gap-4 py-7', className]} role="separator" aria-label={label}>
+  <span class="h-px flex-1 bg-rule dark:bg-ivory/15" aria-hidden="true"></span>
+  <span class="eyebrow text-text-light dark:text-ivory/40">{label}</span>
+  <span class="h-px flex-1 bg-rule dark:bg-ivory/15" aria-hidden="true"></span>
+</div>

@@ -1,0 +1,442 @@
+---
+// ── The stage every journey feature shares ──────────────────────────────────
+//
+// A thin wrapper over `terrain-journey`. It owns the markup, the styling and
+// the controls; the package owns the terrain, the camera and the loop. Adding a
+// new feature means writing a data file and dropping this in — see
+// /design/terrain-journey for the full recipe.
+//
+// Stacking contract: the stage is `position: fixed` at z-index 0, so every
+// other block on the host page must carry `relative z-10` and an opaque
+// background. That alone lets the terrain show through here and be covered
+// everywhere else, with no scroll-driven show/hide of page content.
+import 'terrain-journey/style.css';
+import type { Journey } from 'terrain-journey';
+
+interface Props {
+  journey: Journey;
+  /** Viewport heights of scroll the journey gets. Longer is calmer. */
+  heightVh?: number;
+  /** Seconds for autoplay to cover the whole thing. */
+  autoplaySeconds?: number;
+  /** What the two views are called on this journey. A road is chased and
+   *  driven; a river is flown over and floated down. */
+  overviewLabel?: string;
+  firstPersonLabel?: string;
+  overviewIcon?: string;
+  firstPersonIcon?: string;
+  playLabel?: string;
+  /** Shown over the stage before the reader starts moving. */
+  kicker?: string;
+  title?: string;
+  standfirst?: string;
+  /** Units for the big readout. */
+  markerNoun?: string;
+}
+
+const {
+  journey,
+  heightVh = 600,
+  autoplaySeconds = 110,
+  overviewLabel = 'Overview',
+  firstPersonLabel = 'First person',
+  overviewIcon = 'ti-drone',
+  firstPersonIcon = 'ti-steering-wheel',
+  playLabel = 'Travel',
+  kicker,
+  title,
+  standfirst,
+  markerNoun = 'Marker',
+} = Astro.props;
+
+const id = journey.id;
+---
+
+<div class:list={['mc', 'tj-stage']} data-tj-stage aria-hidden="true">
+  <canvas class="tj-canvas" data-tj-canvas></canvas>
+  <div class="tj-labels" data-tj-overlay></div>
+
+  <div class="tj-hud">
+    <div class="tj-hud__read">
+      <span class="tj-hud__ele" data-tj-ele>{journey.lowest} m</span>
+      <span class="tj-hud__km" data-tj-km>0.0 km</span>
+    </div>
+    <p class="tj-hud__marker" data-tj-marker></p>
+  </div>
+
+  <div class="tj-profile">
+    <canvas class="tj-profile__canvas" data-tj-profile></canvas>
+  </div>
+
+  <p class="tj-scale" data-tj-scale></p>
+</div>
+
+<!--
+  Controls sit OUTSIDE the stage, twice over. The stage is `position: fixed` at
+  `z-index: 0`, which makes it a stacking context — nothing inside it can rise
+  above the `z-10` page content, so a button in there is simply unclickable. It
+  is also `aria-hidden`, and interactive controls must not live inside that.
+-->
+<!--
+  The reveal card lives here, not in the stage. Same reason as the controls: the
+  stage is `position: fixed` at `z-index: 0` with `pointer-events: none`, so a
+  card with an expander inside it would never receive a click. This layer is
+  transparent to pointers itself; only the card takes them.
+-->
+<div class="tj-cards" data-tj-cards aria-live="polite"></div>
+
+<div class="tj-controls" data-tj-controls>
+  <div class="tj-controls__group" role="group" aria-label="View">
+    <button type="button" data-tj-view="overview" aria-pressed="true">
+      <i class:list={['ti', overviewIcon]} aria-hidden="true"></i> {overviewLabel}
+    </button>
+    <button type="button" data-tj-view="firstPerson" aria-pressed="false">
+      <i class:list={['ti', firstPersonIcon]} aria-hidden="true"></i> {firstPersonLabel}
+    </button>
+  </div>
+
+  <div class="tj-controls__group">
+    <button type="button" data-tj-play aria-pressed="false">
+      <i class="ti ti-player-play" data-tj-play-icon aria-hidden="true"></i>
+      <span data-tj-play-label>{playLabel}</span>
+    </button>
+  </div>
+</div>
+
+<section
+  class="tj-run"
+  data-tj-run
+  data-tj-autoplay-seconds={autoplaySeconds}
+  style={`height: ${heightVh}vh`}
+>
+  <div class="tj-run__intro">
+    {kicker && <p class="eyebrow text-white/55">{kicker}</p>}
+    {title && <h2 class="mt-3 text-title font-bold text-white text-balance">{title}</h2>}
+    {standfirst && (
+      <p class="mt-3 max-w-md body-small text-white/60 text-pretty">{standfirst}</p>
+    )}
+  </div>
+
+  <!-- Server-rendered, so the journey's marked points exist before any of the
+       above runs, and remain if WebGL never arrives. -->
+  <ol class="tj-run__fallback">
+    {journey.markers.map((m) => (
+      <li>
+        {markerNoun} {m.n} — {Math.round(m.elevation)} m, {m.km.toFixed(2)} km
+        {m.detail ? `, ${m.detail}` : ''}
+      </li>
+    ))}
+  </ol>
+</section>
+
+<script
+  type="application/json"
+  data-tj-data={id}
+  set:html={JSON.stringify(journey)}
+/>
+
+<style is:global>
+  .tj-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: #05070a;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+  .tj-stage.is-live { opacity: 1; visibility: visible; }
+  .tj-stage.is-failed { display: none; }
+
+  .tj-canvas { display: block; width: 100%; height: 100%; }
+
+  /* ── Readout ────────────────────────────────────────────────────────── */
+  .tj-hud {
+    position: absolute;
+    top: clamp(4.5rem, 12vh, 7rem);
+    left: 1.25rem;
+    /* The terrain behind this runs from deep shade to bright haze, so the
+       readout needs its own contrast rather than relying on the backdrop. */
+    text-shadow: 0 1px 12px rgba(5, 7, 10, 0.95), 0 0 3px rgba(5, 7, 10, 0.9);
+  }
+  .tj-hud__read {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .tj-hud__ele {
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1;
+    color: #5ff0e0;
+  }
+  .tj-hud__km { font-size: 0.875rem; color: rgba(234, 246, 244, 0.6); }
+  .tj-hud__marker {
+    margin-top: 0.5rem;
+    min-height: 1.25rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffb648;
+  }
+
+  /* ── Controls ───────────────────────────────────────────────────────── */
+  .tj-cards {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+  }
+  .tj-stage.is-live ~ .tj-cards { opacity: 1; visibility: visible; }
+  .tj-stage.is-failed ~ .tj-cards { display: none; }
+
+  .tj-controls {
+    position: fixed;
+    top: clamp(4.5rem, 12vh, 7rem);
+    right: 1.25rem;
+    z-index: 20;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+  }
+  .tj-stage.is-live ~ .tj-controls { opacity: 1; visibility: visible; }
+  .tj-stage.is-failed ~ .tj-controls { display: none; }
+
+  .tj-controls__group {
+    display: flex;
+    border: 1px solid rgba(95, 240, 224, 0.3);
+    background: rgba(5, 7, 10, 0.75);
+  }
+  .tj-controls button {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(234, 246, 244, 0.6);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .tj-controls button + button { border-left: 1px solid rgba(95, 240, 224, 0.2); }
+  .tj-controls button:hover { color: #eaf6f4; background: rgba(95, 240, 224, 0.1); }
+  .tj-controls button[aria-pressed='true'] { color: #05070a; background: #5ff0e0; }
+  /* Autoplay reads as running, not as a selected view. */
+  .tj-controls button[data-tj-play][aria-pressed='true'] { color: #05070a; background: #ffb648; }
+  .tj-controls button:focus-visible { outline: 2px solid #ffb648; outline-offset: -2px; }
+
+  /* ── Elevation strip ────────────────────────────────────────────────── */
+  .tj-profile {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    height: 118px;
+    padding: 0 0.25rem;
+    /* Nearly opaque: the route passes behind this and turned the curve to mud
+       at 0.6. */
+    background: rgba(5, 7, 10, 0.88);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .tj-profile__canvas { display: block; width: 100%; height: 100%; }
+
+  .tj-scale {
+    position: absolute;
+    right: 1.25rem;
+    bottom: calc(1.25rem + 118px + 0.5rem);
+    padding: 2px 6px;
+    background: rgba(5, 7, 10, 0.7);
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(234, 246, 244, 0.45);
+  }
+
+  /* ── The scroll range ───────────────────────────────────────────────── */
+  .tj-run { position: relative; z-index: 10; }
+  .tj-run__intro {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    max-width: 34rem;
+    padding: 0 1.25rem;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .tj-run.is-armed .tj-run__intro { opacity: 0; }
+
+  /* The marker list is the floor: in the HTML before any script runs, and what
+     remains if WebGL never arrives. Once the stage is armed it has done its
+     job. */
+  .tj-run__fallback {
+    max-width: 34rem;
+    padding: 0 1.25rem 4rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-variant-numeric: tabular-nums;
+    line-height: 2;
+  }
+  .tj-run.is-armed .tj-run__fallback { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tj-run { height: 100vh !important; }
+  }
+
+  @media (max-width: 640px) {
+    .tj-profile { height: 84px; }
+    .tj-scale { bottom: calc(1.25rem + 84px + 0.5rem); }
+  }
+</style>
+
+<script>
+  import type { Journey, ViewMode } from 'terrain-journey';
+
+  const stage = document.querySelector<HTMLElement>('[data-tj-stage]');
+  const run = document.querySelector<HTMLElement>('[data-tj-run]');
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-tj-canvas]');
+  const overlay = document.querySelector<HTMLElement>('[data-tj-overlay]');
+  const dataEl = document.querySelector<HTMLScriptElement>('[data-tj-data]');
+
+  if (stage && run && canvas && overlay && dataEl) {
+    const journey = JSON.parse(dataEl.textContent || '{}') as Journey;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const profileCanvas = document.querySelector<HTMLCanvasElement>('[data-tj-profile]');
+    const eleEl = document.querySelector<HTMLElement>('[data-tj-ele]');
+    const kmEl = document.querySelector<HTMLElement>('[data-tj-km]');
+    const markerEl = document.querySelector<HTMLElement>('[data-tj-marker]');
+    const scaleEl = document.querySelector<HTMLElement>('[data-tj-scale]');
+    const playBtn = document.querySelector<HTMLButtonElement>('[data-tj-play]');
+    const playIcon = document.querySelector<HTMLElement>('[data-tj-play-icon]');
+    const playLabel = document.querySelector<HTMLElement>('[data-tj-play-label]');
+    const viewButtons = Array.from(
+      document.querySelectorAll<HTMLButtonElement>('[data-tj-view]'),
+    );
+    const controls = document.querySelector<HTMLElement>('[data-tj-controls]');
+    const idleLabel = playLabel?.textContent ?? 'Travel';
+
+    /** Every failure path ends here: hide the stage, leave the marker list. */
+    function fail(why: string, err?: unknown) {
+      stage!.classList.add('is-failed');
+      run!.classList.remove('is-armed');
+      console.warn(`[journey:${journey.id}] disabled:`, why, err ?? '');
+    }
+
+    // Boot only when the reader is within a viewport of the journey, so no
+    // other page on the site pays for three.js or the DEM tiles.
+    let booted = false;
+    const arm = new IntersectionObserver(
+      (entries) => {
+        if (booted || !entries.some((e) => e.isIntersecting)) return;
+        booted = true;
+        arm.disconnect();
+        boot();
+      },
+      { rootMargin: '100% 0px 100% 0px', threshold: 0 },
+    );
+    arm.observe(run);
+
+    async function boot() {
+      let mountJourney;
+      try {
+        ({ mountJourney } = await import('terrain-journey'));
+      } catch (e) {
+        return fail('library import failed', e);
+      }
+
+      const nf = new Intl.NumberFormat('en-IN');
+
+      let mounted;
+      try {
+        mounted = await mountJourney({
+          canvas: canvas!,
+          overlay: overlay!,
+          section: run!,
+          journey,
+          profileCanvas,
+          cardHost: document.querySelector<HTMLElement>('[data-tj-cards]'),
+          reducedMotion: reduce,
+          autoplaySeconds: Number(run!.dataset.tjAutoplaySeconds) || 110,
+          onLive: (live) => {
+            stage!.classList.toggle('is-live', live);
+            // Published on <html> so the rest of the page can stand out of the
+            // way — a trek page already has its own fixed route map in the
+            // corner the journey wants. A plain class beats `body:has(...)`
+            // here: no specificity argument with utility CSS, and no reliance
+            // on :has() at all.
+            document.documentElement.classList.toggle('tj-live', live);
+          },
+          onProgress: ({ metres, elevation, marker }) => {
+            if (eleEl) eleEl.textContent = `${nf.format(Math.round(elevation))} m`;
+            if (kmEl) kmEl.textContent = `${(metres / 1000).toFixed(1)} km`;
+            if (markerEl) {
+              // Terse on purpose. The reveal card carries the figures and the
+              // note; repeating them here just puts the same sentence on screen
+              // twice, in two places, at two sizes.
+              const m = marker >= 0 ? journey.markers[marker] : null;
+              const what = m?.title ?? m?.detail;
+              markerEl.textContent = m
+                ? `${m.n} of ${journey.markers.length}${what ? ` · ${what}` : ''}`
+                : '';
+            }
+          },
+          onPlaying: (playing) => {
+            playBtn?.setAttribute('aria-pressed', String(playing));
+            if (playIcon) {
+              playIcon.className = playing
+                ? 'ti ti-player-pause'
+                : 'ti ti-player-play';
+            }
+            if (playLabel) playLabel.textContent = playing ? 'Pause' : idleLabel;
+          },
+          onViewChange: (mode) => {
+            viewButtons.forEach((b) =>
+              b.setAttribute('aria-pressed', String(b.dataset.tjView === mode)),
+            );
+            if (scaleEl) {
+              const s = journey.verticalScale[mode];
+              scaleEl.textContent =
+                s === 1 ? 'True vertical scale' : `Vertical exaggeration ×${s}`;
+            }
+          },
+        });
+      } catch (e) {
+        return fail('stage could not be built', e);
+      }
+
+      run!.classList.add('is-armed');
+
+      // A handle for poking at the scene from the console while building a new
+      // journey — camera position, marker placement, what is actually visible.
+      // Dev only; it never reaches a built page.
+      if (import.meta.env.DEV) (window as any).__journey = mounted;
+
+      viewButtons.forEach((b) =>
+        b.addEventListener('click', () => mounted.setView(b.dataset.tjView as ViewMode)),
+      );
+
+      if (reduce) {
+        // Autoplay is precisely the motion this preference opts out of.
+        playBtn?.closest('.tj-controls__group')?.remove();
+        stage!.classList.add('is-live');
+      } else {
+        playBtn?.addEventListener('click', () => mounted.scrubber.toggle());
+      }
+
+      // Controls are outside the stage, so they cannot inherit its aria-hidden
+      // — but they are still decoration until the journey is running.
+      controls?.removeAttribute('hidden');
+    }
+  }
+</script>

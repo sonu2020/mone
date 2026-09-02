@@ -1,0 +1,20 @@
+{
+  "project": "OpenDataKerala — Kerala LSG Election Portal",
+  "projectUrl": "https://opendatakerala.org/LSG2025/",
+  "repos": [
+    {
+      "name": "LSG2025",
+      "url": "https://github.com/opendatakerala/LSG2025"
+    },
+    {
+      "name": "LSGD2025-Results-Data",
+      "url": "https://github.com/opendatakerala/LSGD2025-Results-Data"
+    }
+  ],
+  "sources": [
+    "State Election Commission, Kerala",
+    "OpenStreetMap"
+  ],
+  "license": "GPL-3.0 (code); data credited to SEC Kerala via OpenDataKerala",
+  "builtAt": "2026-08-12T12:56:18.840Z"
+}

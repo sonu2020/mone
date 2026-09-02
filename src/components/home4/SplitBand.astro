@@ -1,0 +1,174 @@
+---
+// BLOCK · SplitBand — a labelled band with a split lead,
+// four cards underneath and a right-side story rail.
+import Art from "./Art.astro";
+import DummyImage from "../DummyImage.astro";
+import Kicker from "../ui/Kicker.astro";
+import BandHeading from "./BandHeading.astro";
+import ThumbRow from "./ThumbRow.astro";
+import type { LiveStory as Story } from "../../lib/home4-data";
+
+export interface Props {
+  label?: string;
+  href?: string;
+  viewAllHref?: string;
+  lead: Story;
+  cards: Story[];
+  rail?: Story[];
+  authors?: Story[];
+  class?: string;
+}
+
+const {
+  label,
+  href,
+  viewAllHref,
+  lead,
+  cards,
+  rail = [],
+  authors = [],
+  class: className = "",
+} = Astro.props;
+
+const hasRail = rail.length > 0 || authors.length > 0;
+---
+
+<section class:list={["mc", "py-6", className]}>
+  {
+    label && (
+      <BandHeading
+        label={label}
+        href={href}
+        viewAllHref={viewAllHref}
+        class="mb-6"
+      />
+    )
+  }
+
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
+    <!-- Main content -->
+    <div
+      class:list={[
+        "flex flex-col gap-6",
+        hasRail ? "lg:col-span-8 xl:col-span-9" : "lg:col-span-12",
+      ]}
+    >
+      <!-- Large lead story -->
+      <a
+        href={lead.href}
+        class="mc group grid grid-cols-1 bg-light-gray sm:grid-cols-12 dark:bg-brand-elevated"
+      >
+        <!-- Lead text boundary -->
+        <div
+          class="order-2 flex flex-col justify-center gap-3 px-6 py-5 sm:order-1 sm:col-span-5 lg:px-8"
+        >
+          {lead.category && <Kicker text={lead.category} />}
+
+          <h3
+            class="headline-feature text-balance text-text-navy-deep transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light"
+          >
+            {lead.title}
+          </h3>
+
+          {
+            lead.excerpt && (
+              <p class="font-malayalam-alt line-clamp-4 text-[0.9375rem] leading-[1.53] text-text-secondary dark:text-ivory/70">
+                {lead.excerpt}
+              </p>
+            )
+          }
+
+          {
+            lead.date && (
+              <p class="caption-text pt-1 text-text-muted tabular-nums dark:text-ivory/45">
+                {lead.date}
+              </p>
+            )
+          }
+        </div>
+
+        <!-- Lead image boundary -->
+        <div
+          class="relative order-1 aspect-[5/3] overflow-hidden sm:order-2 sm:col-span-7 sm:aspect-auto sm:min-h-full"
+        >
+          {
+            lead.image ? (
+              <DummyImage
+                seed={lead.href}
+                src={lead.image}
+                w={800}
+                h={480}
+                class="absolute inset-0 h-full w-full transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div class="absolute inset-0 bg-light-gray dark:bg-brand-elevated" />
+            )
+          }
+        </div>
+      </a>
+
+      <!-- Four cards -->
+      <div
+        class="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-2 lg:gap-5 xl:grid-cols-4"
+      >
+        {
+          cards.slice(0, 4).map((story) => (
+            <a
+              href={story.href}
+              class="mc group flex h-full flex-col border border-rule bg-bg-card transition-colors hover:border-azure/40 dark:border-ivory/10"
+            >
+              <Art story={story} ratio="16/9" w={560} zoom />
+
+              <div class="flex flex-1 flex-col gap-2 p-3">
+                <h3 class="headline-deck line-clamp-3 text-text-primary transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light">
+                  {story.title}
+                </h3>
+
+                {(story.category || story.date) && (
+                  <p class="mt-auto flex items-baseline gap-1.5">
+                    {story.category && <Kicker text={story.category} />}
+
+                    {story.category && story.date && (
+                      <span class="caption-text text-text-light dark:text-ivory/30">
+                        ·
+                      </span>
+                    )}
+
+                    {story.date && (
+                      <span class="caption-text text-text-muted tabular-nums dark:text-ivory/45">
+                        {story.date}
+                      </span>
+                    )}
+                  </p>
+                )}
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Right rail -->
+    {
+      hasRail && (
+        <aside class="flex flex-col divide-y divide-rule lg:col-span-4 xl:col-span-3 dark:divide-ivory/10">
+          {rail.slice(0, 2).map((story, index) => (
+            <ThumbRow
+              story={story}
+              class:list={[index === 0 ? "pb-6" : "py-6"]}
+            />
+          ))}
+
+          {authors.slice(0, 2).map((story, index) => (
+            <ThumbRow
+              story={story}
+              metaBelow
+              clamp={3}
+              class:list={[index === 0 ? "py-6" : "pt-6"]}
+            />
+          ))}
+        </aside>
+      )
+    }
+  </div>
+</section>

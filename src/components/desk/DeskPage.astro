@@ -1,0 +1,400 @@
+---
+// DeskPage — complete section and story component boundaries.
+import Art from "../home4/Art.astro";
+import ThumbRow from "../home4/ThumbRow.astro";
+import StoryListItem from "../news/StoryListItem.astro";
+import Kicker from "../ui/Kicker.astro";
+import BandHeading from "../home4/BandHeading.astro";
+import DeskRail from "./DeskRail.astro";
+import DeskMasthead from "./DeskMasthead.astro";
+import Media from "../ui/Media.astro";
+import AdSlot from "../AdSlot.astro";
+import DummyImage from "../DummyImage.astro";
+import {
+  densityPlan,
+  type Desk,
+  type DeskPage as DeskPageData,
+} from "../../lib/desk";
+import { blurbFor } from "../../lib/dummy-text";
+import type { LiveStory } from "../../lib/home4-data";
+import type { Video } from "../../lib/videos";
+import { featureFor } from "../../lib/desk-features";
+
+export interface Props {
+  desk: Desk;
+  page: DeskPageData;
+  videos: Video[];
+  trending: LiveStory[];
+  latest?: LiveStory[];
+  latestViewAllHref?: string | null;
+}
+
+const {
+  desk,
+  page,
+  videos,
+  trending,
+  latest = [],
+  latestViewAllHref = "/latest-news",
+} = Astro.props;
+
+const feature = featureFor(desk.id);
+const plan = densityPlan(desk);
+
+const heroBlurb = page.hero?.excerpt ?? desk.description;
+const heroBlurbIsDesk = !page.hero?.excerpt;
+---
+
+<div class="desk-page w-full max-w-site mx-auto bg-bg-card">
+  <div class="px-4 sm:px-6 lg:px-8">
+    <!-- Page heading -->
+    <DeskMasthead
+      title={desk.label}
+      topic={desk.label}
+      showBreadcrumb={false}
+      tail={page.page > 1 ? `Page ${page.page}` : undefined}
+    />
+
+    <!-- Complete promotional feature -->
+    {
+      feature && page.page === 1 && (
+        <div class="pt-6">
+          <a href={feature.href} class="mc desk-story-boundary group block">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-0 overflow-hidden rounded-sm border border-rule dark:border-ivory/15">
+              <div class="relative">
+                <Media
+                  seed={feature.href}
+                  src={feature.image}
+                  ratio="16/9"
+                  w={720}
+                  zoom
+                />
+              </div>
+
+              <div class="flex flex-col justify-center gap-2 p-5 lg:p-7 bg-ivory dark:bg-brand-elevated">
+                <p class="eyebrow text-accent-red">{feature.kicker}</p>
+
+                <h2 class="headline-feature text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance">
+                  {feature.title}
+                </h2>
+
+                <p class="body-small text-text-secondary dark:text-ivory/65 line-clamp-3">
+                  {feature.standfirst}
+                </p>
+
+                {feature.facts && (
+                  <dl class="flex flex-wrap gap-x-6 gap-y-1 pt-1">
+                    {feature.facts.map((fact) => (
+                      <div>
+                        <dt class="eyebrow text-text-muted dark:text-ivory/40">
+                          {fact.label}
+                        </dt>
+                        <dd class="article-title tabular-nums text-text-primary dark:text-ivory">
+                          {fact.value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+
+                <p class="pt-1 inline-flex items-center gap-1.5 eyebrow text-azure dark:text-azure-light">
+                  {feature.cta ?? "Read the feature"}
+                  <i
+                    class="ti ti-arrow-right text-sm transition-transform group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      )
+    }
+
+    <!-- Layout wrappers do not receive component outlines -->
+    <div class="grid grid-cols-1 gap-8 py-6 lg:grid-cols-12 lg:gap-x-8">
+      <div class="lg:col-span-8 xl:col-span-8 min-w-0">
+        <!-- Complete hero: image, headline, description and date -->
+        {
+          page.hero && (
+            <div class="pb-6">
+              <article class="mc desk-story-boundary">
+                <a
+                  href={page.hero.href}
+                  class="group grid grid-cols-1 sm:grid-cols-12 bg-light-gray dark:bg-brand-elevated"
+                >
+                  <div class="relative overflow-hidden sm:col-span-6 aspect-[5/3] sm:aspect-auto sm:min-h-full">
+                    {page.hero.image ? (
+                      <DummyImage
+                        seed={page.hero.href}
+                        src={page.hero.image}
+                        w={900}
+                        h={540}
+                        class="absolute inset-0 h-full w-full transition-transform duration-700 group-hover:scale-[1.03]"
+                        loading="eager"
+                        fetchpriority="high"
+                      />
+                    ) : (
+                      <div class="absolute inset-0 bg-light-gray dark:bg-brand-elevated" />
+                    )}
+                  </div>
+
+                  <div class="sm:col-span-6 flex flex-col justify-center gap-3 px-6 py-5 lg:px-8">
+                    <div class="flex flex-col gap-2">
+                      {page.hero.category && (
+                        <Kicker text={page.hero.category} />
+                      )}
+
+                      <h2 class="headline-feature text-text-navy-deep dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance">
+                        {page.hero.title}
+                      </h2>
+                    </div>
+
+                    {heroBlurb && (
+                      <p
+                        class:list={[
+                          "text-[0.9375rem] leading-[1.53] line-clamp-4",
+                          heroBlurbIsDesk
+                            ? "text-text-muted dark:text-ivory/55"
+                            : "font-malayalam-alt text-text-secondary dark:text-ivory/70",
+                        ]}
+                      >
+                        {heroBlurb}
+                      </p>
+                    )}
+
+                    {page.hero.date && (
+                      <p class="caption-text tabular-nums text-text-muted dark:text-ivory/45 pt-1">
+                        {page.hero.date}
+                      </p>
+                    )}
+                  </div>
+                </a>
+              </article>
+            </div>
+          )
+        }
+
+        <!-- Each featured card gets one complete boundary -->
+        {
+          page.featured.length > 0 && (
+            <ul class="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-6 py-6">
+              {page.featured.map((story) => (
+                <li class="mc desk-story-boundary">
+                  <a href={story.href} class="group block">
+                    <Art story={story} ratio="16/9" w={420} zoom />
+
+                    <div class="flex flex-col gap-1 pt-2">
+                      {story.category && <Kicker text={story.category} />}
+
+                      <h3 class="headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light line-clamp-3 transition-colors">
+                        {story.title}
+                      </h3>
+
+                      {story.date && (
+                        <p class="caption-text tabular-nums text-text-muted dark:text-ivory/45">
+                          {story.date}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        <!-- Each thumbnail row gets one complete boundary -->
+        {
+          page.thumbed.length > 0 && (
+            <div class="flex flex-col gap-5 py-6 border-b border-rule dark:border-ivory/10">
+              {page.thumbed.map((story) => (
+                <div class="mc desk-story-boundary">
+                  <ThumbRow story={story} />
+                </div>
+              ))}
+            </div>
+          )
+        }
+
+        <!-- Inline advertisement -->
+        {
+          plan.midAd && page.page === 1 && (
+            <AdSlot
+              slot={`${desk.id}-inline`}
+              format="leaderboard"
+              lazy
+              tone="sage"
+              class="my-2"
+            />
+          )
+        }
+
+        <!-- Subsection boundaries and individual story boundaries -->
+        {
+          page.subsections.map((sub) => (
+            <section class="mc pt-6">
+              <div class="desk-heading-content">
+                <BandHeading
+                  label={sub.label}
+                  href={sub.href}
+                  viewAllHref={sub.href}
+                  class="mb-4"
+                />
+              </div>
+
+              <ul class="desk-story-list grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                {sub.stories.map((story) => (
+                  <StoryListItem
+                    story={story}
+                    kicker={sub.label}
+                    kickerHref={sub.href}
+                    size="md"
+                    class="mc"
+                  />
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+
+        <!-- Optional collection -->
+        {
+          Astro.slots.has("collection") && page.page === 1 && (
+            <section class="mc pt-6">
+              <slot name="collection" />
+            </section>
+          )
+        }
+
+        <!-- Complete Latest section -->
+        <section class="mc pt-6">
+          <div class="desk-heading-content">
+            <BandHeading
+              label="Latest"
+              href={`/${desk.id}`}
+              viewAllHref={latestViewAllHref ?? undefined}
+              class="mb-5"
+            />
+          </div>
+
+          {
+            page.latest.length > 0 ? (
+              <ul class="desk-story-list flex flex-col divide-y divide-rule dark:divide-ivory/10">
+                {page.latest.map((story) => (
+                  <StoryListItem
+                    story={story}
+                    blurb={blurbFor(story)}
+                    class="mc py-5 first:pt-0 last:pb-0"
+                  />
+                ))}
+              </ul>
+            ) : (
+              <p class="body-small text-text-muted dark:text-ivory/45">
+                Nothing further on this desk yet.
+              </p>
+            )
+          }
+
+          <!-- Complete pagination component -->
+          {
+            page.pageCount > 1 && (
+              <nav
+                class="mc flex items-center gap-3 mt-8 pt-4 border-t border-rule dark:border-ivory/10"
+                aria-label="Pagination"
+              >
+                {page.prevHref ? (
+                  <a
+                    href={page.prevHref}
+                    rel="prev"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-rule dark:border-ivory/15 caption-text font-semibold text-text-secondary dark:text-ivory/70 hover:border-azure hover:text-azure dark:hover:border-azure-light dark:hover:text-azure-light transition-colors"
+                  >
+                    <i class="ti ti-arrow-left text-sm" aria-hidden="true" />
+                    Previous
+                  </a>
+                ) : (
+                  <span
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-rule/60 dark:border-ivory/10 caption-text text-text-light dark:text-ivory/25"
+                    aria-disabled="true"
+                  >
+                    <i class="ti ti-arrow-left text-sm" aria-hidden="true" />
+                    Previous
+                  </span>
+                )}
+
+                <span class="caption-text tabular-nums text-text-muted dark:text-ivory/45">
+                  Page {page.page} of {page.pageCount}
+                </span>
+
+                {page.nextHref ? (
+                  <a
+                    href={page.nextHref}
+                    rel="next"
+                    class="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 border border-rule dark:border-ivory/15 caption-text font-semibold text-text-secondary dark:text-ivory/70 hover:border-azure hover:text-azure dark:hover:border-azure-light dark:hover:text-azure-light transition-colors"
+                  >
+                    Next
+                    <i class="ti ti-arrow-right text-sm" aria-hidden="true" />
+                  </a>
+                ) : (
+                  <span
+                    class="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 border border-rule/60 dark:border-ivory/10 caption-text text-text-light dark:text-ivory/25"
+                    aria-disabled="true"
+                  >
+                    Next
+                    <i class="ti ti-arrow-right text-sm" aria-hidden="true" />
+                  </span>
+                )}
+              </nav>
+            )
+          }
+        </section>
+      </div>
+
+      <!-- Sidebar: its internal boundaries belong to DeskRail -->
+      <div
+        class="lg:col-span-4 xl:col-span-4 min-w-0 lg:border-l border-rule dark:border-ivory/10 lg:pl-8"
+      >
+        <DeskRail
+          videos={videos}
+          trending={trending}
+          latest={latest}
+          channelDesk={desk.id}
+          adSlot={`${desk.id}-rail`}
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /*
+   * Suppress nested debug outlines inside complete story boundaries.
+   * Keep the outer .mc outline and keyboard-focus outlines.
+   * These rules apply only while the component-outline mode is active.
+   */
+  :global(.mc-outline)
+    .desk-page
+    :global(.desk-story-boundary .mc:not(:focus-visible)) {
+    outline: none !important;
+  }
+
+  /*
+   * StoryListItem renders the list item itself.
+   * Keep its root boundary; suppress outlines on its descendants.
+   */
+  :global(.mc-outline)
+    .desk-page
+    :global(.desk-story-list > li .mc:not(:focus-visible)) {
+    outline: none !important;
+  }
+
+  /*
+   * A section already owns its boundary, so its heading does not
+   * need another component outline.
+   */
+  :global(.mc-outline)
+    .desk-page
+    :global(.desk-heading-content .mc:not(:focus-visible)) {
+    outline: none !important;
+  }
+</style>

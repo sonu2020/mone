@@ -1,0 +1,21 @@
+---
+// SECTION · MoreSection — the long-tail catch-all. A 4-up promo grid of the
+// remaining stories. The closing band that lets a reader keep scrolling into the
+// archive before the footer.
+import SectionHeading from '../ui/SectionHeading.astro';
+import PromoGrid from '../news/PromoGrid.astro';
+import type { Story } from '../../lib/home-data';
+
+export interface Props {
+  items: Story[];
+  title?: string;
+  titleEn?: string;
+  cols?: 2 | 3 | 4;
+  class?: string;
+}
+const { items, title = 'കൂടുതൽ', titleEn = 'More from MediaOne', cols = 4, class: className = '' } = Astro.props;
+---
+<section class:list={['mc', 'py-7 lg:py-10 border-t border-rule', className]}>
+  <SectionHeading title={title} titleEn={titleEn} />
+  <PromoGrid items={items} cols={cols} />
+</section>

@@ -1,0 +1,518 @@
+@import "tailwindcss";
+@import "@tabler/icons-webfont/dist/tabler-icons.min.css";
+@import "./videojs-mediaone.css";
+/* Swappable type scales (PUBLIC_TYPE_SCALE) — class-scoped --text-* overrides,
+   inert without the class on <html>, the same deal as the .mc-outline styles. */
+@import "./type-scales/tailwind.css";
+@import "./type-scales/editorial.css";
+/* Spacing scenarios for the test UI — tight / spacious overrides of
+   Tailwind's --spacing base and the fluid --spacing-* vars, class-scoped. */
+@import "./spacing-scales/tight.css";
+@import "./spacing-scales/spacious.css";
+
+/* Dark mode driven by a `.dark` class on <html> (set pre-paint in Layout). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================================
+   MediaOne design tokens — an editorial system in the Wired tradition,
+   rendered for a Malayalam newsroom. Cool navy/slate neutrals matched to
+   mediaoneonline.com (never pure #000/#fff), the MediaOne blue (#166bc0) as the
+   single reserved accent over a navy ink (#2e4164), Anek Latin + Anek Malayalam type.
+
+   Primitives (color, type scale, spacing, radius, dimensions) are generated
+   by Style Dictionary from tokens/*.json — that JSON is the single source of
+   truth. Edit it, then run `bun run tokens:build` (or `dev`/`build`, which
+   run it for you). Never hand-edit tokens.generated.css. See /system for the
+   full spec, and TOKENS.md for how the pipeline works.
+   ============================================================================ */
+@import "./tokens.generated.css";
+
+/* ============================================================================
+   Base layer
+   ============================================================================ */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-rule);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    container-type: inline-size;
+    /* Clear the sticky header so an in-page anchor never lands under it.
+       Below lg that is the 56px bar plus its 36px desk row; at lg the desks
+       move inline and it is one 64px bar. */
+    scroll-padding-top: 6rem;
+  }
+
+  @media (min-width: 1024px) {
+    html { scroll-padding-top: 4.5rem; }
+  }
+
+  /* Variable font axis defaults — mobile: condensed + bold, desktop: normal + regular.
+     (Fluid --spacing-* lives in tokens.generated.css's own :root block —
+     kept out of @theme there too, to dodge the same max-w/--spacing collision.) */
+  :root {
+    --font-wdth: 94;
+    --font-wght: 600;
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --font-wdth: 95;
+      --font-wght: 550;
+    }
+  }
+
+  body {
+    background-color: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-variation-settings: "wdth" var(--font-wdth), "wght" var(--font-wght);
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Dark mode */
+  .dark body {
+    background-color: var(--color-brand-dark);
+    color: var(--color-ivory);
+  }
+
+  .dark {
+    --color-text-primary: var(--color-text-inverse);
+    --color-text-secondary: var(--color-text-inverse-soft);
+    --color-text-muted: var(--color-text-light);
+    --color-bg-page: var(--color-brand-dark);
+    --color-bg-card: var(--color-brand-elevated);
+    --color-bg-pure: var(--color-brand-dark);
+    --color-rule: oklch(0.24 0.018 262);
+    --color-rule-light: oklch(0.29 0.022 262);
+  }
+
+  /* Editorial typesetting */
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+    font-variation-settings: "wdth" var(--font-wdth), "wght" 700;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Article and post body paragraphs set exclusively to Noto Sans Malayalam regular */
+  article p, .article-body {
+    font-family: "Noto Sans Malayalam", var(--font-sans);
+    font-variation-settings: normal;
+    font-weight: 400;
+  }
+
+  /* Variable font weight classes */
+  .font-thin { font-variation-settings: "wdth" var(--font-wdth), "wght" 100; }
+  .font-extralight { font-variation-settings: "wdth" var(--font-wdth), "wght" 200; }
+  .font-light { font-variation-settings: "wdth" var(--font-wdth), "wght" 300; }
+  .font-normal { font-variation-settings: "wdth" var(--font-wdth), "wght" 400; }
+  .font-medium { font-variation-settings: "wdth" var(--font-wdth), "wght" 500; }
+  .font-semibold { font-variation-settings: "wdth" var(--font-wdth), "wght" 600; }
+  .font-bold { font-variation-settings: "wdth" var(--font-wdth), "wght" 700; }
+  .font-extrabold { font-variation-settings: "wdth" var(--font-wdth), "wght" 800; }
+
+  ::selection {
+    background-color: oklch(0.527 0.153 253 / 0.18);
+  }
+
+  /* Honor reduced-motion globally. */
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ============================================================================
+   Utilities
+   ============================================================================ */
+
+/* Uppercase micro-label */
+@utility eyebrow {
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 700;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+
+/* Category label — large Malayalam display text */
+@utility category-label {
+  font-size: var(--text-category);
+  line-height: var(--text-category--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 700;
+  font-family: var(--font-malayalam);
+  letter-spacing: -0.02em;
+}
+
+/* Breaking badge */
+@utility breaking-badge {
+  font-size: var(--text-nav);
+  line-height: var(--text-nav--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 600;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Article title */
+@utility article-title {
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 525;
+  font-family: var(--font-malayalam);
+  letter-spacing: -0.01em;
+}
+
+/* Article title — lighter weight variant (reserved for future use) */
+@utility article-title-soft {
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 520;
+  font-family: var(--font-malayalam);
+  letter-spacing: -0.01em;
+}
+
+/* Article title large (for lead stories) */
+@utility article-title-lg {
+  font-size: var(--text-title);
+  line-height: var(--text-title--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 700;
+  font-family: var(--font-malayalam);
+  letter-spacing: -0.01em;
+}
+
+/* Deck — rail rows and grid cards in the dense editorial composition */
+@utility headline-deck {
+  font-size: var(--text-deck);
+  line-height: var(--text-deck--line-height);
+  font-variation-settings: "wdth" 94, "wght" 550;
+  font-family: var(--font-malayalam);
+}
+
+/* Feature — the shelf hero headline */
+@utility headline-feature {
+  font-size: var(--text-xl);
+  line-height: var(--text-feature--line-height);
+  font-variation-settings: "wdth" 94, "wght" 550;
+  font-family: var(--font-malayalam);
+}
+
+/* Lead story — the hero package headline */
+@utility headline-lead {
+  font-size: var(--text-lead-story);
+  line-height: var(--text-lead-story--line-height);
+  font-variation-settings: "wdth" 95, "wght" 550;
+  font-family: var(--font-malayalam);
+  letter-spacing: -0.011em;
+}
+
+/* Band label — the uppercase Latin section marker with its hairline rule */
+@utility band-label {
+  font-size: var(--text-lg);
+  line-height: var(--text-band--line-height);
+  font-variation-settings: "wdth" 120, "wght" 700;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.011em;
+  color: var(--color-text-muted);
+}
+
+/* Row meta — the "Kerala · 5 mnt ago" line above a deck headline */
+@utility row-meta {
+  font-size: 0.75rem;
+  line-height: 1.3125rem;
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 500;
+  font-family: var(--font-malayalam);
+}
+
+/* Body small for blurbs */
+@utility body-small {
+  font-size: var(--text-body-small);
+  line-height: var(--text-body-small--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 500;
+  font-family: var(--font-malayalam-alt);
+}
+
+/* Lead paragraph */
+@utility lead-text {
+  font-size: var(--text-lead);
+  line-height: var(--text-lead--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 400;
+}
+
+/* Section header */
+@utility section-header {
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 600;
+}
+
+/* Display text (hero headlines) */
+@utility display-text {
+  font-size: var(--text-display);
+  line-height: var(--text-display--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 700;
+}
+
+/* Hero text */
+@utility hero-text {
+  font-size: var(--text-hero);
+  line-height: var(--text-hero--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 700;
+}
+
+/* Meta / timestamp */
+@utility meta-text {
+  font-size: var(--text-meta);
+  line-height: var(--text-meta--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 500;
+}
+
+/* Caption */
+@utility caption-text {
+  font-size: var(--text-caption);
+  line-height: var(--text-caption--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 400;
+}
+
+/* Nav link */
+@utility nav-text {
+  font-size: var(--text-nav);
+  line-height: var(--text-nav--line-height);
+  font-variation-settings: "wdth" var(--font-wdth), "wght" 600;
+}
+
+/* Max-width utilities (max-w-xs … max-w-3xl, max-w-prose, max-w-site) now
+   resolve natively from the --container-* tokens in @theme. */
+
+/* Subtle scrollbar */
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+/* ============================================================================
+   Container Queries for component-level responsiveness
+   ============================================================================ */
+
+/* Article card container */
+@container (min-width: 400px) {
+  .cq-article-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+  }
+}
+
+@container (min-width: 600px) {
+  .cq-article-card {
+    grid-template-columns: 2fr 3fr;
+  }
+}
+
+/* Two-column grid responsive */
+@container (min-width: 500px) {
+  .cq-two-col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+@container (min-width: 900px) {
+  .cq-two-col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Gallery responsive */
+@container (min-width: 400px) {
+  .cq-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+  }
+}
+
+@container (min-width: 700px) {
+  .cq-gallery {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ============================================================================
+   Sticky Section Behavior — Mobile
+   Section headers stick below the mobile header with smooth motion
+   ============================================================================ */
+
+@media (max-width: 1023px) {
+  [data-sticky="true"] {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+
+  [data-sticky="true"].is-stuck {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Section header sticky animation */
+.section-sticky-enter {
+  animation: sticky-slide-down 0.2s ease-out;
+}
+
+@keyframes sticky-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   Breaking News Ticker — subtle horizontal scroll
+   ============================================================================ */
+
+.ticker-scroll {
+  animation: ticker-scroll 20s linear infinite;
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+/* ============================================================================
+   Lazy Ad Slots — hidden until after page load, then fade in
+   ============================================================================ */
+
+.ad-lazy {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.4s ease-out, max-height 0.4s ease-out, padding 0.4s ease-out;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.ad-lazy.ad-loaded {
+  opacity: 1;
+  max-height: 200px;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+/* ============================================================================
+   Sticky Header — shadow on scroll
+   ============================================================================ */
+
+#site-header {
+  transition: box-shadow 0.2s ease-out;
+}
+
+#site-header.is-scrolled {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================================================
+   Mobile Header — smart scroll hide/show (transform only, GPU composited)
+   ============================================================================ */
+
+#mobile-header-container {
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+}
+
+#mobile-trending-bar {
+  transition: max-height 0.2s ease-out, opacity 0.15s ease-out;
+  max-height: 40px;
+}
+
+/* ============================================================================
+   On Air — motion for the live TV utility. A double-thump heartbeat on the
+   LIVE dot, an expanding ring behind it, and equalizer bars on the row that
+   is currently broadcasting. All three are suppressed by the global
+   prefers-reduced-motion rule above.
+   ============================================================================ */
+
+.heartbeat {
+  animation: heartbeat 1.9s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes heartbeat {
+  0%, 30%, 70%, 100% { transform: scale(1); }
+  12%               { transform: scale(1.3); }
+  22%               { transform: scale(1); }
+  44%               { transform: scale(1.18); }
+}
+
+/* Sits behind the dot at the same size and blows outward on each beat. */
+.heartbeat-ring {
+  animation: heartbeat-ring 1.9s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes heartbeat-ring {
+  0%        { transform: scale(1);   opacity: 0.6; }
+  40%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq-bounce 1.05s ease-in-out infinite;
+}
+
+.eq-bar:nth-child(2) { animation-delay: 0.18s; animation-duration: 0.86s; }
+.eq-bar:nth-child(3) { animation-delay: 0.36s; animation-duration: 1.24s; }
+
+@keyframes eq-bounce {
+  0%, 100% { transform: scaleY(0.3); }
+  50%      { transform: scaleY(1); }
+}
+
+/* ── Language ───────────────────────────────────────────────────────────────
+   Bilingual pages ship both scripts as sibling elements and let a class on
+   <html> choose. `display: none` also removes the hidden side from the
+   accessibility tree, so a screen reader gets one language rather than both in
+   sequence — no `hidden` attribute and no aria-hidden needed, and importantly
+   none wanted: a server-rendered `hidden` would fix the language at build time
+   and the other could never appear.
+
+   `lang-ml` is in the markup; Layout's pre-paint script swaps to `lang-en`. */
+.lang-ml [data-en] { display: none; }
+.lang-en [data-ml] { display: none; }
+
+/* ============================================================================
+   Internal component marker (.mc)
+   Every custom Astro component in this repo stamps its root element with the
+   `mc` class — the audit hook that shows which parts of a page are custom
+   components rather than plain markup (inventory + usage map in
+   docs/component-stock.md). The class itself is inert: no styles attach to it
+   unless the debug toggle `.mc-outline` sits on <html>, which Layout.astro
+   applies when PUBLIC_MC_OUTLINE=true. Turn the marker off by unsetting that
+   env var (or deleting this block — then shipped CSS carries no marker styles).
+   ============================================================================ */
+.mc-outline .mc {
+  outline: 1px dashed var(--color-azure);
+  outline-offset: -1px;
+}
+

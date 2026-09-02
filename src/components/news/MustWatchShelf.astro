@@ -1,0 +1,88 @@
+---
+// BLOCK · MustWatchShelf — a full-bleed premium horizontal video carousel with a dark background.
+// Features a "MUST WATCH >" link heading, visual navigation arrows, and a responsive grid
+// of video cards (aspect-ratio 16/9, play overlay, clean text, and kickers).
+import Media from '../ui/Media.astro';
+import type { VideoItem } from '../../lib/video-data';
+
+export interface Props {
+  title: string;
+  titleEn?: string;
+  viewAllHref?: string;
+  videos: VideoItem[];
+  class?: string;
+}
+
+const {
+  title,
+  titleEn,
+  viewAllHref = '/videos',
+  videos,
+  class: className = '',
+} = Astro.props;
+---
+
+<section class:list={['w-full bg-[#000813] text-white py-8 lg:py-10 my-6 lg:my-8 border-t border-b border-white/5', className]}>
+  <div class="w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Heading Area -->
+    <div class="flex items-baseline justify-between border-b border-white/10 pb-3 mb-6">
+      <a href={viewAllHref} class="group inline-flex items-center gap-1.5 text-white hover:text-azure-light transition-colors font-bold tracking-wider uppercase text-section">
+        <span>{titleEn || title}</span>
+        <svg viewBox="0 0 24 24" class="size-4 fill-none stroke-current stroke-2.5 ml-0.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </a>
+      
+      <!-- Navigation controls -->
+      <div class="hidden sm:flex items-center gap-3">
+        <button class="size-8 rounded-full border border-white/20 hover:border-white/40 text-white/70 hover:text-white flex items-center justify-center transition-colors cursor-pointer" aria-label="Previous">
+          <svg viewBox="0 0 24 24" class="size-4 fill-none stroke-current stroke-2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <button class="size-8 rounded-full border border-white/20 hover:border-white/40 text-white/70 hover:text-white flex items-center justify-center transition-colors cursor-pointer" aria-label="Next">
+          <svg viewBox="0 0 24 24" class="size-4 fill-none stroke-current stroke-2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Carousel/Slider Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      {videos.slice(0, 5).map((video) => (
+        <a href={video.href} class="group block">
+          <!-- Thumbnail Frame -->
+          <div class="relative aspect-[16/9] overflow-hidden rounded-sm mb-3">
+            <Media seed={video.seed || video.href} ratio="16/9" class="w-full h-full object-cover" zoom />
+            
+            {/* Surgical Play Button Overlay */}
+            <span class="absolute bottom-2.5 left-2.5 size-7 bg-black/75 rounded-sm flex items-center justify-center border border-white/10 group-hover:scale-105 transition-transform duration-200">
+              <svg class="size-3 fill-white ml-0.5" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z" />
+              </svg>
+            </span>
+          </div>
+
+          <!-- Video Text Metadata -->
+          <div class="flex flex-col">
+            <h3 class="text-headline font-bold text-white group-hover:text-azure-light transition-colors duration-200 leading-snug line-clamp-2">
+              {video.title}
+            </h3>
+            {video.views && (
+              <p class="mt-2 text-xs text-text-inverse-soft dark:text-ivory/60 line-clamp-2">
+                {video.views} views {video.duration && `· ${video.duration}`}
+              </p>
+            )}
+            {video.category && (
+              <span class="mt-2.5 block eyebrow text-xs text-azure-light/60">
+                {video.category}
+              </span>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

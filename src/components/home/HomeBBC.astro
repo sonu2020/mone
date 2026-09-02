@@ -1,0 +1,117 @@
+---
+// ── Modular (BBC homage) ───────────────────────────────────────────────────
+// One promo unit, repeated with discipline: image-top, headline, summary, meta.
+// Systematic equal-weight grid + a numbered "Most read" rail. Calm modularity.
+import DummyImage from '../DummyImage.astro';
+import { hero, latest, mostRead, cluster } from '../../lib/home-data';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+const gulf = cluster('gulf');
+const sports = cluster('sports');
+
+const secondaries = [latest[0], latest[1]];
+const grid1 = [india.lead, gulf.lead, sports.lead, kerala.items[0], latest[3], india.items[0], gulf.items[0], sports.items[0]];
+---
+
+<div class:list={['mc', 'bg-bg-page']}>
+  <div class="w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-7">
+
+    <!-- Top: lead promo + secondaries · most-read rail -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pb-7 border-b border-rule">
+      <div class="lg:col-span-8">
+        <!-- Lead promo -->
+        <a href={hero.href} class="group block">
+          <div class="relative aspect-[16/9] overflow-hidden">
+            <DummyImage class="w-full h-full" w={1280} h={720} seed="bbc-lead" />
+          </div>
+          <div class="pt-3">
+            <h1 class="text-hero font-bold text-ink group-hover:text-azure transition-colors text-balance leading-[1.1]">{hero.title}</h1>
+            <p class="mt-2 lead-text text-text-secondary max-w-prose">{hero.excerpt}</p>
+            <div class="mt-2 flex items-center gap-2 caption-text text-text-muted">
+              <span class="tabular-nums">{hero.date}</span><span>·</span><span class="text-azure">{hero.category}</span>
+            </div>
+          </div>
+        </a>
+        <!-- Two secondary promos -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6 pt-6 border-t border-rule">
+          {secondaries.map((s) => (
+            <a href={s.href} class="group block">
+              <div class="relative aspect-[16/9] overflow-hidden">
+                <DummyImage class="w-full h-full" w={640} h={360} seed={s.href + 'bbc'} />
+              </div>
+              <div class="pt-3">
+                <h3 class="article-title-lg font-bold text-text-primary group-hover:text-azure transition-colors leading-snug">{s.title}</h3>
+                <div class="mt-2 flex items-center gap-2 caption-text text-text-muted">
+                  <span class="tabular-nums">{s.date}</span><span>·</span><span class="text-azure">{s.category}</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Most read rail -->
+      <aside class="lg:col-span-4 lg:border-l border-rule lg:pl-8">
+        <h2 class="section-header text-ink pb-3 mb-1 border-b border-ink">ഏറ്റവും വായിച്ചത്</h2>
+        <ol>
+          {mostRead.concat(latest.slice(0, 5)).slice(0, 8).map((s, i) => (
+            <li class="border-b border-rule">
+              <a href={s.href} class="group flex items-start gap-4 py-3.5">
+                <span class="text-3xl font-extrabold text-azure/30 tabular-nums leading-[0.9] w-8 shrink-0">{i + 1}</span>
+                <h3 class="article-title font-semibold text-text-primary group-hover:text-azure transition-colors leading-snug pt-0.5">{s.title}</h3>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </aside>
+    </section>
+
+    <!-- Modular promo grid -->
+    <section class="py-7">
+      <div class="flex items-baseline justify-between mb-5">
+        <h2 class="section-header text-ink">കൂടുതൽ വാർത്തകൾ</h2>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-7">
+        {grid1.map((s) => (
+          <a href={s.href} class="group block">
+            <div class="relative aspect-[16/9] overflow-hidden">
+              <DummyImage class="w-full h-full" w={520} h={293} seed={s.href + 'm'} />
+            </div>
+            <div class="pt-3">
+              <h3 class="article-title font-bold text-text-primary group-hover:text-azure transition-colors leading-snug">{s.title}</h3>
+              {s.excerpt && <p class="mt-1.5 body-small text-text-secondary line-clamp-2 hidden sm:block">{s.excerpt}</p>}
+              {s.date && <p class="mt-2 caption-text text-text-muted tabular-nums">{s.date}</p>}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Section strip: label + 1 lead + 3 text links, repeated -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-8 pt-7 border-t border-rule">
+      {[kerala, india, sports].map((sec) => (
+        <div>
+          <h2 class="section-header text-ink pb-2 mb-4 border-b-2 border-azure inline-block">{sec.name}</h2>
+          <a href={sec.lead.href} class="group block mb-4">
+            <div class="relative aspect-[16/9] overflow-hidden">
+              <DummyImage class="w-full h-full" w={520} h={293} seed={sec.id + 'bbcsec'} />
+            </div>
+            <h3 class="article-title font-bold text-text-primary group-hover:text-azure transition-colors leading-snug pt-3">{sec.lead.title}</h3>
+          </a>
+          <ul class="divide-y divide-rule border-t border-rule">
+            {sec.items.slice(0, 3).map((s) => (
+              <li>
+                <a href={s.href} class="group flex items-start gap-2 py-2.5">
+                  <span class="text-azure mt-1.5 shrink-0 size-1.5 rounded-full bg-azure"></span>
+                  <h3 class="article-title text-text-primary group-hover:text-azure transition-colors leading-snug">{s.title}</h3>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </section>
+
+  </div>
+</div>

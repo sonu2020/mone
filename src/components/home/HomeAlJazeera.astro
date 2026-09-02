@@ -1,0 +1,86 @@
+---
+// ── Spotlight (Al Jazeera homage) ──────────────────────────────────────────
+// Image-led and dramatic. A dominant full-bleed hero with overlaid headline,
+// a featured cluster of large overlay cards, then image-forward lists.
+import DummyImage from '../DummyImage.astro';
+import { hero, topStories, latest, cluster } from '../../lib/home-data';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+const featured = [latest[0], latest[1], latest[3]];
+const moreList = [...kerala.items.slice(0, 2), ...india.items.slice(0, 2)];
+---
+
+<div class:list={['mc', 'bg-bg-card']}>
+  <!-- Dominant hero -->
+  <section class="w-full max-w-site mx-auto">
+    <a href={hero.href} class="group relative block aspect-[16/10] sm:aspect-[2/1] lg:aspect-[21/9] overflow-hidden">
+      <DummyImage class="w-full h-full transition-transform duration-700 group-hover:scale-[1.03]" w={1680} h={720} seed="ajz-hero" />
+      <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-transparent"></div>
+      <div class="absolute inset-x-0 bottom-0 p-5 sm:p-8 lg:p-12">
+        <div class="max-w-3xl">
+          <span class="inline-block bg-azure text-white eyebrow px-2.5 py-1 mb-3">{hero.category}</span>
+          <h1 class="display-text font-extrabold text-white text-balance leading-[1.04] group-hover:text-azure-light transition-colors">{hero.title}</h1>
+          <p class="mt-3 lead-text text-white/80 max-w-prose hidden sm:block">{hero.excerpt}</p>
+          <p class="mt-3 caption-text text-white/55 tabular-nums">{hero.date}</p>
+        </div>
+      </div>
+    </a>
+  </section>
+
+  <div class="w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Featured cluster: three large overlay cards -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5 py-6 lg:py-8">
+      {featured.map((s) => (
+        <a href={s.href} class="group relative block aspect-[4/3] overflow-hidden">
+          <DummyImage class="w-full h-full transition-transform duration-700 group-hover:scale-[1.04]" w={640} h={480} seed={s.href + 'ajz'} />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/25 to-transparent"></div>
+          <div class="absolute inset-x-0 bottom-0 p-4 lg:p-5">
+            <span class="eyebrow text-azure-light mb-1.5 block">{s.category}</span>
+            <h3 class="article-title-lg font-bold text-white group-hover:text-azure-light transition-colors leading-snug">{s.title}</h3>
+            <p class="mt-1.5 caption-text text-white/55 tabular-nums">{s.date}</p>
+          </div>
+        </a>
+      ))}
+    </section>
+
+    <!-- Two-up: image-forward list + topbar headlines -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 py-6 lg:py-8 border-t border-rule">
+      <!-- More news, image-left rows -->
+      <div class="lg:col-span-8">
+        <h2 class="section-header text-ink pb-3 mb-4 border-b-2 border-azure inline-block">കൂടുതൽ വാർത്തകൾ</h2>
+        <div class="divide-y divide-rule">
+          {moreList.map((s) => (
+            <a href={s.href} class="group grid grid-cols-[7.5rem_1fr] sm:grid-cols-[12rem_1fr] gap-4 sm:gap-5 py-4 first:pt-0">
+              <div class="relative aspect-[4/3] overflow-hidden">
+                <DummyImage class="w-full h-full" w={384} h={288} seed={s.href + 'ajlist'} />
+              </div>
+              <div class="min-w-0 flex flex-col justify-center">
+                <h3 class="article-title-lg font-semibold text-text-primary group-hover:text-azure transition-colors leading-snug">{s.title}</h3>
+                <p class="mt-1.5 caption-text text-text-muted tabular-nums">{s.date}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Headlines rail -->
+      <aside class="lg:col-span-4 lg:border-l border-rule lg:pl-10">
+        <h2 class="section-header text-ink pb-3 mb-1 border-b-2 border-azure inline-block">ടോപ് സ്റ്റോറീസ്</h2>
+        <ul class="divide-y divide-rule">
+          {topStories.map((s) => (
+            <li>
+              <a href={s.href} class="group block py-3.5">
+                <span class="eyebrow text-azure mb-1 block">{s.category}</span>
+                <h3 class="article-title font-semibold text-text-primary group-hover:text-azure transition-colors leading-snug">{s.title}</h3>
+                <p class="mt-1.5 caption-text text-text-muted tabular-nums">{s.date}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </section>
+
+  </div>
+</div>

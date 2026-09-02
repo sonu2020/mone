@@ -1,0 +1,21 @@
+---
+// ATOM · Badge — a status/label chip. Square, no radius. Reserve `breaking`
+// and `live` (accent-red) for genuine urgency; `solid`/`outline` otherwise.
+import Pulse from './Pulse.astro';
+export interface Props {
+  label: string;
+  variant?: 'breaking' | 'live' | 'solid' | 'outline';
+  class?: string;
+}
+const { label, variant = 'solid', class: className = '' } = Astro.props;
+const styles = {
+  breaking: 'bg-accent-red text-white',
+  live: 'bg-accent-red text-white',
+  solid: 'bg-azure text-white',
+  outline: 'border border-azure text-azure',
+}[variant];
+---
+<span class:list={['mc', 'inline-flex items-center gap-1.5 px-2 py-1 eyebrow', styles, className]}>
+  {variant === 'live' && <Pulse tone="white" class="size-1.5" />}
+  {label}
+</span>

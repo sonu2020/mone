@@ -1,0 +1,237 @@
+---
+// ── /shelf/[slug] · one piece, or one collection ────────────────────────────
+// Two routes share this file: a single Shelf article, and a collection front
+// (e.g. /shelf/analysis) for readers who click "All →" off the contents page.
+// Both were on the site's generic article/grid template before this pass —
+// rounded thumbnails, an azure top band, a boxed sidebar — none of which
+// belongs to Shelf's own vocabulary (hairline rules, square images, the
+// per-collection layouts in ShelfCollection). This rebuild puts both on that
+// vocabulary so a reader can't tell the contents page and a single piece
+// belong to different sections.
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+import ShelfNav from '../../components/shelf/ShelfNav.astro';
+import ShelfIndexRow from '../../components/shelf/ShelfIndexRow.astro';
+import ShelfFigure from '../../components/shelf/ShelfFigure.astro';
+import ShelfCollection from '../../components/shelf/ShelfCollection.astro';
+import { shareChannels } from '../../lib/share-channels';
+import {
+  allShelfArticles,
+  allShelfSections,
+  getRelatedShelfArticles,
+  getArticlesByCategory,
+  shelfCollectionIndex,
+  SHELF_COLLECTION_NOTES,
+} from '../../lib/shelf';
+
+export function getStaticPaths() {
+  const paths = allShelfArticles.map((article) => ({
+    params: { slug: article.slug },
+    props: { type: 'article', article },
+  }));
+
+  const articleSlugs = new Set(allShelfArticles.map((a) => a.slug));
+
+  allShelfSections.forEach((section) => {
+    if (!articleSlugs.has(section.id)) {
+      paths.push({
+        params: { slug: section.id },
+        props: { type: 'category', section },
+      });
+    }
+  });
+
+  return paths;
+}
+
+const { type, article, section } = Astro.props;
+const isArticle = type === 'article';
+
+const related = isArticle ? getRelatedShelfArticles(article.slug, 4) : [];
+const sidebarPicks = isArticle ? getRelatedShelfArticles(article.slug, 3) : [];
+
+const body = isArticle ? [
+  `${article.title} എന്ന വിഷയത്തിൽ വിശദമായ പരിശോധന നടത്തിയപ്പോൾ കണ്ടെത്തിയ പ്രധാന കാര്യങ്ങൾ ഇവിടെ അവതരിപ്പിക്കുന്നു. ഈ ലേഖനം വായനക്കാർക്ക് വിഷയത്തെ കുറിച്ച് കൂടുതൽ അറിയാൻ സഹായകമാകും.`,
+  'വിഷയത്തിന്റെ പശ്ചാത്തലത്തിൽ നിരവധി കോണുകളിൽ നിന്ന് വിവരങ്ങൾ ശേഖരിച്ചു. വിദഗ്ധരുടെ അഭിപ്രായങ്ങളും, സാധാരണ ജനങ്ങളുടെ അനുഭവങ്ങളും ഇതിൽ ഉൾപ്പെടുത്തിയിട്ടുണ്ട്.',
+  'ഈ വിഷയം സംബന്ധിച്ച് വിവിധ സംഘടനകളും അധികൃതരും പ്രതികരണങ്ങൾ അറിയിച്ചിട്ടുണ്ട്. തുടർന്നുള്ള നടപടികൾ എന്തായിരിക്കുമെന്ന് ഇനിയും വ്യക്തമല്ല.',
+  'മീഡിയവൺ ഈ വിഷയം സൂക്ഷ്മമായി പിന്തുടരുന്നു. പുതിയ വിവരങ്ങൾ ലഭ്യമാകുന്ന മുറയ്ക്ക് ഈ റിപ്പോർട്ട് പുതുക്കും.',
+] : [];
+const tags = isArticle ? [article.category, 'SHELF', 'MediaOne'] : [];
+
+const categoryArticles = !isArticle ? getArticlesByCategory(section.id) : [];
+const categoryIndex = !isArticle ? shelfCollectionIndex(section.id) : undefined;
+const categoryNote = !isArticle ? SHELF_COLLECTION_NOTES[section.id] : undefined;
+---
+
+<Layout
+  title={isArticle ? `${article.title} — SHELF | MediaOne` : `${section.title} — SHELF | MediaOne`}
+  description={isArticle ? article.title : section.title}
+>
+  <ShelfNav />
+
+  <main class="flex-1 bg-bg-page">
+    {isArticle ? (
+      <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="lg:grid lg:grid-cols-12 lg:gap-10">
+
+          {/* MAIN COLUMN */}
+          <div class="lg:col-span-8">
+
+            {/* Breadcrumb */}
+            <nav class="pt-5 lg:pt-7" aria-label="Breadcrumb">
+              <ol class="flex items-center gap-2 meta-text text-text-muted">
+                <li><a href="/" class="hover:text-azure dark:hover:text-azure-light transition-colors">Home</a></li>
+                <li aria-hidden="true">/</li>
+                <li><a href="/shelf" class="hover:text-azure dark:hover:text-azure-light transition-colors">Shelf</a></li>
+                <li aria-hidden="true">/</li>
+                <li class="text-text-primary">{article.category}</li>
+              </ol>
+            </nav>
+
+            {/* Article header */}
+            <header class="mt-4 pb-5 lg:pb-6">
+              <span class="eyebrow text-azure dark:text-azure-light">{article.category}</span>
+              <h1 class="mt-2 headline-lead sm:text-hero text-text-primary text-balance max-w-[22ch]">
+                {article.title}
+              </h1>
+
+              <div class="mt-5 flex items-center gap-3.5 py-3.5 border-y border-rule">
+                <span class="size-11 shrink-0 bg-ivory-dark dark:bg-brand-elevated flex items-center justify-center meta-text font-bold text-azure dark:text-azure-light">M1</span>
+                <div class="min-w-0">
+                  <p class="article-title text-text-primary">{article.author}</p>
+                  <p class="meta-text text-text-muted tabular-nums">{article.date} · 6 min read</p>
+                </div>
+                <div class="ml-auto hidden sm:flex items-center gap-2">
+                  {shareChannels.map((c) => (
+                    <a href="#" class="grid place-items-center size-9 border border-rule text-text-light hover:border-azure hover:text-azure dark:hover:border-azure-light dark:hover:text-azure-light transition-colors" aria-label={`Share on ${c.name}`} title={c.name}>
+                      <i class:list={['ti', c.icon, 'text-[17px]']} aria-hidden="true"></i>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </header>
+
+            {/* Hero image — 3:2, the native ratio every Shelf image ships in;
+                stretching to 16:9 tore the source, so this holds the ceiling
+                ShelfFigure already respects elsewhere on Shelf. */}
+            <figure class="w-full">
+              <div class="aspect-[3/2] w-full bg-placeholder overflow-hidden">
+                <img
+                  src={article.image}
+                  alt={article.title}
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <figcaption class="pt-3 caption-text text-text-muted">
+                {article.title} · MediaOne Shelf
+              </figcaption>
+            </figure>
+
+            {/* Body */}
+            <article class="py-6 lg:py-8 max-w-prose">
+              {body.map((p) => (
+                <p class="text-body text-text-primary leading-relaxed mb-5">{p}</p>
+              ))}
+
+              <blockquote class="my-6 py-5 border-y border-ink/10 dark:border-ivory/15 text-center">
+                <p class="section-header text-text-primary text-balance">
+                  സത്യം പുറത്തുവരാൻ സൂക്ഷ്മമായ അന്വേഷണം അവശ്യമാണ്.
+                </p>
+                <cite class="mt-3 block eyebrow text-azure dark:text-azure-light not-italic">SHELF</cite>
+              </blockquote>
+
+              <h2 class="section-header text-text-primary pt-2 pb-3">തുടർന്നുള്ള വായന</h2>
+              <p class="text-body text-text-primary leading-relaxed mb-5">
+                ഈ വിഷയത്തെ കുറിച്ച് കൂടുതൽ അറിയാൻ MediaOne SHELF-ൽ പ്രസിദ്ധീകരിച്ച മറ്റ് ലേഖനങ്ങളും വായിക്കാം. ഓരോ ലേഖനവും വ്യത്യസ്ത കോണുകളിൽ നിന്ന് വിഷയത്തെ അപഗ്രഥിക്കുന്നു.
+              </p>
+
+              <div class="flex flex-wrap gap-2 pt-6 mt-4 border-t border-rule">
+                {tags.map((tag) => (
+                  <a href="/shelf" class="px-2.5 py-1 border border-rule text-meta text-text-light hover:border-azure hover:text-azure dark:hover:border-azure-light dark:hover:text-azure-light transition-colors">
+                    #{tag.replace(/\s+/g, '')}
+                  </a>
+                ))}
+              </div>
+            </article>
+
+            {/* Related — the collection's own vocabulary, not a card grid */}
+            {related.length > 0 && (
+              <div class="py-6 lg:py-8 border-t border-ink dark:border-ivory/30">
+                <p class="eyebrow text-text-muted">More from Shelf</p>
+                <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+                  {related.map((item) => <ShelfFigure article={item} scale="plate" />)}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* SIDEBAR */}
+          {sidebarPicks.length > 0 && (
+            <aside class="hidden lg:block lg:col-span-4 lg:border-l lg:border-rule">
+              <div class="pl-10 pt-7">
+                <p class="eyebrow text-text-muted pb-4 border-b border-ink dark:border-ivory/30">
+                  In Depth
+                </p>
+                {sidebarPicks.map((item) => <ShelfIndexRow article={item} showCategory />)}
+              </div>
+            </aside>
+          )}
+
+        </div>
+      </div>
+    ) : (
+      <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Breadcrumb */}
+        <nav class="pt-5 lg:pt-7" aria-label="Breadcrumb">
+          <ol class="flex items-center gap-2 meta-text text-text-muted">
+            <li><a href="/" class="hover:text-azure dark:hover:text-azure-light transition-colors">Home</a></li>
+            <li aria-hidden="true">/</li>
+            <li><a href="/shelf" class="hover:text-azure dark:hover:text-azure-light transition-colors">Shelf</a></li>
+            <li aria-hidden="true">/</li>
+            <li class="text-text-primary">{section.title}</li>
+          </ol>
+        </nav>
+
+        {/* Collection header — a scaled-down ShelfSectionHead, since this page
+            IS the collection rather than one stop among five on the contents
+            page. */}
+        <header class="mt-4 pb-6 lg:pb-8 border-b border-ink dark:border-ivory/30">
+          <div class="flex items-baseline gap-4 sm:gap-6">
+            {categoryIndex && (
+              <span class="eyebrow tabular-nums text-azure dark:text-azure-light shrink-0">
+                {String(categoryIndex).padStart(2, '0')}
+              </span>
+            )}
+            <h1 class="text-title font-bold text-text-primary text-balance">{section.title}</h1>
+            <span class="ml-auto hidden sm:block caption-text tabular-nums text-text-muted shrink-0">
+              {categoryArticles.length} pieces
+            </span>
+          </div>
+          {categoryNote && (
+            <p class="mt-2 lead-text text-text-secondary max-w-[46ch]">{categoryNote}</p>
+          )}
+        </header>
+
+        {categoryArticles.length > 0 ? (
+          <div class="py-6 lg:py-8">
+            <ShelfCollection section={section} />
+          </div>
+        ) : (
+          <div class="py-12 lg:py-16 text-center">
+            <p class="section-header text-text-primary">ഈ വിഭാഗത്തിൽ ലേഖനങ്ങൾ ഒന്നുമില്ല</p>
+            <p class="mt-2 text-body text-text-muted">No articles in this category yet.</p>
+            <a
+              href="/shelf"
+              class="mt-8 inline-block px-4 py-2 border border-rule text-meta text-text-primary hover:border-azure hover:text-azure dark:hover:border-azure-light dark:hover:text-azure-light transition-colors"
+            >
+              SHELF-ലേക്ക് തിരികെ / Back to SHELF
+            </a>
+          </div>
+        )}
+      </div>
+    )}
+  </main>
+
+  <Footer />
+</Layout>

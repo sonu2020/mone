@@ -1,0 +1,105 @@
+---
+// BLOCK · InlineMap — a map set into the flow of the story, not in the corner.
+//
+// The HUD tracks the whole route; this answers "where exactly is this bit",
+// at the point in the reading where that question comes up. Static until it
+// reaches the viewport, then it zooms in — the scroll-driven move the corner
+// map can't make, because the corner map is always on screen.
+//
+// Tile theme, pin styling and the Leaflet boot come from MapBase, which loads
+// them once however many maps a page mounts. This component used to depend on a
+// RouteMap being on the same page to supply all three; it no longer does, and
+// works anywhere.
+import MapBase from '../map/MapBase.astro';
+
+export interface Props {
+  id: string;
+  center: [number, number];
+  zoom: number;
+  label: string;
+  class?: string;
+}
+const { id, center, zoom, label, class: className = '' } = Astro.props;
+---
+
+<MapBase />
+
+<div
+  id={id}
+  class:list={['mc', 'route-map inline-map w-full h-[16rem] sm:h-[22rem] bg-bg-page dark:bg-brand-dark border border-rule dark:border-ivory/15', className]}
+  data-inline-map
+  data-lat={center[0]}
+  data-lng={center[1]}
+  data-zoom={zoom}
+  data-label={label}
+  role="img"
+  aria-label={`Map — ${label}`}
+></div>
+
+<script is:inline>
+  (function () {
+    var nodes = Array.prototype.slice.call(document.querySelectorAll('[data-inline-map]'));
+    if (!nodes.length) return;
+
+    window.mapReady(function (L) {
+      var reduce = window.mapReduceMotion();
+
+      nodes.forEach(function (node) {
+        // This script ships once per InlineMap on the page but each copy walks
+        // every inline map, so without a guard the second copy tries to build
+        // a map on a container the first already claimed and Leaflet throws
+        // "Map container is already initialized" — taking the earlier map down
+        // with it. Claim each node once.
+        if (node.dataset.mapInit) return;
+        node.dataset.mapInit = '1';
+
+        var lat = Number(node.getAttribute('data-lat'));
+        var lng = Number(node.getAttribute('data-lng'));
+        var zoom = Number(node.getAttribute('data-zoom'));
+        var label = node.getAttribute('data-label') || '';
+
+        // Start wider than the caption promises, so there is somewhere to go.
+        var start = Math.max(zoom - 3, 4);
+
+        var map = L.map(node, {
+          zoomControl: false,
+          scrollWheelZoom: false,
+          dragging: false,
+          doubleClickZoom: false,
+          touchZoom: false,
+          keyboard: false,
+          attributionControl: false,
+        }).setView([lat, lng], reduce ? zoom : start);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19,
+        }).addTo(map);
+
+        L.marker([lat, lng], {
+          icon: L.divIcon({
+            className: 'route-pin is-current',
+            html: '<span class="route-pin__dot"><span class="route-pin__tick"></span></span>',
+            iconSize: [26, 26],
+            iconAnchor: [13, 13],
+          }),
+          interactive: false,
+        }).addTo(map)
+          .bindTooltip(label, { permanent: true, direction: 'top', offset: [0, -14], className: 'route-tip' })
+          .openTooltip();
+
+        if (reduce || !('IntersectionObserver' in window)) return;
+
+        // Zoom in once, when the reader arrives at it.
+        var done = false;
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (!e.isIntersecting || done) return;
+            done = true;
+            map.invalidateSize();
+            map.flyTo([lat, lng], zoom, { duration: 2.2 });
+          });
+        }, { rootMargin: '-20% 0px -20% 0px', threshold: 0 }).observe(node);
+      });
+    });
+  })();
+</script>

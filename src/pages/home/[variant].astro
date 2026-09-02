@@ -1,0 +1,48 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/OldHeader.astro';
+import Footer from '../../components/Footer.astro';
+import LayoutSwitcher from '../../components/LayoutSwitcher.astro';
+import { homeLayouts } from '../../lib/home-layouts';
+
+import HomeModular from '../../components/home/HomeModular.astro';
+import HomeMagazine from '../../components/home/HomeMagazine.astro';
+import HomeIdeal from '../../components/home/HomeIdeal.astro';
+import HomeNYT from '../../components/home/HomeNYT.astro';
+import HomeGuardian from '../../components/home/HomeGuardian.astro';
+import HomeBBC from '../../components/home/HomeBBC.astro';
+import HomeBBC3Col from '../../components/home/HomeBBC3Col.astro';
+import HomeAlJazeera from '../../components/home/HomeAlJazeera.astro';
+import HomeSky from '../../components/home/HomeSky.astro';
+
+export function getStaticPaths() {
+  return homeLayouts.map((l) => ({ params: { variant: l.id }, props: { layout: l } }));
+}
+
+const { layout } = Astro.props;
+
+const variants = {
+  modular: HomeModular,
+  magazine: HomeMagazine,
+  ideal: HomeIdeal,
+  nyt: HomeNYT,
+  guardian: HomeGuardian,
+  bbc: HomeBBC,
+  'bbc-3col': HomeBBC3Col,
+  aljazeera: HomeAlJazeera,
+  sky: HomeSky,
+} as const;
+
+const Variant = variants[layout.id as keyof typeof variants];
+---
+
+<Layout title={`${layout.label} — Homepage Lab | MediaOne`} description={layout.signature} topAd={false}>
+  <Header isBreaking={false} />
+
+  <main class="flex-1 bg-bg-page pb-24">
+    <Variant />
+  </main>
+
+  <Footer />
+  <LayoutSwitcher current={layout.id} />
+</Layout>

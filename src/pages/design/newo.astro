@@ -1,0 +1,547 @@
+---
+// ── /design/newo · the homepage band patterns, rendered ─────────────────────
+// The band set the homepage (and /guided/home) is composed from, documented
+// with the components themselves. Every example below is the real component
+// with real snapshot data — nothing here re-implements a band, and nothing
+// here modifies one. Markup outside the components uses tokens only (the
+// @theme block in src/styles/app.css); any exploration that drifts from the
+// patterns is staged at the end of the page, labelled, and kept out of the
+// documented set. The same content lives in prose at docs/homepage-patterns.md.
+import DesignShell from '../../components/design/DesignShell.astro';
+import Blueprint from '../../components/design/handbook/Blueprint.astro';
+import Rule from '../../components/design/handbook/Rule.astro';
+import Split from '../../components/design/handbook/Split.astro';
+
+import BandHeading from '../../components/home4/BandHeading.astro';
+import LeadPackage from '../../components/home4/LeadPackage.astro';
+import ShelfBand from '../../components/home4/ShelfBand.astro';
+import OpinionBand from '../../components/home4/OpinionBand.astro';
+import FeatureBand from '../../components/home4/FeatureBand.astro';
+import SplitBand from '../../components/home4/SplitBand.astro';
+import VideoBand from '../../components/home4/VideoBand.astro';
+import Art from '../../components/home4/Art.astro';
+import Kicker from '../../components/ui/Kicker.astro';
+
+import { leadStories, latest, shelf, magazine, feed, section } from '../../lib/home4-data';
+import { allVideos } from '../../lib/videos';
+import { featuredFromPrograms } from '../../lib/video-modal';
+
+const [hero, ...heroRest] = leadStories;
+const kerala = section('kerala');
+const sports = section('sports');
+const entertainment = section('entertainment');
+
+const bandVideos = allVideos.slice(0, 8).map((v) => ({
+  title: v.title,
+  href: '/videos',
+  category: v.category,
+  duration: v.duration,
+  views: v.views,
+  date: v.publishDate,
+  seed: v.thumbnail,
+  imageUrl: v.thumbnailUrl,
+  modalId: v.slug,
+}));
+
+const videoTabs = [
+  { label: 'Latest', href: '/videos', current: true },
+  { label: 'Live', href: '/live' },
+  { label: 'Explainers', href: '/shelf' },
+  { label: 'Programmes', href: '/programs' },
+];
+
+const bandPicks = await featuredFromPrograms(2, 6);
+
+// The band order on /, for the composition diagram.
+const bandOrder = [
+  { n: '01', name: 'Lead', type: 'LeadPackage' },
+  { n: '02', name: 'Shelf', type: 'ShelfBand' },
+  { n: '03', name: 'Video', type: 'VideoBand' },
+  { n: '04', name: 'Kerala', type: 'SplitBand' },
+  { n: '05', name: 'Magazine', type: 'OpinionBand' },
+  { n: '06', name: 'Entertainment', type: 'ShelfBand' },
+  { n: '07', name: 'Sports', type: 'FeatureBand' },
+  { n: '08', name: 'Gulf', type: 'FeatureBand' },
+  { n: '09', name: 'National', type: 'SplitBand' },
+  { n: '10', name: 'World', type: 'SplitBand' },
+];
+
+// ── API tables (terse) ───────────────────────────────────────────────────────
+const api = {
+  bandHeading: [
+    ['label', 'uppercase Latin band label (the one title case token)'],
+    ['href?', 'makes the label a link to the section desk'],
+    ['viewAllHref?', 'azure "View all →" at the far end of the rule'],
+    ['badge?', 'small azure flag beside the label, e.g. "Popular"'],
+  ],
+  leadPackage: [
+    ['lead', 'the top story — full-bleed card, spans both rows'],
+    ['rows', 'headline stack, thumbed rows, 4 max'],
+    ['feed', 'timestamped wire feed, 3 rows'],
+    ['topics?', 'trending strip — off by default (masthead owns it)'],
+    ['onAir?', 'live unit — off by default (masthead owns it)'],
+    ['flushTop?', 'sit flush under the header'],
+  ],
+  shelfBand: [
+    ['lead', 'editorial lead, image left / text right on a tinted panel'],
+    ['cards', 'three promo cards under a hairline'],
+    ['rail', 'three thumbed rows, closed by a rectangle ad (adSlot)'],
+    ['adSlot?', 'ad slot id for the rail rectangle'],
+  ],
+  opinionBand: [
+    ['stories', 'text-forward opinion items — no art at all'],
+    ['label / href / viewAllHref', 'standard band heading'],
+  ],
+  featureBand: [
+    ['feature', 'one tall 8/5 feature over a tinted caption panel'],
+    ['stack', 'two stacked 16/9 promo cards'],
+    ['rail', 'five thumbed rows, deep rail'],
+  ],
+  splitBand: [
+    ['lead', 'mirrored split — text panel left, image right'],
+    ['cards', 'four-up row of bordered cards'],
+    ['rail?', 'thumbed rows'],
+    ['authors?', 'author rows (ThumbRow with metaBelow)'],
+    ['label?', 'omit to run the band on as a continuation'],
+  ],
+  videoBand: [
+    ['videos', 'first four lead the 2×2, next three run compact beneath'],
+    ['tabs', 'Latest · Live · Explainers · Programmes'],
+    ['picks', 'featured videos from the shows, right column'],
+  ],
+};
+---
+
+<DesignShell
+  title="newo — homepage band patterns | MediaOne Design"
+  description="The band set the homepage is composed from — composition, anatomy, API, and the drifts staged at the end."
+  eyebrow="Patterns"
+  heading="The Paper — homepage bands"
+  lede="The homepage is a thin conductor: ten bands over one 12-column grid, hairline-separated, one accent. This page documents that band set with the components themselves — every example is the real component with real snapshot data — so the pattern and the artifact cannot drift apart. Explorations that leave the pattern are staged at the end, labelled, and never mixed into the documented set."
+  active="components"
+  contained={false}
+>
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+    <!-- Quick links -->
+    <div class="flex flex-wrap gap-x-6 gap-y-2 border-b border-rule pb-6">
+      <a href="/guided/home" class="eyebrow text-azure hover:text-azure-dark transition-colors">Watch it as a tour → /guided/home</a>
+      <a href="/" class="eyebrow text-ink-muted hover:text-azure transition-colors">The live homepage → /</a>
+      <span class="eyebrow text-ink-muted">Prose version → docs/homepage-patterns.md</span>
+    </div>
+
+    <!-- ══ 01 · THE COMPOSITION ═══════════════════════════════════════════ -->
+    <section class="mt-12">
+      <Rule n="01" title="The composition" lede="Ten bands, one conductor. The order tracks the live site; every band is a component with data — a new section is a new data slice, not a new component." />
+
+      <Blueprint label="BAND ORDER · /" caption="Lead → Shelf → Video break the paper; Kerala → World rule it back.">
+        <ol class="divide-y divide-rule dark:divide-ivory/10 border border-rule dark:border-ivory/10">
+          {bandOrder.map((b) => (
+            <li class="flex items-baseline gap-3 px-3 py-2">
+              <span class="eyebrow tabular-nums text-azure dark:text-azure-light">{b.n}</span>
+              <span class="headline-deck font-semibold text-ink dark:text-ivory">{b.name}</span>
+              <span class="ml-auto caption-text text-ink-muted dark:text-ivory/50">{b.type}</span>
+            </li>
+          ))}
+        </ol>
+      </Blueprint>
+
+      <div class="mt-8 grid gap-8 lg:grid-cols-2">
+        <div>
+          <h3 class="eyebrow text-ink-muted">CONTAINER FACTS</h3>
+          <ul class="mt-3 space-y-2.5 text-body text-ink dark:text-ivory">
+            <li class="flex gap-3"><span class="size-1.5 shrink-0 translate-y-2 bg-azure" aria-hidden="true"></span>
+              Every band but Video runs in <code class="font-mono text-caption">max-w-site bg-bg-card</code> with <code class="font-mono text-caption">px-4 sm:px-6 lg:px-8</code> gutters over the <code class="font-mono text-caption">bg-bg-page</code> canvas.</li>
+            <li class="flex gap-3"><span class="size-1.5 shrink-0 translate-y-2 bg-azure" aria-hidden="true"></span>
+              Bands breathe at <code class="font-mono text-caption">py-6</code> and close on <code class="font-mono text-caption">border-b border-rule</code> — the page is ruled columns, not stacked cards.</li>
+            <li class="flex gap-3"><span class="size-1.5 shrink-0 translate-y-2 bg-azure" aria-hidden="true"></span>
+              Ad slots are full-width lazy leaderboards between bands (<code class="font-mono text-caption">home4-1/2/3</code>), plus one rail rectangle (<code class="font-mono text-caption">home4-shelf-rail</code>).</li>
+            <li class="flex gap-3"><span class="size-1.5 shrink-0 translate-y-2 bg-azure" aria-hidden="true"></span>
+              Video breaks the paper: full-bleed <code class="font-mono text-caption">bg-header-bg-deep</code> with <code class="font-mono text-caption">border-y border-white/10</code> — a player surface, not a column.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="eyebrow text-ink-muted">THE LEAD GRID · 5 / 4 / 3</h3>
+          <div class="mt-3"><Split cols={[5, 4, 3]} label="LeadPackage — lead story, headline stack, live rail." /></div>
+          <p class="mt-4 text-body text-ink dark:text-ivory">
+            Every band is the same gesture at a different scale: a lead, a
+            stack, a rail — <code class="font-mono text-caption">8/9</code> main
+            column and <code class="font-mono text-caption">3/4</code> rail for
+            the shelf bands, <code class="font-mono text-caption">5/3/4</code>
+            for the feature band.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 02 · SHARED ANATOMY ════════════════════════════════════════════ -->
+    <section class="mt-14">
+      <Rule n="02" title="Shared anatomy" lede="Every labelled band is BandHeading + content + border-b. The heading is the one constant; the content grid is the band's decision." />
+
+      <div class="grid gap-8 lg:grid-cols-2">
+        <Blueprint label="BANDHEADING" caption="label · flex hairline · View all — the rule always ends where the link begins.">
+          <BandHeading label="Kerala" viewAllHref="/kerala" />
+        </Blueprint>
+        <div class="space-y-2.5 text-body text-ink dark:text-ivory">
+          <p>
+            The label is the only uppercase-Latin display token
+            (<code class="font-mono text-caption">band-label</code>); the
+            hairline is a flex child, not a border. Inside the band: leads set
+            in <code class="font-mono text-caption">headline-feature</code>,
+            cards and rows in <code class="font-mono text-caption">headline-deck</code>,
+            metadata in <code class="font-mono text-caption">caption-text</code>
+            with <code class="font-mono text-caption">tabular-nums</code>.
+          </p>
+          <p>
+            Surfaces: tinted panels are <code class="font-mono text-caption">bg-light-gray dark:bg-brand-elevated</code>;
+            headlines on navy read <code class="font-mono text-caption">text-text-navy-deep dark:text-ivory</code>;
+            hover is always <code class="font-mono text-caption">hover:text-azure</code>.
+            Images via <code class="font-mono text-caption">Art</code> — 8/5 features, 16/9 promos, 1/1 thumbs; missing art holds a neutral tint, never a borrowed photo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 03 · THE BAND SET ═══════════════════════════════════════════════ -->
+    <section class="mt-14">
+      <Rule n="03" title="The band set" lede="Six distinct bands (Shelf does double duty) plus the atoms they share. Each is shown live below its API — what it takes, and what it renders with real data." />
+
+      <!-- BandHeading -->
+      <h3 class="eyebrow mt-10 text-ink-muted">ATOM · BANDHEADING</h3>
+      <div class="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+        <table class="w-full border-t border-rule text-left">
+          <tbody>
+            {api.bandHeading.map(([prop, note]) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="py-2 pr-4 align-top font-mono text-caption font-semibold text-ink dark:text-ivory">{prop}</th>
+                <td class="py-2 text-body-small text-ink-muted dark:text-ivory/60">{note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="space-y-4">
+          <BandHeading label="Shelf" viewAllHref="/shelf" />
+          <BandHeading label="Popular" badge="Popular" />
+          <BandHeading label="Sports" href="/sports" viewAllHref="/sports" />
+        </div>
+      </div>
+
+      <!-- LeadPackage -->
+      <h3 class="eyebrow mt-12 text-ink-muted">BAND · LEADPACKAGE <span class="text-ink-muted/70">— the hero</span></h3>
+      <div class="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+        <table class="w-full border-t border-rule text-left">
+          <tbody>
+            {api.leadPackage.map(([prop, note]) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="py-2 pr-4 align-top font-mono text-caption font-semibold text-ink dark:text-ivory">{prop}</th>
+                <td class="py-2 text-body-small text-ink-muted dark:text-ivory/60">{note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-body-small text-ink-muted dark:text-ivory/60">
+          The topics strip and on-air unit are masthead concerns on /; the band
+          accepts them only for pages without the header (the tour page does
+          this). Rendering as on / — <code class="font-mono text-caption">topics=[] onAir=false flushTop</code>.
+        </p>
+      </div>
+      <div class="mt-4 w-full max-w-site mx-auto bg-bg-card dark:bg-brand-dark">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <LeadPackage
+            lead={hero}
+            rows={[...heroRest, ...latest].slice(0, 4)}
+            feed={feed}
+            topics={[]}
+            onAir={false}
+            flushTop
+            class="border-b border-rule dark:border-ivory/10"
+          />
+        </div>
+      </div>
+
+      <!-- ShelfBand -->
+      <h3 class="eyebrow mt-12 text-ink-muted">BAND · SHELFBAND <span class="text-ink-muted/70">— editorial lead + promos</span></h3>
+      <div class="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+        <table class="w-full border-t border-rule text-left">
+          <tbody>
+            {api.shelfBand.map(([prop, note]) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="py-2 pr-4 align-top font-mono text-caption font-semibold text-ink dark:text-ivory">{prop}</th>
+                <td class="py-2 text-body-small text-ink-muted dark:text-ivory/60">{note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-body-small text-ink-muted dark:text-ivory/60">
+          Also the Entertainment band on /. The rail ad is omitted here — the
+          doc page is not an ad surface; pass <code class="font-mono text-caption">adSlot="home4-shelf-rail"</code> on the homepage.
+        </p>
+      </div>
+      <div class="mt-4 w-full max-w-site mx-auto bg-bg-card dark:bg-brand-dark">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <ShelfBand
+            label="Shelf"
+            href="/shelf"
+            viewAllHref="/shelf"
+            lead={shelf[0]}
+            cards={shelf.slice(1, 4)}
+            rail={shelf.slice(4, 7)}
+          />
+        </div>
+      </div>
+
+      <!-- OpinionBand -->
+      <h3 class="eyebrow mt-12 text-ink-muted">BAND · OPINIONBAND <span class="text-ink-muted/70">— type only</span></h3>
+      <div class="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+        <table class="w-full border-t border-rule text-left">
+          <tbody>
+            {api.opinionBand.map(([prop, note]) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="py-2 pr-4 align-top font-mono text-caption font-semibold text-ink dark:text-ivory">{prop}</th>
+                <td class="py-2 text-body-small text-ink-muted dark:text-ivory/60">{note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-body-small text-ink-muted dark:text-ivory/60">
+          The live site runs Magazine as a text-forward strip with no art — the
+          column rule, the kicker and the headline carry it. The clearest
+          statement of "hierarchy is density, not chrome".
+        </p>
+      </div>
+      <div class="mt-4 w-full max-w-site mx-auto bg-bg-card dark:bg-brand-dark">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <OpinionBand label="Magazine" href="/magazine" viewAllHref="/magazine" stories={magazine} />
+        </div>
+      </div>
+
+      <!-- FeatureBand -->
+      <h3 class="eyebrow mt-12 text-ink-muted">BAND · FEATUREBAND <span class="text-ink-muted/70">— one tall feature</span></h3>
+      <div class="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+        <table class="w-full border-t border-rule text-left">
+          <tbody>
+            {api.featureBand.map(([prop, note]) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="py-2 pr-4 align-top font-mono text-caption font-semibold text-ink dark:text-ivory">{prop}</th>
+                <td class="py-2 text-body-small text-ink-muted dark:text-ivory/60">{note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-body-small text-ink-muted dark:text-ivory/60">
+          Sports, Gulf. The 5 / 3 / 4 grid gives the feature a tall 8/5 frame
+          and the rail room for five rows.
+        </p>
+      </div>
+      <div class="mt-4 w-full max-w-site mx-auto bg-bg-card dark:bg-brand-dark">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <FeatureBand
+            label={sports.label}
+            href={sports.href}
+            viewAllHref={sports.href}
+            feature={sports.stories[0]}
+            stack={sports.stories.slice(1, 3)}
+            rail={sports.stories.slice(3, 8)}
+          />
+        </div>
+      </div>
+
+      <!-- SplitBand -->
+      <h3 class="eyebrow mt-12 text-ink-muted">BAND · SPLITBAND <span class="text-ink-muted/70">— mirrored lead + four-up</span></h3>
+      <div class="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+        <table class="w-full border-t border-rule text-left">
+          <tbody>
+            {api.splitBand.map(([prop, note]) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="py-2 pr-4 align-top font-mono text-caption font-semibold text-ink dark:text-ivory">{prop}</th>
+                <td class="py-2 text-body-small text-ink-muted dark:text-ivory/60">{note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-body-small text-ink-muted dark:text-ivory/60">
+          Kerala, National, World. Omitting <code class="font-mono text-caption">label</code> runs the band on as a
+          continuation of the one above — the ruleless splice keeps a section
+          split across two bands from re-announcing itself.
+        </p>
+      </div>
+      <div class="mt-4 w-full max-w-site mx-auto bg-bg-card dark:bg-brand-dark">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <SplitBand
+            label={kerala.label}
+            href={kerala.href}
+            viewAllHref={kerala.href}
+            lead={kerala.stories[0]}
+            cards={kerala.stories.slice(1, 5)}
+            rail={kerala.stories.slice(5, 7)}
+            authors={kerala.stories.slice(7, 8)}
+          />
+        </div>
+      </div>
+
+      <!-- VideoBand -->
+      <h3 class="eyebrow mt-12 text-ink-muted">BAND · VIDEOBAND <span class="text-ink-muted/70">— the navy player surface</span></h3>
+      <div class="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+        <table class="w-full border-t border-rule text-left">
+          <tbody>
+            {api.videoBand.map(([prop, note]) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="py-2 pr-4 align-top font-mono text-caption font-semibold text-ink dark:text-ivory">{prop}</th>
+                <td class="py-2 text-body-small text-ink-muted dark:text-ivory/60">{note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-body-small text-ink-muted dark:text-ivory/60">
+          Full-bleed and near-black on purpose — a player surface, never a
+          second masthead. Tiles open the shared <code class="font-mono text-caption">VideoModal</code>;
+          the tab strip is real destinations, not dead tabs.
+        </p>
+      </div>
+      <div class="mt-4">
+        <VideoBand
+          title="വീഡിയോ"
+          titleEn="Videos"
+          viewAllHref="/videos"
+          videos={bandVideos}
+          tabs={videoTabs}
+          picks={bandPicks}
+        />
+      </div>
+    </section>
+
+    <!-- ══ 04 · PATTERN RULES ══════════════════════════════════════════════ -->
+    <section class="mt-14">
+      <Rule n="04" title="Pattern rules" lede="The invariants every band obeys. A pattern that breaks one of these is a drift — and drifts live at the end of this page." />
+      <ol class="mt-4 space-y-2.5">
+        {[
+          'Hierarchy is density, not chrome — size of type and image, then space. Never borders, shadows, or decorative color.',
+          'Cards are not the default. Hairline rows and bands first; cards only where a grid of promos earns them.',
+          'One accent, used as a verb — azure for links, hover, labels, live state. No red in the chrome.',
+          'Tokens over literals. Colors and type from the @theme block; never raw hex or gray-* on new work.',
+          'Dark mode is a twin, not a tint — every band carries dark: variants (brand-elevated, ivory, white/10).',
+          'A band is data + props. A new section is a new data slice and a label, not a new component.',
+        ].map((rule) => (
+          <li class="flex gap-3 text-body text-ink dark:text-ivory">
+            <span class="size-1.5 shrink-0 translate-y-2 bg-azure" aria-hidden="true"></span>
+            {rule}
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- ══ 05 · DRIFTS — staged at the end ══════════════════════════════════ -->
+    <section class="mt-14" aria-labelledby="drifts-heading">
+      <Rule n="05" title="Drifts" lede="Explorations that leave the patterns above. They are staged here — the last thing on the page — so the documented set stays clean and the experiments stay findable. Token-only markup; no components were changed to make them." />
+
+      <h2 id="drifts-heading" class="sr-only">Staged drifts</h2>
+
+      <!-- Drift A -->
+      <div class="border border-azure/40 bg-azure/[0.03] dark:bg-azure/[0.06]">
+        <div class="flex flex-wrap items-baseline gap-2 border-b border-azure/25 px-5 py-3">
+          <span class="eyebrow text-azure">DRIFT · A</span>
+          <span class="headline-deck font-semibold text-ink dark:text-ivory">The video band on ivory</span>
+          <span class="ml-auto caption-text text-ink-muted dark:text-ivory/50">Token swap only — bg-header-bg-deep → bg-ivory</span>
+        </div>
+        <div class="p-5">
+          <p class="caption-text text-ink-muted dark:text-ivory/60">
+            The navy band reads as a player surface that breaks the paper. On
+            ivory it becomes a quiet paper band — but loses the one moment of
+            surface drama on the page. Judgement: keep the navy.
+          </p>
+          <div class="mt-4 border-b border-rule pb-2">
+            <BandHeading label="Videos · drift" viewAllHref="/videos" />
+          </div>
+          <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {shelf.slice(0, 4).map((story) => (
+              <a href={story.href} class="group block border-b border-rule pb-3">
+                <Art story={story} ratio="16/9" w={480} zoom />
+                <div class="pt-2 flex flex-col gap-1">
+                  {story.category && <Kicker text={story.category} />}
+                  <h3 class="headline-deck text-ink dark:text-ivory group-hover:text-azure transition-colors line-clamp-2">{story.title}</h3>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Drift B -->
+      <div class="mt-6 border border-azure/40 bg-azure/[0.03] dark:bg-azure/[0.06]">
+        <div class="flex flex-wrap items-baseline gap-2 border-b border-azure/25 px-5 py-3">
+          <span class="eyebrow text-azure">DRIFT · B</span>
+          <span class="headline-deck font-semibold text-ink dark:text-ivory">The shelf as hairline rows</span>
+          <span class="ml-auto caption-text text-ink-muted dark:text-ivory/50">Cards → rows, rule one</span>
+        </div>
+        <div class="p-5">
+          <p class="caption-text text-ink-muted dark:text-ivory/60">
+            Rule one taken literally: the promo grid becomes a ruled list. More
+            stories per screen, calmer — but the shelf loses the visual weight
+            that separates it from the rails below. Judgement: cards earn their
+            place at the shelf; rows belong to rails.
+          </p>
+          <div class="mt-4 border-t border-rule">
+            {shelf.slice(1, 4).map((story) => (
+              <a href={story.href} class="group flex items-center gap-4 border-b border-rule py-3.5">
+                <div class="w-32 shrink-0"><Art story={story} ratio="16/9" w={320} zoom /></div>
+                <div class="min-w-0 flex-1">
+                  {story.category && <Kicker text={story.category} />}
+                  <h3 class="headline-deck text-ink dark:text-ivory group-hover:text-azure transition-colors line-clamp-2">{story.title}</h3>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Drift C -->
+      <div class="mt-6 border border-azure/40 bg-azure/[0.03] dark:bg-azure/[0.06]">
+        <div class="flex flex-wrap items-baseline gap-2 border-b border-azure/25 px-5 py-3">
+          <span class="eyebrow text-azure">DRIFT · C</span>
+          <span class="headline-deck font-semibold text-ink dark:text-ivory">Opinion with square markers</span>
+          <span class="ml-auto caption-text text-ink-muted dark:text-ivory/50">border-l-2 rule → size-2 squares</span>
+        </div>
+        <div class="p-5">
+          <p class="caption-text text-ink-muted dark:text-ivory/60">
+            The opinion column rule becomes an azure square per item — the one
+            accent promoted from verb to noun. It pulls the eye to the list the
+            way a border cannot. Judgement: attractive, but it turns the accent
+            decorative; the rule stays.
+          </p>
+          <div class="mt-4 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+            {magazine.slice(0, 4).map((story) => (
+              <a href={story.href} class="group flex gap-3 border-b border-rule pb-4">
+                <span class="size-2 shrink-0 translate-y-2 bg-azure" aria-hidden="true"></span>
+                <div>
+                  <Kicker text={story.category ?? 'Magazine'} class="mb-1 block" />
+                  <h3 class="headline-deck text-ink dark:text-ivory group-hover:text-azure transition-colors line-clamp-3">{story.title}</h3>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-6 caption-text text-ink-muted dark:text-ivory/60">
+        Drifts are judged against the patterns above and either promoted into
+        the band set (a component change, made deliberately and with review) or
+        retired. The current three hold at "interesting, not adopted".
+      </p>
+    </section>
+
+    <!-- ══ COLOPHON LINKS ══════════════════════════════════════════════════ -->
+    <section class="mt-14 border-t border-rule pt-8">
+      <div class="grid gap-6 sm:grid-cols-2">
+        <a href="/guided/home" class="group block border border-rule p-5 hover:border-azure transition-colors">
+          <p class="eyebrow text-azure">TOUR</p>
+          <p class="mt-2 text-title font-bold text-ink dark:text-ivory group-hover:text-azure transition-colors">/guided/home</p>
+          <p class="mt-1 text-body-small text-ink-muted dark:text-ivory/60">The first three bands as a guided walkthrough with next/prev — the pattern set in motion.</p>
+        </a>
+        <div class="block border border-rule p-5">
+          <p class="eyebrow text-ink-muted">PROSE</p>
+          <p class="mt-2 text-title font-bold text-ink dark:text-ivory">docs/homepage-patterns.md</p>
+          <p class="mt-1 text-body-small text-ink-muted dark:text-ivory/60">The same content as a document — composition table, anatomy, API, rules.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</DesignShell>

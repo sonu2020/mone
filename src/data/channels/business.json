@@ -1,0 +1,451 @@
+{
+  "desk": "business",
+  "label": "MediaOne Business",
+  "blurb": "Markets, enterprise and the money story, from MediaOne’s business desk.",
+  "handle": "@MediaOneBusiness",
+  "channelUrl": "https://www.youtube.com/@MediaOneBusiness",
+  "social": [],
+  "avatarSource": "https://yt3.googleusercontent.com/5bM0mPlOChasWEFXOKYHtR7_NRfmZG956UhFtg5cgPammRfJi4zIBNY63RJUlTYdO_0Kz9bgdH8=s900-c-k-c0x00ffffff-no-rj",
+  "avatar": "/images/channels/business.jpg",
+  "subscribersText": "8.2K subscribers",
+  "videoCountText": "434 videos",
+  "shows": [
+    {
+      "playlistId": "PLLIITGi09guM",
+      "title": "BIZ TALK",
+      "videoCountText": "1 video",
+      "href": "https://www.youtube.com/playlist?list=PLLIITGi09guM",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLLIITGi09guM",
+      "thumbnail": "https://i.ytimg.com/vi/g5O5CZDf0_c/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLQXM6skaOxc8",
+      "title": "Brand Stories",
+      "videoCountText": "7 videos",
+      "href": "https://www.youtube.com/playlist?list=PLQXM6skaOxc8",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLQXM6skaOxc8",
+      "thumbnail": "https://i.ytimg.com/vi/Zi7VDvhCpgA/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3aanckVpa1on2sAuV00MNkP0R5LoC05k",
+      "title": "Her Story MediaOne",
+      "videoCountText": "3 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3aanckVpa1on2sAuV00MNkP0R5LoC05k",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3aanckVpa1on2sAuV00MNkP0R5LoC05k",
+      "thumbnail": "https://i.ytimg.com/vi/I7Lp0ayHnI0/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3aanckVpa1qOnUiIpgo0msEh0KpVrA89",
+      "title": "MediaOne Future Summit",
+      "videoCountText": "7 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3aanckVpa1qOnUiIpgo0msEh0KpVrA89",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3aanckVpa1qOnUiIpgo0msEh0KpVrA89",
+      "thumbnail": "https://i.ytimg.com/vi/roAflN_OxBE/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3aanckVpa1pxlU0fVLM_xOkjowqFvBQM",
+      "title": "One Story MediaOne",
+      "videoCountText": "9 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3aanckVpa1pxlU0fVLM_xOkjowqFvBQM",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3aanckVpa1pxlU0fVLM_xOkjowqFvBQM",
+      "thumbnail": "https://i.ytimg.com/vi/7gnX3q1xNIA/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3aanckVpa1qJ_6wk8qIPJ39MtGlttqIT",
+      "title": "MediaOneBusinessConclave",
+      "videoCountText": "138 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3aanckVpa1qJ_6wk8qIPJ39MtGlttqIT",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3aanckVpa1qJ_6wk8qIPJ39MtGlttqIT",
+      "thumbnail": "https://i.ytimg.com/vi/e63TlPLDFqI/mqdefault.jpg"
+    }
+  ],
+  "capturedAt": "2026-08-07",
+  "featured": [
+    {
+      "youtubeId": "qlt86rDRmhQ",
+      "title": "Buy Me a Coffee: The ATM for Creators | Buy Me a Coffee Start-UP",
+      "durationText": "5:57",
+      "viewsText": "11 views",
+      "publishedText": "17 minutes ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/qlt86rDRmhQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/qlt86rDRmhQ/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=qlt86rDRmhQ",
+      "durationSeconds": 356,
+      "viewCount": 11,
+      "publishedAt": "2026-08-07T13:30:03Z"
+    },
+    {
+      "youtubeId": "5DagfUOBJZY",
+      "title": "Buy Me A Coffee and the Chief Minister: My Response to the Controversy | Buy Me A Coffee Start-Up",
+      "durationText": "3:33",
+      "viewsText": "447 views",
+      "publishedText": "23 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/5DagfUOBJZY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/5DagfUOBJZY/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=5DagfUOBJZY",
+      "durationSeconds": 213,
+      "viewCount": 447,
+      "publishedAt": "2026-08-06T14:30:20Z"
+    },
+    {
+      "youtubeId": "eDG0LBOPwic",
+      "title": "Buy Me a Coffee: A World-Class Startup from Kozhikode | Buy Me a Coffee Start-up",
+      "durationText": "7:29",
+      "viewsText": "1.1K views",
+      "publishedText": "23 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/eDG0LBOPwic/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/eDG0LBOPwic/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=eDG0LBOPwic",
+      "durationSeconds": 448,
+      "viewCount": 1150,
+      "publishedAt": "2026-08-06T14:00:12Z"
+    },
+    {
+      "youtubeId": "3kyMxo-h09E",
+      "title": "Today’s youth must hear these words from Gulfar Mohamed Ali! Gulfar Mohamed Ali",
+      "durationText": "5:10",
+      "viewsText": "1.5K views",
+      "publishedText": "1 day ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/3kyMxo-h09E/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/3kyMxo-h09E/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=3kyMxo-h09E",
+      "durationSeconds": 310,
+      "viewCount": 1580,
+      "publishedAt": "2026-08-05T14:43:13Z"
+    },
+    {
+      "youtubeId": "2rIGLOrFMO4",
+      "title": "The Chief Minister didn't go to a coffee shop; Jijo Sunny on the Buy Me a Coffee Silicon Valley m...",
+      "durationText": "28:17",
+      "viewsText": "21K views",
+      "publishedText": "2 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/2rIGLOrFMO4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/2rIGLOrFMO4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=2rIGLOrFMO4",
+      "durationSeconds": 1697,
+      "viewCount": 21244,
+      "publishedAt": "2026-08-05T13:30:06Z"
+    },
+    {
+      "youtubeId": "BMNgtR5a-LQ",
+      "title": "A 100 Crore Risk, Kochi's First Business Revolution! | Galfar Mohamed Ali Interview",
+      "durationText": "3:55",
+      "viewsText": "8K views",
+      "publishedText": "3 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/BMNgtR5a-LQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/BMNgtR5a-LQ/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=BMNgtR5a-LQ",
+      "durationSeconds": 235,
+      "viewCount": 8041,
+      "publishedAt": "2026-08-04T13:30:05Z"
+    },
+    {
+      "youtubeId": "00I7T-usd90",
+      "title": "Money Will Seek You Out in Business If You Create a Brand: Galfar Mohamed Ali",
+      "durationText": "35:43",
+      "viewsText": "23K views",
+      "publishedText": "4 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/00I7T-usd90/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/00I7T-usd90/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=00I7T-usd90",
+      "durationSeconds": 2142,
+      "viewCount": 23723,
+      "publishedAt": "2026-08-03T13:30:09Z"
+    },
+    {
+      "youtubeId": "fuPW9ln33VM",
+      "title": "The Woman Who Judges by Taste! The Story of the 'Taste Magician' in the UAE",
+      "durationText": "11:56",
+      "viewsText": "340 views",
+      "publishedText": "4 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/fuPW9ln33VM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/fuPW9ln33VM/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=fuPW9ln33VM",
+      "durationSeconds": 716,
+      "viewCount": 340,
+      "publishedAt": "2026-08-03T11:27:42Z"
+    }
+  ],
+  "more": [
+    {
+      "youtubeId": "2XwinrMJMJg",
+      "title": "സൗജന്യങ്ങളും ഓഫറുകളും ചതിയാണോ? കമ്പനികളുടെ ഈ 5 തന്ത്രങ്ങളിൽ വീഴരുത്!\" | CorporateBrainwashing",
+      "durationText": "4:04",
+      "viewsText": "2.4K views",
+      "publishedText": "4 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/2XwinrMJMJg/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/2XwinrMJMJg/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=2XwinrMJMJg"
+    },
+    {
+      "youtubeId": "Gpa041yxLNs",
+      "title": "This is what happened when gold import duty was hiked! Modi's decision poses a new challenge for ...",
+      "durationText": "4:33",
+      "viewsText": "7.5K views",
+      "publishedText": "5 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Gpa041yxLNs/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Gpa041yxLNs/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Gpa041yxLNs"
+    },
+    {
+      "youtubeId": "t4CbARKcr5w",
+      "title": "Why isn't Air India changing even after Tata took over? | How many years will it take for a turna...",
+      "durationText": "4:34",
+      "viewsText": "9.1K views",
+      "publishedText": "6 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/t4CbARKcr5w/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/t4CbARKcr5w/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=t4CbARKcr5w"
+    },
+    {
+      "youtubeId": "aaorDzGPmWE",
+      "title": "Is Hunger Now a Thing of the Past? North Korea's Shocking Economic Growth! | NorthKorea | KimJongUn",
+      "durationText": "5:33",
+      "viewsText": "47K views",
+      "publishedText": "7 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/aaorDzGPmWE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/aaorDzGPmWE/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=aaorDzGPmWE"
+    },
+    {
+      "youtubeId": "HKydg4walH4",
+      "title": "India Didn't Play in the World Cup... But This Company Made Millions! | FIFA World Cup 2026",
+      "durationText": "5:24",
+      "viewsText": "2.8K views",
+      "publishedText": "8 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/HKydg4walH4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/HKydg4walH4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=HKydg4walH4"
+    },
+    {
+      "youtubeId": "-8cNXGla9Zg",
+      "title": "E20 പെട്രോളിന് പിന്നിൽ ഗഡ്കരിയുടെ കുടുംബമോ? വൈറൽ ആരോപണങ്ങളുടെ സത്യമെന്ത്?",
+      "durationText": "5:25",
+      "viewsText": "1.3K views",
+      "publishedText": "9 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/-8cNXGla9Zg/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/-8cNXGla9Zg/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=-8cNXGla9Zg"
+    },
+    {
+      "youtubeId": "pkP9kIVINWc",
+      "title": "Adani vs. Ambani Face-off! India's Biggest Business War | Adani-Ambani",
+      "durationText": "4:41",
+      "viewsText": "16K views",
+      "publishedText": "10 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/pkP9kIVINWc/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/pkP9kIVINWc/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=pkP9kIVINWc"
+    },
+    {
+      "youtubeId": "qu4Z4htNQBs",
+      "title": "The Oil Price Explosion: What is India About to Face? | Oil Price",
+      "durationText": "5:04",
+      "viewsText": "3.9K views",
+      "publishedText": "11 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/qu4Z4htNQBs/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/qu4Z4htNQBs/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=qu4Z4htNQBs"
+    },
+    {
+      "youtubeId": "SQjWq6Pgv5o",
+      "title": "Who Silently Controls the World? | Company That Controls the World | BlackRock Explained",
+      "durationText": "5:26",
+      "viewsText": "4.6K views",
+      "publishedText": "13 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/SQjWq6Pgv5o/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/SQjWq6Pgv5o/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=SQjWq6Pgv5o"
+    },
+    {
+      "youtubeId": "6bFeewpEWPQ",
+      "title": "7 Decisions by Ratan Tata That Made Tata What It Is Today | RatanTata | Tata Success Story",
+      "durationText": "5:42",
+      "viewsText": "1.9K views",
+      "publishedText": "13 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/6bFeewpEWPQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/6bFeewpEWPQ/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=6bFeewpEWPQ"
+    },
+    {
+      "youtubeId": "UWQEQwtzN5I",
+      "title": "Volkswagen Partners with Indian Company | Volkswagen India",
+      "durationText": "5:09",
+      "viewsText": "25K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/UWQEQwtzN5I/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/UWQEQwtzN5I/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=UWQEQwtzN5I"
+    },
+    {
+      "youtubeId": "SNx7gb9xP44",
+      "title": "The 'Ghost' That Rocked the Korean Market! What is a Casino ETF? | South Korea Casino ETF Crisis",
+      "durationText": "5:03",
+      "viewsText": "9.6K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/SNx7gb9xP44/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/SNx7gb9xP44/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=SNx7gb9xP44"
+    },
+    {
+      "youtubeId": "3xzatLXzBmA",
+      "title": "A Big Loss for Kerala! Another Bank May Depart | Business Story Malayalam",
+      "durationText": "4:27",
+      "viewsText": "21K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/3xzatLXzBmA/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/3xzatLXzBmA/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=3xzatLXzBmA"
+    },
+    {
+      "youtubeId": "aEu6AsEJGs4",
+      "title": "Not Just the World Cup Trophy, but Millions in Prize Money Too! | FIFA World Cup Money Explained",
+      "durationText": "4:26",
+      "viewsText": "24K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/aEu6AsEJGs4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/aEu6AsEJGs4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=aEu6AsEJGs4"
+    },
+    {
+      "youtubeId": "mbB6NUxum0Y",
+      "title": "You’ll Regret Not Knowing This Before Taking a Gold Loan! | Gold Loan",
+      "durationText": "4:52",
+      "viewsText": "1.1K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/mbB6NUxum0Y/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/mbB6NUxum0Y/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=mbB6NUxum0Y"
+    },
+    {
+      "youtubeId": "_1Jzh-YrcbY",
+      "title": "No More Fuel Shortages! How India Is Bypassing the Strait of Hormuz to Source Oil...",
+      "durationText": "4:36",
+      "viewsText": "9.5K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/_1Jzh-YrcbY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/_1Jzh-YrcbY/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=_1Jzh-YrcbY"
+    },
+    {
+      "youtubeId": "SZEiUGkfKiI",
+      "title": "Tata to take Kerala by storm! Tough competition ahead for Muthoot and Manappuram? | TATA GOLD",
+      "durationText": "4:36",
+      "viewsText": "4.7K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/SZEiUGkfKiI/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/SZEiUGkfKiI/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=SZEiUGkfKiI"
+    },
+    {
+      "youtubeId": "D0oafYVQZO8",
+      "title": "Instagram Born from a Massive Failure! | The Inspirational Story of Instagram",
+      "durationText": "5:13",
+      "viewsText": "4K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/D0oafYVQZO8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/D0oafYVQZO8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=D0oafYVQZO8"
+    },
+    {
+      "youtubeId": "F3XVZr_5fGo",
+      "title": "Jio and Airtel to be stunned! | Vodafone Idea back in the game | Vodafone-Idea Comeback",
+      "durationText": "5:13",
+      "viewsText": "21K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/F3XVZr_5fGo/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/F3XVZr_5fGo/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=F3XVZr_5fGo"
+    },
+    {
+      "youtubeId": "cBZjSRXSpE8",
+      "title": "Why did Messi’s country collapse? | The story of Argentina beyond football | Argentina | LionelMessi",
+      "durationText": "5:38",
+      "viewsText": "2.5K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/cBZjSRXSpE8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/cBZjSRXSpE8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=cBZjSRXSpE8"
+    },
+    {
+      "youtubeId": "AKwJiQwnFYw",
+      "title": "6 തവണ ബാങ്ക്റപ്റ്റ്സി! പിന്നെ എങ്ങനെ വീണ്ടും കോടീശ്വരനായി? | ഡൊണാൾഡ് ട്രംപിന്റെ ബിസിനസ് കഥ",
+      "durationText": "5:06",
+      "viewsText": "1.7K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/AKwJiQwnFYw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/AKwJiQwnFYw/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=AKwJiQwnFYw"
+    },
+    {
+      "youtubeId": "vB3kQzzaBL8",
+      "title": "The Story of Airbnb: How It Rose from Near-Collapse to Conquer the World!",
+      "durationText": "6:28",
+      "viewsText": "486 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/vB3kQzzaBL8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/vB3kQzzaBL8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=vB3kQzzaBL8"
+    }
+  ]
+}

@@ -1,0 +1,921 @@
+---
+// ── /food-map · ഭക്ഷണ ഭൂപടം ─────────────────────────────────────────────────
+// One question: where do I eat this dish?
+//
+// Dish-first. The index on the left is the subject, the map on the right is the
+// answer, and the district filter narrows both — including the index itself, so
+// a reader can never pick a dish and land on nothing. That dead end is designed
+// out in food-map.ts rather than handled here with an empty state.
+//
+// The whole page reads in Malayalam or English on a toggle: both scripts ship
+// in the HTML and a class on <html> chooses (Layout sets it pre-paint). Every
+// row is server-rendered, so with JavaScript off this is still a full, readable
+// list of dishes and places — the filtering, the map and the toggle are
+// enhancements over a page that already works.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import DeskMasthead from '../components/desk/DeskMasthead.astro';
+import Footer from '../components/Footer.astro';
+import PinMap from '../components/map/PinMap.astro';
+import Bi from '../components/ui/Bi.astro';
+
+import {
+  dishes,
+  places,
+  activeDistricts,
+  placesServing,
+  districtById,
+  dishKindLabel,
+  dishKindIcon,
+  primaryKind,
+  commonsThumb,
+  KERALA_EXTENT,
+} from '../lib/food-map';
+
+const dists = activeDistricts();
+
+// Per-dish, per-district counts, so the client can renumber the index as the
+// district changes without recomputing from the place list every keystroke.
+const counts: Record<string, Record<string, number>> = {};
+for (const d of dishes) {
+  counts[d.id] = { all: placesServing(d.id).length };
+  for (const dist of dists) counts[d.id][dist.id] = placesServing(d.id, dist.id).length;
+}
+
+const payload = {
+  dishes: dishes.map((d) => ({
+    id: d.id,
+    name: d.name,
+    nameML: d.nameML,
+    icon: dishKindIcon[d.kind],
+    q: `${d.name} ${d.nameML}`.toLowerCase(),
+    counts: counts[d.id],
+  })),
+  places: places.map((p) => ({
+    id: p.id,
+    district: p.district,
+    serves: p.serves,
+    q: `${p.name} ${p.nameML} ${p.town} ${p.townML}`.toLowerCase(),
+  })),
+};
+
+// Google Maps by name and town rather than by coordinate. The coordinates here
+// are town-level (see food-map.ts), so dropping someone on a lat/lng would put
+// them confidently in the wrong doorway; a search for the name in the town is
+// both more honest about what we know and more likely to be right.
+const mapsQuery = (p: (typeof places)[number]) =>
+  encodeURIComponent(`${p.name}, ${p.town}, ${districtById(p.district)!.name}, Kerala`);
+
+const mapsSearchUrl = (p: (typeof places)[number]) =>
+  `https://www.google.com/maps/search/?api=1&query=${mapsQuery(p)}`;
+
+const mapsDirectionsUrl = (p: (typeof places)[number]) =>
+  `https://www.google.com/maps/dir/?api=1&destination=${mapsQuery(p)}`;
+
+const pins = places.map((p) => ({
+  id: p.id,
+  label: `${p.name} · ${p.town}`,
+  labelML: p.nameML,
+  coords: p.coords,
+  icon: dishKindIcon[primaryKind(p)],
+}));
+
+// Only the kinds actually on the map get a legend line — a key to something
+// that is not there is noise.
+const kindsInUse = [...new Set(dishes.map((d) => d.kind))];
+---
+
+<Layout
+  title="ഭക്ഷണ ഭൂപടം | The Food Map — MediaOne"
+  description="Kerala district by district, dish by dish: what to eat, and where it is served."
+>
+  <Header isBreaking={false} showTopics={false} liveUnit />
+
+  <main class="flex-1 bg-bg-page">
+    {/* ══ MASTHEAD ═══════════════════════════════════════════════════════ */}
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 bg-bg-card">
+      <div class="flex items-start justify-between gap-4">
+        <DeskMasthead
+          title="Food Map"
+          crumbs={[{ label: 'Travel', href: '/travel' }]}
+          description="Kerala district by district, dish by dish — what to eat, and where it is served."
+          class="flex-1"
+        />
+
+        {/* The language switch. Both scripts are already in the page; this
+            only changes which one the CSS shows. */}
+        <div class="shrink-0 pt-6 sm:pt-8">
+          <div
+            class="inline-flex items-stretch border border-rule dark:border-ivory/15"
+            role="group"
+            aria-label="Language / ഭാഷ"
+          >
+            <button
+              type="button"
+              data-lang-set="ml"
+              class="px-3 py-1.5 font-malayalam text-meta transition-colors"
+              lang="ml"
+            >മല</button>
+            <button
+              type="button"
+              data-lang-set="en"
+              class="px-3 py-1.5 text-meta border-l border-rule dark:border-ivory/15 transition-colors"
+              lang="en"
+            >EN</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* ══ FILTER BAR ═════════════════════════════════════════════════════ */}
+    <div class="border-y border-rule dark:border-ivory/10 bg-bg-card sticky top-0 z-30">
+      <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center gap-x-5 gap-y-3">
+        <label class="flex items-center gap-2">
+          <Bi as="span" ml="ജില്ല" en="District" class="eyebrow text-text-muted dark:text-ivory/40" />
+          <select
+            data-district
+            class="border border-rule dark:border-ivory/15 bg-bg-card dark:bg-brand-elevated text-text-primary dark:text-ivory text-meta px-2.5 py-1.5 max-w-[12rem]"
+          >
+            <option value="">All Kerala · കേരളം മുഴുവൻ</option>
+            {dists.map((d) => (
+              <option value={d.id}>{d.nameML} · {d.name}</option>
+            ))}
+          </select>
+        </label>
+
+        <label class="flex items-center gap-2 flex-1 min-w-[12rem]">
+          <span class="sr-only">Search dishes and places</span>
+          <input
+            type="search"
+            data-search
+            placeholder="വിഭവം തിരയുക · Search a dish"
+            class="w-full max-w-sm border border-rule dark:border-ivory/15 bg-bg-card dark:bg-brand-elevated text-text-primary dark:text-ivory text-meta px-2.5 py-1.5 placeholder:text-text-light dark:placeholder:text-ivory/30"
+          />
+        </label>
+
+        <p
+          data-tally
+          class="ml-auto caption-text tabular-nums text-text-muted dark:text-ivory/40"
+          aria-live="polite"
+        >
+          <span data-ml lang="ml" class="font-malayalam">{dishes.length} വിഭവം · {places.length} സ്ഥലം</span
+          ><span data-en lang="en">{dishes.length} dishes · {places.length} places</span>
+        </p>
+
+        <button
+          type="button"
+          data-clear
+          hidden
+          class="caption-text text-azure hover:text-azure-dark dark:text-azure-light transition-colors"
+        >
+          <Bi as="span" ml="മായ്ക്കുക" en="Clear" />
+        </button>
+      </div>
+    </div>
+
+    {/* ══ MAP + PANEL ════════════════════════════════════════════════════
+        The map holds the left column and stays put. The right column is the
+        one that moves: it carries the listing until a reader picks a place,
+        then swaps to that place's own page and back. Two views in one column,
+        so the map never reloads underneath them and the reader never loses
+        where they were on it. */}
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,32rem)] gap-8 lg:gap-10 items-start">
+
+        {/* ── LEFT · the map ──────────────────────────────────────────── */}
+        <section aria-labelledby="map-heading" class="order-1">
+          <h2 id="map-heading" class="sr-only">Map of places</h2>
+          <div class="lg:sticky lg:top-20">
+            <PinMap
+              id="food-map"
+              pins={pins}
+              center={KERALA_EXTENT.center}
+              zoom={KERALA_EXTENT.zoom}
+              label="Map of places serving the selected dish across Kerala"
+              class="h-[20rem] sm:h-[26rem] lg:h-[calc(100dvh-10rem)] lg:min-h-[30rem]"
+            />
+            {/* The key. A pin carries the glyph for what the place mostly
+                serves, so the map can be read before anything is clicked;
+                with one dish selected every pin switches to that dish's
+                glyph instead. */}
+            <ul class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              {kindsInUse.map((kind) => (
+                <li class="flex items-center gap-1.5">
+                  <span
+                    class="grid size-5 place-items-center rounded-full bg-nav-bg text-white"
+                    aria-hidden="true"
+                  ><i class={`ti ${dishKindIcon[kind]} text-[11px]`}></i></span>
+                  <span class="caption-text text-text-muted dark:text-ivory/45">
+                    <span data-ml lang="ml" class="font-malayalam">{dishKindLabel[kind].ml}</span
+                    ><span data-en lang="en">{dishKindLabel[kind].en}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <p class="mt-3 caption-text text-text-muted dark:text-ivory/40 text-pretty">
+              <Bi
+                as="span"
+                ml="സ്ഥലങ്ങൾ ഏകദേശ സ്ഥാനത്താണ് അടയാളപ്പെടുത്തിയിരിക്കുന്നത്."
+                en="Pins are approximate, at town level."
+              />
+            </p>
+          </div>
+        </section>
+
+        {/* ── RIGHT · listing ⇄ spot ──────────────────────────────────── */}
+        <div class="order-2 min-w-0">
+
+        {/* ── VIEW A · the listing ─────────────────────────────────────── */}
+        <div data-view="listing">
+        <section aria-labelledby="dish-index-heading">
+          <h2 id="dish-index-heading" class="eyebrow text-text-muted dark:text-ivory/40 mb-4">
+            <Bi as="span" ml="വിഭവങ്ങൾ" en="Dishes" />
+          </h2>
+
+          <ul class="border-t border-rule dark:border-ivory/10">
+            {dishes.map((dish) => (
+              <li data-dish-row={dish.id} data-kind={dish.kind}>
+                <button
+                  type="button"
+                  data-dish-pick={dish.id}
+                  aria-pressed="false"
+                  class="group w-full text-left py-3 pr-1 border-b border-rule dark:border-ivory/10 flex items-center gap-3 hover:bg-bg-card dark:hover:bg-brand-elevated transition-colors"
+                >
+                  {/* A plate where there is a real photograph of the dish, a
+                      flat tinted block where there is not. Never a photo of
+                      something else. */}
+                  {dish.image ? (
+                    <img
+                      src={commonsThumb(dish.image, 250)}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      width="52"
+                      height="52"
+                      class="shrink-0 size-13 object-cover bg-placeholder"
+                    />
+                  ) : (
+                    <span class="shrink-0 size-13 bg-placeholder grid place-items-center" aria-hidden="true">
+                      <i class="ti ti-tools-kitchen-2 text-text-light dark:text-ivory/25"></i>
+                    </span>
+                  )}
+
+                  <span class="flex-1 min-w-0">
+                    <span class="block font-malayalam text-[1.0625rem] leading-snug text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors" lang="ml">
+                      {dish.nameML}
+                    </span>
+                    <span class="block mt-0.5 body-small text-text-muted dark:text-ivory/45 truncate">
+                      {dish.name}
+                    </span>
+                  </span>
+                  <span
+                    data-dish-count={dish.id}
+                    class="shrink-0 caption-text tabular-nums text-text-light dark:text-ivory/30"
+                  >{placesServing(dish.id).length}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <p
+            data-no-dishes
+            hidden
+            class="py-6 body-small text-text-secondary dark:text-ivory/60 text-pretty"
+          >
+            <Bi
+              as="span"
+              ml="ഈ തിരച്ചിലിന് ചേരുന്ന വിഭവമൊന്നും ഇല്ല. മറ്റൊരു പേരോ ജില്ലയോ പരീക്ഷിക്കൂ."
+              en="No dish matches that search. Try another name, or a different district."
+            />
+          </p>
+        </section>
+
+        <section aria-labelledby="results-heading" class="mt-10">
+          {/* One panel per dish, all hidden; the script unhides the chosen one.
+              Without JavaScript none shows and nothing is lost — the index rows
+              above already carry the plate and the name. */}
+      {dishes.map((dish) => (
+        <figure
+          data-dish-panel={dish.id}
+          hidden
+          class="mb-6 grid grid-cols-1 sm:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] gap-4 sm:gap-6 items-start border-t border-rule dark:border-ivory/10 pt-6"
+        >
+          {dish.image && (
+            <div>
+              <img
+                src={commonsThumb(dish.image, 960)}
+                alt={`${dish.name} — ${dish.nameML}`}
+                loading="lazy"
+                decoding="async"
+                class="w-full aspect-[4/3] object-cover bg-placeholder"
+              />
+              {dish.credit && (
+                <figcaption class="mt-1.5 caption-text text-text-light dark:text-ivory/30 text-pretty">
+                  {dish.credit}
+                </figcaption>
+              )}
+            </div>
+          )}
+
+          <div class={dish.image ? '' : 'sm:col-span-2'}>
+            <p class="eyebrow text-azure">
+              <span data-ml lang="ml" class="font-malayalam">{dishKindLabel[dish.kind].ml}</span
+              ><span data-en lang="en">{dishKindLabel[dish.kind].en}</span>
+            </p>
+            <p class="mt-2 body-small text-text-secondary dark:text-ivory/70 text-pretty">
+              <span data-ml lang="ml" class="font-malayalam">{dish.blurbML}</span
+              ><span data-en lang="en">{dish.blurb}</span>
+            </p>
+            <p class="mt-3 caption-text text-text-muted dark:text-ivory/40">
+              <span data-ml lang="ml" class="font-malayalam">നാട്: </span
+              ><span data-en lang="en">From: </span>
+              {dish.origin.map((o, i) => (
+                <>
+                  {i > 0 && <span aria-hidden="true">, </span>}
+                  <span data-ml lang="ml" class="font-malayalam">{districtById(o)!.nameML}</span
+                  ><span data-en lang="en">{districtById(o)!.name}</span>
+                </>
+              ))}
+            </p>
+          </div>
+        </figure>
+      ))}
+
+      <div class="flex items-baseline gap-3 pb-3 border-b-2 border-ink dark:border-ivory/70">
+        <h2 id="results-heading" class="text-section font-semibold text-ink dark:text-ivory">
+          <span data-results-title>
+            <Bi as="span" ml="എല്ലാ സ്ഥലങ്ങളും" en="All places" />
+          </span>
+        </h2>
+        <span data-results-count class="caption-text tabular-nums text-text-muted dark:text-ivory/40">
+          {places.length}
+        </span>
+      </div>
+
+      <ul>
+        {places.map((place) => {
+          const dist = districtById(place.district)!;
+          return (
+            <li
+              data-place-row={place.id}
+              data-district={place.district}
+              data-serves={place.serves.join(' ')}
+              class="border-b border-rule dark:border-ivory/10"
+            >
+              {/* The row is the way in. The editorial note lives on the spot
+                  page rather than here, so the list stays scannable and the
+                  page a reader arrives at has something they had not read. */}
+              <button
+                type="button"
+                data-spot-open={place.id}
+                class="group w-full text-left pt-4 pb-2 flex items-start gap-3 transition-colors hover:bg-bg-card dark:hover:bg-brand-elevated"
+              >
+                <span class="flex-1 min-w-0">
+                  <span class="block font-malayalam text-[1.0625rem] leading-snug text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors" lang="ml">
+                    {place.nameML}
+                  </span>
+                  <span class="block mt-0.5 body-small text-text-secondary dark:text-ivory/60">{place.name}</span>
+                  <span class="block mt-1 caption-text text-text-muted dark:text-ivory/40">
+                    <span data-ml lang="ml" class="font-malayalam">{place.townML} · {dist.nameML}</span
+                    ><span data-en lang="en">{place.town} · {dist.name}</span>
+                    {place.since && <span class="tabular-nums"> · {place.since}</span>}
+                  </span>
+                </span>
+                <i
+                  class="ti ti-chevron-right shrink-0 mt-1 text-text-light dark:text-ivory/25 group-hover:text-azure dark:group-hover:text-azure-light transition-colors"
+                  aria-hidden="true"
+                ></i>
+              </button>
+
+              <ul class="pb-4 flex flex-wrap gap-x-3 gap-y-1">
+                {place.serves.map((id) => {
+                  const dish = dishes.find((d) => d.id === id)!;
+                  return (
+                    <li>
+                      <button
+                        type="button"
+                        data-dish-pick={dish.id}
+                        class="caption-text text-azure hover:text-azure-dark dark:text-azure-light transition-colors"
+                      >
+                        <span data-ml lang="ml" class="font-malayalam">{dish.nameML}</span
+                        ><span data-en lang="en">{dish.name}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          );
+        })}
+      </ul>
+
+      <p
+        data-no-places
+        hidden
+        class="py-8 body-small text-text-secondary dark:text-ivory/60 text-pretty"
+      >
+        <Bi
+          as="span"
+          ml="ഈ ജില്ലയിൽ ഈ വിഭവം വിളമ്പുന്ന സ്ഥലമൊന്നും പട്ടികയിൽ ഇല്ല. ജില്ലാ ഫിൽട്ടർ മാറ്റി നോക്കൂ."
+          en="No place on this list serves that dish in the chosen district. Try widening the district filter."
+        />
+      </p>
+
+          {/* What the dish kinds mean, once, at the foot. */}
+          <p class="mt-8 caption-text text-text-light dark:text-ivory/30">
+            {Object.values(dishKindLabel).map((l, i) => (
+              <>
+                {i > 0 && <span aria-hidden="true"> · </span>}
+                <span data-ml lang="ml" class="font-malayalam">{l.ml}</span><span data-en lang="en">{l.en}</span>
+              </>
+            ))}
+          </p>
+        </section>
+        </div>{/* ── /VIEW A ─────────────────────────────────────────────── */}
+
+        {/* ── VIEW B · one place ───────────────────────────────────────────
+            Where the listing leads. Everything the reader could already see in
+            the row is repeated here as a heading, and everything they could
+            not — the note, the hours, the way to actually get there — is only
+            here. Hidden until asked for; the listing is the resting state. */}
+        <div data-view="spot" hidden>
+          <button
+            type="button"
+            data-spot-back
+            class="group inline-flex items-center gap-1.5 caption-text text-text-muted dark:text-ivory/45 hover:text-azure dark:hover:text-azure-light transition-colors"
+          >
+            <i class="ti ti-arrow-left" aria-hidden="true"></i>
+            <Bi as="span" ml="പട്ടികയിലേക്ക് മടങ്ങുക" en="Back to the list" />
+          </button>
+
+          {places.map((place) => {
+            const dist = districtById(place.district)!;
+            return (
+              <article data-spot-panel={place.id} hidden class="mt-5">
+                <p class="eyebrow text-azure">
+                  <span data-ml lang="ml" class="font-malayalam">{place.townML} · {dist.nameML}</span
+                  ><span data-en lang="en">{place.town} · {dist.name}</span>
+                </p>
+
+                <h2 class="mt-2 font-malayalam text-title font-bold text-text-primary dark:text-ivory text-balance" lang="ml">
+                  {place.nameML}
+                </h2>
+                <p class="mt-1 headline-deck text-text-muted dark:text-ivory/45">{place.name}</p>
+
+                <p class="mt-5 body-small text-text-secondary dark:text-ivory/70 text-pretty">
+                  <span data-ml lang="ml" class="font-malayalam">{place.noteML}</span
+                  ><span data-en lang="en">{place.note}</span>
+                </p>
+
+                {(place.since || place.hours) && (
+                  <dl class="mt-5 flex flex-wrap gap-x-8 gap-y-3 pt-4 border-t border-rule dark:border-ivory/10">
+                    {place.since && (
+                      <div>
+                        <dt class="caption-text text-text-muted dark:text-ivory/40">
+                          <Bi as="span" ml="മുതൽ" en="Since" />
+                        </dt>
+                        <dd class="mt-0.5 article-title tabular-nums text-text-primary dark:text-ivory">{place.since}</dd>
+                      </div>
+                    )}
+                    {place.hours && (
+                      <div>
+                        <dt class="caption-text text-text-muted dark:text-ivory/40">
+                          <Bi as="span" ml="സമയം" en="Hours" />
+                        </dt>
+                        <dd class="mt-0.5 article-title text-text-primary dark:text-ivory">{place.hours}</dd>
+                      </div>
+                    )}
+                  </dl>
+                )}
+
+                {/* What to eat, with the plate — picking one takes the reader
+                    back to the listing filtered to that dish. */}
+                <h3 class="mt-8 eyebrow text-text-muted dark:text-ivory/40">
+                  <Bi as="span" ml="ഇവിടെ കഴിക്കേണ്ടത്" en="What to eat here" />
+                </h3>
+                <ul class="mt-3 border-t border-rule dark:border-ivory/10">
+                  {place.serves.map((id) => {
+                    const dish = dishes.find((d) => d.id === id)!;
+                    return (
+                      <li>
+                        <button
+                          type="button"
+                          data-dish-pick={dish.id}
+                          class="group w-full text-left py-3 border-b border-rule dark:border-ivory/10 flex items-center gap-3 hover:bg-bg-card dark:hover:bg-brand-elevated transition-colors"
+                        >
+                          {dish.image ? (
+                            <img
+                              src={commonsThumb(dish.image, 250)}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              width="44"
+                              height="44"
+                              class="shrink-0 size-11 object-cover bg-placeholder"
+                            />
+                          ) : (
+                            <span class="shrink-0 size-11 bg-placeholder grid place-items-center" aria-hidden="true">
+                              <i class="ti ti-tools-kitchen-2 text-text-light dark:text-ivory/25"></i>
+                            </span>
+                          )}
+                          <span class="flex-1 min-w-0">
+                            <span class="block font-malayalam text-[1.0625rem] leading-snug text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors" lang="ml">
+                              {dish.nameML}
+                            </span>
+                            <span class="block mt-0.5 body-small text-text-muted dark:text-ivory/45 truncate">{dish.name}</span>
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {/* ── Out to Google ──────────────────────────────────────── */}
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <a
+                    href={mapsSearchUrl(place)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-ink text-ivory hover:bg-azure dark:bg-ivory dark:text-ink dark:hover:bg-azure-light transition-colors"
+                  >
+                    <i class="ti ti-map-pin" aria-hidden="true"></i>
+                    <Bi as="span" ml="ഗൂഗിൾ മാപ്പിൽ കാണുക" en="Open in Google Maps" />
+                  </a>
+                  <a
+                    href={mapsDirectionsUrl(place)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 border border-rule dark:border-ivory/20 text-text-primary dark:text-ivory hover:border-azure hover:text-azure dark:hover:border-azure-light dark:hover:text-azure-light transition-colors"
+                  >
+                    <i class="ti ti-directions" aria-hidden="true"></i>
+                    <Bi as="span" ml="വഴി കാണിക്കുക" en="Directions" />
+                  </a>
+                </div>
+
+                <p class="mt-3 caption-text text-text-light dark:text-ivory/30 text-pretty">
+                  <Bi
+                    as="span"
+                    ml="ഗൂഗിൾ തിരയുന്നത് സ്ഥാപനത്തിന്റെ പേരിലാണ്, ഭൂപടത്തിലെ അടയാളത്തിലല്ല — അടയാളം ഏകദേശമാണ്."
+                    en="Google opens on the name, not on our pin — the pin is approximate."
+                  />
+                </p>
+              </article>
+            );
+          })}
+        </div>{/* ── /VIEW B ─────────────────────────────────────────────── */}
+
+        </div>{/* ── /right column ───────────────────────────────────────── */}
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+{/* ══ BEHAVIOUR ═════════════════════════════════════════════════════════ */}
+<script
+  type="application/json"
+  id="food-map-data"
+  set:html={JSON.stringify(payload).replace(/</g, '\\u003c')}
+></script>
+
+<script is:inline>
+  (function () {
+    var dataEl = document.getElementById('food-map-data');
+    if (!dataEl) return;
+    var DATA = JSON.parse(dataEl.textContent || '{}');
+
+    var mapEl = document.getElementById('food-map');
+    var districtEl = document.querySelector('[data-district]');
+    var searchEl = document.querySelector('[data-search]');
+    var clearEl = document.querySelector('[data-clear]');
+    var tallyEl = document.querySelector('[data-tally]');
+    var titleEl = document.querySelector('[data-results-title]');
+    var countEl = document.querySelector('[data-results-count]');
+    var noDishesEl = document.querySelector('[data-no-dishes]');
+    var noPlacesEl = document.querySelector('[data-no-places]');
+
+    var dishRows = {};
+    document.querySelectorAll('[data-dish-row]').forEach(function (n) {
+      dishRows[n.getAttribute('data-dish-row')] = n;
+    });
+    var placeRows = {};
+    document.querySelectorAll('[data-place-row]').forEach(function (n) {
+      placeRows[n.getAttribute('data-place-row')] = n;
+    });
+
+    var listingEl = document.querySelector('[data-view="listing"]');
+    var spotEl = document.querySelector('[data-view="spot"]');
+    var spotBackEl = document.querySelector('[data-spot-back]');
+
+    var state = { dish: null, district: null, q: '', spot: null };
+
+    /* ── URL. Filtering is refinement, not navigation, so replaceState:
+          the back button should leave the page, not unwind the filters. ── */
+    function readUrl() {
+      var p = new URLSearchParams(location.search);
+      var dish = p.get('dish');
+      var district = p.get('district');
+      // A stale or hand-edited link degrades to a working page.
+      state.dish = DATA.dishes.some(function (d) { return d.id === dish; }) ? dish : null;
+      state.district =
+        district && DATA.places.some(function (x) { return x.district === district; })
+          ? district
+          : null;
+      state.q = p.get('q') || '';
+      var spot = p.get('spot');
+      state.spot = DATA.places.some(function (x) { return x.id === spot; }) ? spot : null;
+    }
+
+    function writeUrl() {
+      var p = new URLSearchParams();
+      if (state.dish) p.set('dish', state.dish);
+      if (state.district) p.set('district', state.district);
+      if (state.q) p.set('q', state.q);
+      if (state.spot) p.set('spot', state.spot);
+      var qs = p.toString();
+      history.replaceState(null, '', qs ? location.pathname + '?' + qs : location.pathname);
+    }
+
+    /* ── Render ─────────────────────────────────────────────────────────── */
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+
+    /** A bilingual pair, so headings switch with the toggle like everything else. */
+    function bilingual(ml, en) {
+      return (
+        '<span data-ml lang="ml" class="font-malayalam">' + esc(ml) + '</span>' +
+        '<span data-en lang="en">' + esc(en) + '</span>'
+      );
+    }
+
+    function render() {
+      var q = state.q.trim().toLowerCase();
+      var districtKey = state.district || 'all';
+
+      // ── Dish index: only dishes served in the district, matching search.
+      var visibleDishes = 0;
+      DATA.dishes.forEach(function (d) {
+        var count = d.counts[districtKey] || 0;
+        var matches = !q || d.q.indexOf(q) !== -1;
+        var show = count > 0 && matches;
+        var row = dishRows[d.id];
+        if (row) row.hidden = !show;
+        if (show) visibleDishes++;
+
+        var badge = document.querySelector('[data-dish-count="' + d.id + '"]');
+        if (badge) badge.textContent = String(count);
+
+        var pick = row && row.querySelector('[data-dish-pick]');
+        if (pick) {
+          var on = state.dish === d.id;
+          pick.setAttribute('aria-pressed', on ? 'true' : 'false');
+          pick.classList.toggle('is-selected', on);
+        }
+      });
+      if (noDishesEl) noDishesEl.hidden = visibleDishes > 0;
+
+      // If the chosen dish is not served in the chosen district, the district
+      // wins and the dish is dropped — the filter the reader just moved is the
+      // one they meant.
+      if (state.dish) {
+        var chosen = DATA.dishes.find(function (d) { return d.id === state.dish; });
+        if (!chosen || !(chosen.counts[districtKey] > 0)) state.dish = null;
+      }
+
+      // ── Places.
+      var shown = [];
+      DATA.places.forEach(function (p) {
+        var inDistrict = !state.district || p.district === state.district;
+        var servesDish = !state.dish || p.serves.indexOf(state.dish) !== -1;
+        // With no dish chosen, search also matches place names.
+        var matches = !q || (state.dish ? true : p.q.indexOf(q) !== -1);
+        var show = inDistrict && servesDish && matches;
+        var row = placeRows[p.id];
+        if (row) row.hidden = !show;
+        if (show) shown.push(p.id);
+      });
+
+      if (noPlacesEl) noPlacesEl.hidden = shown.length > 0;
+      if (countEl) countEl.textContent = String(shown.length);
+
+      if (titleEl) {
+        var picked = state.dish
+          ? DATA.dishes.find(function (d) { return d.id === state.dish; })
+          : null;
+        titleEl.innerHTML = picked
+          ? bilingual(picked.nameML, picked.name)
+          : bilingual('എല്ലാ സ്ഥലങ്ങളും', 'All places');
+      }
+
+      // Only the chosen dish's panel.
+      document.querySelectorAll('[data-dish-panel]').forEach(function (n) {
+        n.hidden = n.getAttribute('data-dish-panel') !== state.dish;
+      });
+
+      // The tally counts in whichever language is being read, and counts one
+      // thing as one thing.
+      if (tallyEl) {
+        tallyEl.innerHTML = bilingual(
+          visibleDishes + ' വിഭവം · ' + shown.length + ' സ്ഥലം',
+          visibleDishes + (visibleDishes === 1 ? ' dish · ' : ' dishes · ') +
+            shown.length + (shown.length === 1 ? ' place' : ' places'),
+        );
+      }
+
+      if (clearEl) clearEl.hidden = !(state.dish || state.district || q);
+
+      // ── Which view the right column is showing.
+      //
+      // A spot only survives if it is still in the filtered set — narrow the
+      // district away from the place you are reading and the listing is the
+      // honest thing to show, rather than a page for somewhere excluded.
+      if (state.spot && shown.indexOf(state.spot) === -1) state.spot = null;
+
+      var onSpot = !!state.spot;
+      if (listingEl) listingEl.hidden = onSpot;
+      if (spotEl) spotEl.hidden = !onSpot;
+      document.querySelectorAll('[data-spot-panel]').forEach(function (n) {
+        n.hidden = n.getAttribute('data-spot-panel') !== state.spot;
+      });
+
+      // ── Map. On a spot, the map carries just that one place and comes in
+      //    close to it; otherwise it holds the whole filtered set.
+      // With a dish chosen, every pin wears that dish's glyph, so the map reads
+      // as one answer rather than as a mix of what each place mostly serves.
+      // With none, each pin goes back to its own.
+      var pinIcon = null;
+      if (state.dish) {
+        var d = DATA.dishes.find(function (x) { return x.id === state.dish; });
+        pinIcon = d ? d.icon : null;
+      }
+
+      if (mapEl) {
+        mapEl.dispatchEvent(new CustomEvent('map:pins', {
+          detail: { ids: onSpot ? [state.spot] : shown, fit: true, icon: pinIcon },
+        }));
+        mapEl.dispatchEvent(new CustomEvent('map:focus', {
+          detail: { id: onSpot ? state.spot : null },
+        }));
+      }
+
+      writeUrl();
+    }
+
+    /* ── Events ─────────────────────────────────────────────────────────── */
+    // Dish picks come from two places — the index and the tags on each result
+    // row — so they are handled by delegation rather than bound twice.
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest) return;
+
+      // Into a spot page.
+      var open = e.target.closest('[data-spot-open]');
+      if (open) {
+        openSpot(open.getAttribute('data-spot-open'));
+        return;
+      }
+
+      var pick = e.target.closest('[data-dish-pick]');
+      if (!pick) return;
+      var id = pick.getAttribute('data-dish-pick');
+      // A dish chosen from inside a spot page means "show me this dish", so it
+      // returns to the listing rather than filtering a page of one place.
+      state.spot = null;
+      state.dish = state.dish === id ? null : id;   // picking it again clears it
+      render();
+      var index = document.getElementById('dish-index-heading');
+      if (index && window.innerWidth < 1024) index.scrollIntoView({ block: 'start' });
+    });
+
+    function openSpot(id) {
+      state.spot = id;
+      render();
+      // The panel replaces a list the reader may have scrolled down; start
+      // them at the top of it.
+      if (spotEl) {
+        if (window.innerWidth < 1024) spotEl.scrollIntoView({ block: 'start' });
+        var heading = spotEl.querySelector('[data-spot-panel]:not([hidden]) h2');
+        if (heading) heading.setAttribute('tabindex', '-1'), heading.focus({ preventScroll: true });
+      }
+    }
+
+    function closeSpot() {
+      if (!state.spot) return;
+      var was = state.spot;
+      state.spot = null;
+      render();
+      // Put focus back on the row they came from, not at the top of the page.
+      var row = placeRows[was];
+      var btn = row && row.querySelector('[data-spot-open]');
+      if (btn) btn.focus({ preventScroll: true });
+    }
+
+    if (spotBackEl) spotBackEl.addEventListener('click', closeSpot);
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSpot();
+    });
+
+    // Touching a filter is a listing action, so it comes back out of a spot
+    // page rather than leaving the reader on one while the list moves behind.
+    if (districtEl) {
+      districtEl.addEventListener('change', function () {
+        state.district = districtEl.value || null;
+        state.spot = null;
+        render();
+      });
+    }
+
+    if (searchEl) {
+      searchEl.addEventListener('input', function () {
+        state.q = searchEl.value;
+        state.spot = null;
+        render();
+      });
+    }
+
+    if (clearEl) {
+      clearEl.addEventListener('click', function () {
+        state.dish = null;
+        state.district = null;
+        state.q = '';
+        state.spot = null;
+        if (districtEl) districtEl.value = '';
+        if (searchEl) searchEl.value = '';
+        render();
+      });
+    }
+
+    // Row ↔ pin, both directions. Focus drives it as well as hover, so the
+    // coupling is not mouse-only.
+    Object.keys(placeRows).forEach(function (id) {
+      var row = placeRows[id];
+      function on() {
+        if (mapEl) mapEl.dispatchEvent(new CustomEvent('map:focus', { detail: { id: id } }));
+      }
+      function off() {
+        if (mapEl) mapEl.dispatchEvent(new CustomEvent('map:focus', { detail: { id: null } }));
+      }
+      row.addEventListener('mouseenter', on);
+      row.addEventListener('mouseleave', off);
+      // focusin/focusout rather than focus/blur: the focusable thing is the
+      // button inside the row, and only these two bubble up to it.
+      row.addEventListener('focusin', on);
+      row.addEventListener('focusout', off);
+    });
+
+    // A pin is the other way into a spot page — the map and the list are two
+    // routes to the same destination.
+    if (mapEl) {
+      mapEl.addEventListener('map:select', function (e) {
+        openSpot(e.detail.id);
+      });
+    }
+
+    /* ── Language ───────────────────────────────────────────────────────── */
+    var root = document.documentElement;
+    function paintLangButtons() {
+      var en = root.classList.contains('lang-en');
+      document.querySelectorAll('[data-lang-set]').forEach(function (b) {
+        var active = (b.getAttribute('data-lang-set') === 'en') === en;
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+        b.classList.toggle('bg-ink', active);
+        b.classList.toggle('text-ivory', active);
+        b.classList.toggle('text-text-muted', !active);
+      });
+    }
+
+    document.querySelectorAll('[data-lang-set]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var lang = b.getAttribute('data-lang-set');
+        root.classList.toggle('lang-en', lang === 'en');
+        root.classList.toggle('lang-ml', lang !== 'en');
+        root.lang = lang === 'en' ? 'en' : 'ml';
+        try { localStorage.setItem('lang', lang); } catch (e) {}
+        paintLangButtons();
+      });
+    });
+    paintLangButtons();
+
+    /* ── Go ─────────────────────────────────────────────────────────────── */
+    readUrl();
+    if (districtEl && state.district) districtEl.value = state.district;
+    if (searchEl && state.q) searchEl.value = state.q;
+    render();
+  })();
+</script>
+
+<style>
+  /* The selected dish, marked in the one reserved accent. */
+  [data-dish-pick].is-selected {
+    background: color-mix(in oklab, var(--color-azure) 8%, transparent);
+    box-shadow: inset 2px 0 0 var(--color-azure);
+  }
+  [data-dish-pick].is-selected span:first-child > span:first-child {
+    color: var(--color-azure);
+  }
+</style>

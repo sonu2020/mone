@@ -1,0 +1,94 @@
+---
+// PAGE · /programs — the programme directory, ordered by what is actually
+// running. Everything on it comes from the catalogue swept off the live site
+// (src/data/programs/index.json), so the dates, view counts and posters are
+// real and the ranking means something: this slate spans programmes that
+// published today and ones last seen over a year ago.
+//
+// Three bands, in the order a reader wants them:
+//   1. Latest across the whole slate — the answer to "what's new".
+//   2. Each group, ranked by its freshest programme, listing its programmes
+//      ranked by last publish.
+//   3. Nothing else. A directory's job is to route.
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/nav/HeaderBar.astro';
+import Footer from '../../components/Footer.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import ProgramCard from '../../components/programs/ProgramCard.astro';
+import EpisodeCard from '../../components/programs/EpisodeCard.astro';
+import {
+  catalogueSource,
+  freshnessLabel,
+  isActive,
+  latestEpisodes,
+  programGroups,
+} from '../../lib/program-catalogue';
+import { getProgramBySlug } from '../../lib/programs';
+
+const latest = latestEpisodes(8, 2);
+const totalPrograms = programGroups.reduce((n, g) => n + g.programs.length, 0);
+const activeCount = programGroups.reduce(
+  (n, g) => n + g.programs.filter(isActive).length,
+  0,
+);
+---
+
+<Layout
+  title="Programmes — MediaOne"
+  description="Every MediaOne TV show and digital programme, ordered by what's running now."
+>
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full lg:max-w-site lg:mx-auto px-4 sm:px-6 md:px-8 py-8">
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">Programmes</span>
+      </nav>
+
+      <h1 class="text-hero font-bold text-text-primary text-balance">Programmes</h1>
+      <p class="mt-3 text-body text-text-secondary max-w-prose">
+        മീഡിയവണിന്റെ ടിവി പരിപാടികളും ഡിജിറ്റൽ ഷോകളും — വാർത്തകൾ മുതൽ വിശകലനം വരെ.
+      </p>
+      <p class="mt-2 meta-text text-text-muted tabular-nums">
+        {totalPrograms} programmes · {activeCount} publishing this month
+      </p>
+
+      <!-- ── Latest across the slate ─────────────────────────────────────── -->
+      <section class="mt-10">
+        <SectionHeader title="Latest Episodes" href="/videos" sticky={false} />
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {latest.map((item) => <EpisodeCard item={item} />)}
+        </div>
+      </section>
+
+      <!-- ── The groups, freshest first ──────────────────────────────────── -->
+      {programGroups.map((group) => (
+        <section class="mt-12">
+          <SectionHeader title={group.label} href="/programs" sticky={false} />
+          <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {group.programs.map((program) => (
+              <ProgramCard
+                program={program}
+                description={getProgramBySlug(program.slug)?.description}
+                schedule={getProgramBySlug(program.slug)?.schedule}
+                freshness={freshnessLabel(program)}
+                active={isActive(program)}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <p class="mt-12 pt-5 border-t border-rule dark:border-ivory/10 caption-text text-text-muted">
+        Programme listings captured from mediaoneonline.com on {catalogueSource.capturedAt}.
+        Durations and view counts read from YouTube at capture time.
+      </p>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

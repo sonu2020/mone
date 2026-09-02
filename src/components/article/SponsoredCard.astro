@@ -1,0 +1,38 @@
+---
+// BLOCK · SponsoredCard — paid editorial. The label is accent-red and always
+// present: paid space must announce itself before the headline is read. Two
+// orientations, one for the rail and one for the body measure.
+import Placeholder from '../Placeholder.astro';
+import type { SponsoredItem } from '../../lib/article-data';
+
+export interface Props {
+  item: SponsoredItem;
+  orientation?: 'horizontal' | 'vertical';
+  class?: string;
+}
+const { item, orientation = 'horizontal', class: className = '' } = Astro.props;
+const horizontal = orientation === 'horizontal';
+---
+<a
+  href={item.href}
+  rel="sponsored nofollow"
+  class:list={[
+    'mc group block border border-rule dark:border-ivory/10 p-4 hover:border-azure transition-colors',
+    className,
+  ]}
+>
+  <span class:list={['flex gap-4', !horizontal && 'flex-col']}>
+    <Placeholder
+      class:list={[horizontal ? 'w-32 sm:w-44 shrink-0 aspect-[4/3]' : 'w-full aspect-[16/9]']}
+      src={item.image}
+      alt=""
+    />
+    <span class="min-w-0">
+      <span class="block eyebrow text-accent-red">{item.label}</span>
+      <span class="mt-1.5 block article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+        {item.title}
+      </span>
+      {item.date && <span class="mt-1.5 block caption-text tabular-nums text-text-muted">{item.date}</span>}
+    </span>
+  </span>
+</a>

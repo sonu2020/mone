@@ -1,0 +1,467 @@
+{
+  "desk": "gulf",
+  "label": "MediaOne Gulf",
+  "blurb": "The Gulf desk — expatriate life, law and the news from the region.",
+  "handle": "@MediaOneGulf",
+  "channelUrl": "https://www.youtube.com/@MediaOneGulf",
+  "social": [],
+  "avatarSource": "https://yt3.googleusercontent.com/HlakCGHvA3n9bcvOyXzdGf8UroGyIdRxHVgCAwhixOKxDoMrJdZMqORh6CX55VlwLqTSQfypOSk=s900-c-k-c0x00ffffff-no-rj",
+  "avatar": "/images/channels/gulf.jpg",
+  "subscribersText": "27.1K subscribers",
+  "videoCountText": "21K videos",
+  "shows": [
+    {
+      "playlistId": "PL3jyU4Z60GNboW_YYo5mJUNVhhxwApgSl",
+      "title": "Middle East",
+      "videoCountText": "50 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3jyU4Z60GNboW_YYo5mJUNVhhxwApgSl",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3jyU4Z60GNboW_YYo5mJUNVhhxwApgSl",
+      "thumbnail": "https://i.ytimg.com/vi/ui1N7uavuJw/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3jyU4Z60GNaF2CCfhc9vEeTBOMzz8RZz",
+      "title": "Hajj",
+      "videoCountText": "72 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3jyU4Z60GNaF2CCfhc9vEeTBOMzz8RZz",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3jyU4Z60GNaF2CCfhc9vEeTBOMzz8RZz",
+      "thumbnail": "https://i.ytimg.com/vi/trvUt_nsllU/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3jyU4Z60GNacMLHccZlY_KCk_UiCIVX0",
+      "title": "Saudi",
+      "videoCountText": "452 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3jyU4Z60GNacMLHccZlY_KCk_UiCIVX0",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3jyU4Z60GNacMLHccZlY_KCk_UiCIVX0",
+      "thumbnail": "https://i.ytimg.com/vi/yiL-QkLySFg/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3jyU4Z60GNZLFMbgkI80_lRiRYLt1KIt",
+      "title": "Qatar",
+      "videoCountText": "87 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3jyU4Z60GNZLFMbgkI80_lRiRYLt1KIt",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3jyU4Z60GNZLFMbgkI80_lRiRYLt1KIt",
+      "thumbnail": "https://i.ytimg.com/vi/AsOhAkDpqe4/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3jyU4Z60GNbnvXkmo7pdIzxdhIr5fmwd",
+      "title": "UAE",
+      "videoCountText": "191 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3jyU4Z60GNbnvXkmo7pdIzxdhIr5fmwd",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3jyU4Z60GNbnvXkmo7pdIzxdhIr5fmwd",
+      "thumbnail": "https://i.ytimg.com/vi/NNVolHOJ2Gg/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3jyU4Z60GNYF8qyIY-zHTnxYoslxjBcF",
+      "title": "Bahrain",
+      "videoCountText": "208 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3jyU4Z60GNYF8qyIY-zHTnxYoslxjBcF",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3jyU4Z60GNYF8qyIY-zHTnxYoslxjBcF",
+      "thumbnail": "https://i.ytimg.com/vi/NNVolHOJ2Gg/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3jyU4Z60GNb0WMTVMPNu0QRxUUW-tMof",
+      "title": "Kuwait",
+      "videoCountText": "168 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3jyU4Z60GNb0WMTVMPNu0QRxUUW-tMof",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3jyU4Z60GNb0WMTVMPNu0QRxUUW-tMof",
+      "thumbnail": "https://i.ytimg.com/vi/W66G255-mEs/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PL3jyU4Z60GNZD_7oLdjRGayWWX3u7TrBy",
+      "title": "Oman",
+      "videoCountText": "153 videos",
+      "href": "https://www.youtube.com/playlist?list=PL3jyU4Z60GNZD_7oLdjRGayWWX3u7TrBy",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PL3jyU4Z60GNZD_7oLdjRGayWWX3u7TrBy",
+      "thumbnail": "https://i.ytimg.com/vi/twqONRw573c/mqdefault.jpg"
+    }
+  ],
+  "capturedAt": "2026-08-07",
+  "featured": [
+    {
+      "youtubeId": "yiL-QkLySFg",
+      "title": "സൗദിയും തുർക്കിയും പാകിസ്താനും മക്ക കരാർ ഒപ്പുവെച്ചു | saudi | pakisan | türkey | makkah | mecca |",
+      "durationText": "1:35",
+      "viewsText": "87 views",
+      "publishedText": "1 hour ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/yiL-QkLySFg/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/yiL-QkLySFg/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=yiL-QkLySFg",
+      "durationSeconds": 95,
+      "viewCount": 87,
+      "publishedAt": "2026-08-07T12:47:22Z"
+    },
+    {
+      "youtubeId": "EIFXj4m-XQg",
+      "title": "Saudi Arabia, Turkey, and Pakistan sign defense and cooperation agreement",
+      "durationText": "5:05",
+      "viewsText": "736 views",
+      "publishedText": "1 hour ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/EIFXj4m-XQg/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/EIFXj4m-XQg/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=EIFXj4m-XQg",
+      "durationSeconds": 305,
+      "viewCount": 736,
+      "publishedAt": "2026-08-07T12:23:42Z"
+    },
+    {
+      "youtubeId": "SF2A4cICj9k",
+      "title": "A tribute to people from various nations, regardless of color; a Malayali in the spotlight",
+      "durationText": "3:16",
+      "viewsText": "13 views",
+      "publishedText": "6 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/SF2A4cICj9k/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/SF2A4cICj9k/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=SF2A4cICj9k",
+      "durationSeconds": 195,
+      "viewCount": 15,
+      "publishedAt": "2026-08-07T07:37:15Z"
+    },
+    {
+      "youtubeId": "Q1TdsgsFJ-g",
+      "title": "Houthi projectile attack; four-year-old among the injured",
+      "durationText": "2:04",
+      "viewsText": "325 views",
+      "publishedText": "10 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Q1TdsgsFJ-g/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Q1TdsgsFJ-g/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Q1TdsgsFJ-g",
+      "durationSeconds": 124,
+      "viewCount": 322,
+      "publishedAt": "2026-08-07T02:59:59Z"
+    },
+    {
+      "youtubeId": "Pr7UlrRKgDk",
+      "title": "Talks going well, Trump says war with Iran will end soon",
+      "durationText": "3:58",
+      "viewsText": "3.3K views",
+      "publishedText": "10 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Pr7UlrRKgDk/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Pr7UlrRKgDk/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Pr7UlrRKgDk",
+      "durationSeconds": 238,
+      "viewCount": 3336,
+      "publishedAt": "2026-08-07T02:54:11Z"
+    },
+    {
+      "youtubeId": "XPzLCdyeEww",
+      "title": "ചർച്ച നന്നായി പോകുന്നു, യുദ്ധം ഉടൻ അവസാനിക്കുമെന്ന് ട്രംപ്",
+      "durationText": "0:42",
+      "viewsText": "217 views",
+      "publishedText": "12 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/XPzLCdyeEww/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/XPzLCdyeEww/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=XPzLCdyeEww",
+      "durationSeconds": 42,
+      "viewCount": 232,
+      "publishedAt": "2026-08-07T00:53:53Z"
+    },
+    {
+      "youtubeId": "N5Zndw0o3-A",
+      "title": "Houthi attack in Najran, Saudi Arabia; 11 injured; burns caused by projectile-triggered fire",
+      "durationText": "4:48",
+      "viewsText": "703 views",
+      "publishedText": "12 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/N5Zndw0o3-A/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/N5Zndw0o3-A/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=N5Zndw0o3-A",
+      "durationSeconds": 288,
+      "viewCount": 703,
+      "publishedAt": "2026-08-07T00:51:17Z"
+    },
+    {
+      "youtubeId": "JdlHzGLmj2Q",
+      "title": "Latest Gulf News and Updates | Latest Gulf News | Mideast Hour",
+      "durationText": "35:05",
+      "viewsText": "2.1K views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/JdlHzGLmj2Q/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/JdlHzGLmj2Q/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=JdlHzGLmj2Q",
+      "durationSeconds": 2105,
+      "viewCount": 2105,
+      "publishedAt": "2026-08-06T19:22:48Z"
+    }
+  ],
+  "more": [
+    {
+      "youtubeId": "_69GUIOU5Vw",
+      "title": "Saudi Al-Hasa Supernova Cricket Team to organize Onam Cricket Premier League",
+      "durationText": "0:32",
+      "viewsText": "3 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/_69GUIOU5Vw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/_69GUIOU5Vw/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=_69GUIOU5Vw"
+    },
+    {
+      "youtubeId": "JYU7w24-pIY",
+      "title": "Calling all chocolate lovers... Nesto Hypermarket launches a special offer in the UAE",
+      "durationText": "1:26",
+      "viewsText": "25 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/JYU7w24-pIY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/JYU7w24-pIY/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=JYU7w24-pIY"
+    },
+    {
+      "youtubeId": "ETiGimGK9eg",
+      "title": "ടിഎസി ഖത്തർ സംഘടിപ്പിച്ച വേനൽക്കാല ക്യാമ്പിന് സമാപനം",
+      "durationText": "0:31",
+      "viewsText": "3 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/ETiGimGK9eg/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/ETiGimGK9eg/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=ETiGimGK9eg"
+    },
+    {
+      "youtubeId": "Vn9DeWzZPHw",
+      "title": "‍സംസ്കൃതി ഖത്തർ എക്സലൻസ് അവാർഡ്; സംസ്കൃതി പുരസ്കാര വിതരണം നാളെ അശോക ഹാളിൽ",
+      "durationText": "0:40",
+      "viewsText": "6 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Vn9DeWzZPHw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Vn9DeWzZPHw/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Vn9DeWzZPHw"
+    },
+    {
+      "youtubeId": "KQgkSzjLM0U",
+      "title": "ഹൃദയാഘാതത്തെ തുടര്‍ന്ന് സൗദി ദമ്മാമില്‍ പ്രവാസി മലയാളി ഷാനവാസ് മരിച്ചു",
+      "durationText": "0:31",
+      "viewsText": "58 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/KQgkSzjLM0U/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/KQgkSzjLM0U/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=KQgkSzjLM0U"
+    },
+    {
+      "youtubeId": "Qe2YO_XjfT4",
+      "title": "സൗദി ദമ്മാമില്‍ വാഹനപകടത്തില്‍ പരിക്കേറ്റ് ചികിത്സയില്‍ കഴിഞ്ഞ മലയാളി അബ്ദുൾ റഷീദ് മരിച്ചു",
+      "durationText": "0:33",
+      "viewsText": "10 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Qe2YO_XjfT4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Qe2YO_XjfT4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Qe2YO_XjfT4"
+    },
+    {
+      "youtubeId": "8q8vCZsCTXE",
+      "title": "സൗദി ജിദ്ദയില്‍ ചികിത്സയില്‍ കഴിഞ്ഞ മലയാളി മുഹമ്മദ് അഷ്‌റഫ് മരിച്ചു‌",
+      "durationText": "0:28",
+      "viewsText": "18 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/8q8vCZsCTXE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/8q8vCZsCTXE/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=8q8vCZsCTXE"
+    },
+    {
+      "youtubeId": "HsQMqBGlndM",
+      "title": "Saudi KMCC Social Security Scheme; second phase of aid distribution to be held tomorrow in Kozhikode",
+      "durationText": "2:47",
+      "viewsText": "10 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/HsQMqBGlndM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/HsQMqBGlndM/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=HsQMqBGlndM"
+    },
+    {
+      "youtubeId": "5sQCxrM5yNo",
+      "title": "Dazzling sights... Saudi's remarkable 'SEVEN' entertainment destination",
+      "durationText": "5:14",
+      "viewsText": "28 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/5sQCxrM5yNo/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/5sQCxrM5yNo/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=5sQCxrM5yNo"
+    },
+    {
+      "youtubeId": "LnMqJ2E0Ke0",
+      "title": "ഇത്തിഹാദ് റെയിൽ ദുബൈ സ്റ്റേഷന്റെ പേര് 'അൽ യലായിസ് സ്റ്റേഷൻ'",
+      "durationText": "0:24",
+      "viewsText": "4 views",
+      "publishedText": "18 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/LnMqJ2E0Ke0/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/LnMqJ2E0Ke0/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=LnMqJ2E0Ke0"
+    },
+    {
+      "youtubeId": "thFR1puOO-4",
+      "title": "Candidate list revision; Sharjah Indian Association election in controversy again",
+      "durationText": "3:22",
+      "viewsText": "10 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/thFR1puOO-4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/thFR1puOO-4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=thFR1puOO-4"
+    },
+    {
+      "youtubeId": "N8AHuOAwtv8",
+      "title": "Saudi Arabia becomes owner of EA Sports; deal worth 520 billion rupees executed",
+      "durationText": "2:01",
+      "viewsText": "22 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/N8AHuOAwtv8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/N8AHuOAwtv8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=N8AHuOAwtv8"
+    },
+    {
+      "youtubeId": "XpXpo-4LvZQ",
+      "title": "ഉപയോഗിച്ച ടയറുകൾ വിൽപ്പന നടത്തി; കുവൈത്തിലെ വെയർഹൗസിനെതിരെ കേസ്",
+      "durationText": "0:39",
+      "viewsText": "25 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/XpXpo-4LvZQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/XpXpo-4LvZQ/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=XpXpo-4LvZQ"
+    },
+    {
+      "youtubeId": "IXxlJVcLC7g",
+      "title": "ലൈസൻസില്ലാതെ പ്രവർത്തനം; കുവൈത്തിലെ മധുരപലഹാര നിർമാണ കേന്ദ്രം അടച്ചുപൂട്ടി",
+      "durationText": "0:41",
+      "viewsText": "8 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/IXxlJVcLC7g/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/IXxlJVcLC7g/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=IXxlJVcLC7g"
+    },
+    {
+      "youtubeId": "hg5-pJ21hxY",
+      "title": "സ്കൂൾ അടച്ചുപൂട്ടാൻ ഉത്തരവ്; കുവൈത്തിലെ ഇറാനിയൻ സ്കൂളിന്റെ ലൈസൻസ് റദ്ദാക്കി",
+      "durationText": "0:47",
+      "viewsText": "1.1K views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/hg5-pJ21hxY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/hg5-pJ21hxY/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=hg5-pJ21hxY"
+    },
+    {
+      "youtubeId": "rRbvubZN5kA",
+      "title": "സ്വർണം കടത്താൻ വെറൈറ്റി മാർ​ഗം; പരിശോധനയിൽ പിടികൂടി ദുബായ് കസ്റ്റംസ്",
+      "durationText": "0:27",
+      "viewsText": "21 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/rRbvubZN5kA/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/rRbvubZN5kA/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=rRbvubZN5kA"
+    },
+    {
+      "youtubeId": "Td-wF7K0CiE",
+      "title": "കുവൈത്തിൽ ഇൻഡസ്ട്രിയൽ ഏരിയയിലെ പരിശോധന; നിയമം ലംഘിച്ച 48 പേർ കസ്റ്റഡിയിൽ",
+      "durationText": "0:41",
+      "viewsText": "17 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Td-wF7K0CiE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Td-wF7K0CiE/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Td-wF7K0CiE"
+    },
+    {
+      "youtubeId": "R0mgngeVtz4",
+      "title": "കുവൈത്തിൽ വാഹനങ്ങളുടെ നമ്പർ പ്ലേറ്റ് നഷ്ടപ്പെട്ടവരുടെ ശ്രദ്ധയ്ക്ക്...",
+      "durationText": "0:40",
+      "viewsText": "4 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/R0mgngeVtz4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/R0mgngeVtz4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=R0mgngeVtz4"
+    },
+    {
+      "youtubeId": "Mr0YcKKceIg",
+      "title": "Saudi digital mobile application Tawakkalna expands services",
+      "durationText": "1:22",
+      "viewsText": "3 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Mr0YcKKceIg/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Mr0YcKKceIg/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Mr0YcKKceIg"
+    },
+    {
+      "youtubeId": "W66G255-mEs",
+      "title": "കുവൈത്തിൽ ചൂട് കൂടും; താപനില 50 ഡിഗ്രി വരെ എത്തുമെന്ന മുന്നറിയിപ്പുമായി കാലാവസ്ഥാ വകുപ്പ്",
+      "durationText": "0:45",
+      "viewsText": "2 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/W66G255-mEs/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/W66G255-mEs/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=W66G255-mEs"
+    },
+    {
+      "youtubeId": "kMpNQuerhsQ",
+      "title": "Extreme heat in Saudi Arabia..! Daytime temperatures reach 49 degrees; dust storms also expected",
+      "durationText": "1:18",
+      "viewsText": "22 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/kMpNQuerhsQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/kMpNQuerhsQ/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=kMpNQuerhsQ"
+    },
+    {
+      "youtubeId": "fKbwxwRXaGI",
+      "title": "ഇത്തിഹാദ് എയർവേസ് സർവീസുകൾ പുനരാരംഭിക്കുന്നു; ആഗസ്റ്റ് 8 മുതൽ ആരംഭിക്കും",
+      "durationText": "0:22",
+      "viewsText": "3 views",
+      "publishedText": "19 hours ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/fKbwxwRXaGI/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/fKbwxwRXaGI/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=fKbwxwRXaGI"
+    }
+  ]
+}

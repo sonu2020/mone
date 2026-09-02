@@ -1,0 +1,914 @@
+---
+// BLOCK · TerrainStage — one map, four acts, any story.
+//
+// The reading model is "acts": the page reads as prose on paper, and four times
+// the terrain takes the whole viewport, pins, and plays a camera move as the
+// reader scrolls through it. So there is exactly ONE map instance, fixed behind
+// the document at opacity 0, and four tall sections that each own a stretch of
+// its camera. No map per act, no re-init, no layout thrash.
+//
+// It scrubs rather than plays. Scroll position inside an act maps to a point
+// between two camera keys, and the camera is set with jumpTo once per frame.
+// Scroll back up and the move runs backwards. The reader owns the camera; it
+// never plays at them.
+//
+// WHY BOTH LIBRARIES
+//
+//   MapLibre owns the world: real coordinates, streamed DEM tiles, the terrain
+//   mesh, and a camera with pitch and bearing. Everything the story needs to be
+//   *true* about where things are.
+//
+//   Three.js owns the one thing a map cannot draw: the line as a ribbon — a
+//   volume lying on the valley floor that arrives along its own length as the
+//   story's `lineAct` scrolls. It renders into MapLibre's own GL context as a
+//   custom layer, so there is one canvas and one camera rather than a second
+//   canvas stacked on top hoping to stay in sync.
+//
+// The page is complete without any of it. Both libraries load only when the
+// reader nears the first act, and every failure path leaves the prose readable.
+//
+// It knows about acts, places and a line. It knows nothing about Wayanad or the
+// Periyar — a story is data (see lib/terrain.ts), and the next one mounts this
+// same file. The camera work is handed over as JSON rather than imported,
+// because an Astro <script> is bundled at build time and cannot see props.
+import type { TerrainStory } from '../../lib/terrain';
+
+export interface Props {
+  story: TerrainStory;
+  class?: string;
+}
+const { story, class: className = '' } = Astro.props;
+const { acts, interludes } = story;
+
+// Only what the runtime needs. The prose is already in the markup below.
+const payload = {
+  acts: story.acts,
+  places: story.places,
+  line: story.line,
+  ribbon: story.ribbon,
+  lineAct: story.lineAct,
+  maxBounds: story.maxBounds,
+  exaggeration: story.exaggeration,
+};
+---
+
+{/* The story, handed to the bundled script. Escaped so a `</` inside any
+    string cannot close the tag early. */}
+<script
+  type="application/json"
+  id="wy-data"
+  set:html={JSON.stringify(payload).replace(/</g, '\\u003c')}
+></script>
+
+{/* ── The stage: one fixed canvas the whole document shares ───────────── */}
+<div id="wy-stage" class:list={['mc', 'wy-stage', className]} aria-hidden="true">
+  <div id="wy-map" class="wy-map"></div>
+  <div class="wy-vignette"></div>
+  <div class="wy-narration">
+    <p data-wy-kicker class="wy-narration__kicker"></p>
+    <p data-wy-ml class="wy-narration__ml"></p>
+    <p data-wy-en class="wy-narration__en"></p>
+  </div>
+</div>
+
+{/* ── The acts, as real document sections ─────────────────────────────── */}
+<div class="wy-acts">
+  {acts.map((act) => {
+    const before = interludes.find((i) => i.before === act.n);
+    return (
+      <>
+        {before && (
+          <section class="wy-interlude">
+            <p class="wy-interlude__ml">{before.ml}</p>
+            <p class="wy-interlude__en">{before.en}</p>
+          </section>
+        )}
+
+        <section data-wy-act={act.n} class="wy-act" aria-label={`${act.title} — terrain sequence`}>
+          <header class="wy-act__head">
+            <p class="wy-act__kicker">
+              <span class="font-malayalam">{act.kickerML}</span>
+              <span class="wy-act__kicker-en">{act.kicker}</span>
+            </p>
+            <h2 class="wy-act__title font-malayalam">{act.titleML}</h2>
+            <p class="wy-act__title-en">{act.title}</p>
+          </header>
+        </section>
+      </>
+    );
+  })}
+
+  {interludes.filter((i) => i.before > acts.length).map((i) => (
+    <section class="wy-interlude">
+      <p class="wy-interlude__ml">{i.ml}</p>
+      <p class="wy-interlude__en">{i.en}</p>
+    </section>
+  ))}
+</div>
+
+<style>
+  /* ── Stage ────────────────────────────────────────────────────────────── */
+  /* Fixed behind the document, revealed only while an act is on screen. The
+     terrain render is dark whatever the site theme is, so the stage carries its
+     own colour rather than inheriting one. */
+  .wy-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    visibility: hidden;
+    background: var(--color-brand-dark);
+    transition: opacity 0.55s ease-out, visibility 0s linear 0.55s;
+  }
+  .wy-stage.is-live {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.55s ease-out, visibility 0s linear 0s;
+  }
+  /* If WebGL or the tiles never arrive, the stage never shows and the prose
+     below carries the piece on its own. */
+  .wy-stage.is-failed { display: none; }
+
+  .wy-map { position: absolute; inset: 0; }
+
+  /* Darkens the edges so the narration panel and the act headings hold their
+     contrast over any part of the terrain. Not decoration — legibility. */
+  .wy-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(to top, rgb(0 0 0 / 0.62) 0%, rgb(0 0 0 / 0) 42%),
+      linear-gradient(to bottom, rgb(0 0 0 / 0.45) 0%, rgb(0 0 0 / 0) 30%);
+  }
+
+  /* ── Narration ────────────────────────────────────────────────────────── */
+  .wy-narration {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    max-width: 34rem;
+    padding: 0 1.25rem 2.5rem 1.25rem;
+    border-top: 0;
+  }
+  @media (min-width: 640px) {
+    .wy-narration { padding: 0 2rem 3rem 2rem; }
+  }
+  .wy-narration__kicker {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.45);
+  }
+  .wy-narration__ml {
+    margin-top: 0.5rem;
+    font-family: var(--font-malayalam);
+    font-size: 1.375rem;
+    line-height: 1.55;
+    font-weight: 600;
+    color: #fff;
+    text-wrap: balance;
+    text-shadow: 0 1px 14px rgb(0 0 0 / 0.75);
+  }
+  .wy-narration__en {
+    margin-top: 0.375rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: rgb(255 255 255 / 0.62);
+    text-shadow: 0 1px 10px rgb(0 0 0 / 0.7);
+  }
+  @media (min-width: 640px) {
+    .wy-narration__ml { font-size: 1.75rem; }
+  }
+
+  /* ── Acts ─────────────────────────────────────────────────────────────── */
+  /* Height IS the timeline: the taller the section, the slower the move. */
+  .wy-act {
+    position: relative;
+    z-index: 1;
+    height: 320vh;
+  }
+  .wy-act__head {
+    position: sticky;
+    top: 0;
+    padding: 5.5rem 1.25rem 0 1.25rem;
+    pointer-events: none;
+  }
+  @media (min-width: 640px) {
+    .wy-act__head { padding: 6rem 2rem 0 2rem; }
+  }
+  .wy-act__kicker {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent-red);
+  }
+  .wy-act__kicker-en { color: rgb(255 255 255 / 0.4); }
+  .wy-act__title {
+    margin-top: 0.375rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #fff;
+    text-shadow: 0 1px 14px rgb(0 0 0 / 0.75);
+  }
+  .wy-act__title-en {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: rgb(255 255 255 / 0.5);
+    text-shadow: 0 1px 10px rgb(0 0 0 / 0.7);
+  }
+
+  /* Before the stage ever runs, the act headings sit on the page's own paper
+     and must read in light mode. Once it is live they are over dark terrain. */
+  .wy-acts:not(.is-armed) .wy-act__title { color: var(--color-text-primary); text-shadow: none; }
+  .wy-acts:not(.is-armed) .wy-act__title-en { color: var(--color-text-muted); text-shadow: none; }
+  .wy-acts:not(.is-armed) .wy-act__kicker-en { color: var(--color-text-light); }
+  .wy-acts:not(.is-armed) .wy-act { height: auto; padding: 3rem 0; }
+
+  /* ── Interludes — prose, on paper ─────────────────────────────────────── */
+  .wy-interlude {
+    position: relative;
+    z-index: 1;
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 7rem 1.25rem;
+    background: var(--color-bg-card);
+  }
+  :global(.dark) .wy-interlude { background: var(--color-brand-dark); }
+  .wy-interlude__ml {
+    font-family: var(--font-malayalam);
+    font-size: 1.25rem;
+    line-height: 1.85;
+    color: var(--color-text-primary);
+    text-wrap: pretty;
+  }
+  :global(.dark) .wy-interlude__ml { color: var(--color-ivory); }
+  .wy-interlude__en {
+    margin-top: 0.75rem;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  :global(.dark) .wy-interlude__en { color: rgb(255 255 255 / 0.45); }
+
+  /* The interlude paper must cover the fixed stage, so it needs to be opaque
+     and full-bleed even though the measure is narrow. */
+  .wy-interlude::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    background: inherit;
+    z-index: -1;
+  }
+
+  /* ── Reduced motion ───────────────────────────────────────────────────── */
+  /* No scrubbing: each act becomes one still view, so the dead scroll that
+     existed only to drive a camera goes away with it. */
+  @media (prefers-reduced-motion: reduce) {
+    .wy-act { height: 100vh; }
+    .wy-stage { transition: none; }
+  }
+
+  /* ── Place labels ─────────────────────────────────────────────────────── */
+  :global(.wy-labels) {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 2;
+  }
+  :global(.wy-marker) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+    pointer-events: none;
+    white-space: nowrap;
+    will-change: transform;
+  }
+  :global(.wy-marker.is-shown) { opacity: 1; }
+  :global(.wy-marker__dot) {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--color-accent-red);
+    box-shadow: 0 0 0 3px rgb(167 38 38 / 0.28);
+    flex: none;
+  }
+  :global(.wy-marker__text) {
+    font-family: var(--font-malayalam);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 8px rgb(0 0 0 / 0.9);
+  }
+  :global(.wy-marker__en) {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: rgb(255 255 255 / 0.6);
+    text-shadow: 0 1px 8px rgb(0 0 0 / 0.9);
+  }
+
+  /* MapLibre's own chrome, brought down to the site's register. */
+  :global(#wy-map .maplibregl-ctrl-attrib) {
+    background: rgb(0 0 0 / 0.4);
+    font-size: 10px;
+  }
+  :global(#wy-map .maplibregl-ctrl-attrib a) { color: rgb(255 255 255 / 0.65); }
+</style>
+
+<script>
+  import 'maplibre-gl/dist/maplibre-gl.css';
+  import {
+    TERRAIN_TILES, TERRAIN_ATTRIBUTION, BASE_TILES, BASE_ATTRIBUTION,
+  } from '../../lib/terrain';
+
+  const dataEl = document.getElementById('wy-data');
+  const story = dataEl ? JSON.parse(dataEl.textContent || '{}') : null;
+  const acts = (story && story.acts) || [];
+  const places = (story && story.places) || [];
+  const line = (story && story.line) || [];
+  const RIBBON = (story && story.ribbon) || { head: 90, toe: 240, lift: 60 };
+  const MAX_BOUNDS = story && story.maxBounds;
+  const LINE_ACT = (story && story.lineAct) || 3;
+  const EXAGGERATION = (story && story.exaggeration) || 1.35;
+
+  const stage = document.getElementById('wy-stage');
+  const mapEl = document.getElementById('wy-map');
+  const actsWrap = document.querySelector('.wy-acts');
+  const actEls = Array.from(document.querySelectorAll('[data-wy-act]'));
+  const kickerEl = document.querySelector('[data-wy-kicker]');
+  const mlEl = document.querySelector('[data-wy-ml]');
+  const enEl = document.querySelector('[data-wy-en]');
+  const narration = document.querySelector('.wy-narration');
+
+  if (story && acts.length && stage && mapEl && actsWrap && actEls.length) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ── Maths ─────────────────────────────────────────────────────────────
+    const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+    const lerp = (a, b, f) => a + (b - a) * f;
+    /** Shortest way round the compass, so a move never takes the long way. */
+    const lerpAngle = (a, b, f) => a + (((b - a + 540) % 360) - 180) * f;
+    const ease = (f) => f * f * (3 - 2 * f);
+
+    // ── Boot only when the reader is within a viewport of the first act ───
+    let booted = false;
+    const armObserver = new IntersectionObserver((entries) => {
+      if (booted || !entries.some((e) => e.isIntersecting)) return;
+      booted = true;
+      armObserver.disconnect();
+      boot();
+    }, { rootMargin: '100% 0px 100% 0px', threshold: 0 });
+    armObserver.observe(actEls[0]);
+
+    /** The stage is an enhancement; every failure path ends here, quietly. */
+    function fail(why, err) {
+      stage.classList.add('is-failed');
+      actsWrap.classList.remove('is-armed');
+      console.warn('[wayanad] terrain stage disabled:', why, err || '');
+    }
+
+    async function boot() {
+      let maplibregl, THREE;
+      try {
+        const [ml, three, workerUrl] = await Promise.all([
+          import('maplibre-gl'),
+          import('three'),
+          // MapLibre builds its worker URL at runtime with
+          // `new URL('./maplibre-gl-worker.mjs', import.meta.url)`. That is a
+          // computed string, so Vite cannot see it and never emits the worker;
+          // the built site then requests /_astro/maplibre-gl-worker.mjs, gets
+          // the HTML 404 page, and dies on the MIME type. Dev happens to work,
+          // because there the module really is served from node_modules next
+          // to its worker — so this only breaks in production.
+          //
+          // `?worker&url` makes Vite bundle the worker *and* the
+          // maplibre-gl-shared.mjs it imports into one emitted file, and hand
+          // back its real hashed URL. Works the same in dev and in the build.
+          import('maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'),
+        ]);
+        // v6 dropped the default export and ships named exports only; v5 had
+        // both. Take the namespace when there is no default.
+        maplibregl = ml.default ?? ml;
+        THREE = three;
+        if (maplibregl.setWorkerUrl && workerUrl.default) {
+          maplibregl.setWorkerUrl(workerUrl.default);
+        }
+      } catch (e) {
+        fail('library import failed', e);
+        return;
+      }
+
+      const first = acts[0].keys[0];
+      let map;
+      try {
+        map = new maplibregl.Map({
+          container: mapEl,
+          style: buildStyle(),
+          center: first.center,
+          zoom: first.zoom,
+          pitch: first.pitch,
+          bearing: first.bearing,
+          // The default ceiling is 60°; the low, raking views need more.
+          maxPitch: 85,
+          maxBounds: MAX_BOUNDS,
+          // The page owns every input. The reader scrolls; the camera follows.
+          interactive: false,
+          attributionControl: { compact: true },
+          fadeDuration: 0,
+        });
+      } catch (e) {
+        fail('map construction failed', e);
+        return;
+      }
+
+      map.on('error', (e) => {
+        const msg = String((e && e.error && e.error.message) || e || '');
+        // Tile 404s are survivable — a dead context is not.
+        if (/context/i.test(msg)) fail('gl context', msg);
+        else console.warn('[wayanad] map error:', msg);
+      });
+      map.on('webglcontextlost', () => fail('webgl context lost'));
+
+      map.on('load', () => {
+        actsWrap.classList.add('is-armed');
+        const labels = addLabels(map);
+        const river = addChannel(THREE, maplibregl, map);
+        run(map, labels, river);
+      });
+    }
+
+    // ── Style: open basemap, open DEM, terrain, sky ───────────────────────
+    function buildStyle() {
+      return {
+        version: 8,
+        projection: { type: 'mercator' },
+        sources: {
+          base: {
+            type: 'raster',
+            tiles: [BASE_TILES],
+            tileSize: 256,
+            maxzoom: 19,
+            attribution: BASE_ATTRIBUTION,
+          },
+          dem: {
+            type: 'raster-dem',
+            tiles: [TERRAIN_TILES],
+            tileSize: 256,
+            maxzoom: 14,
+            encoding: 'terrarium',
+            attribution: TERRAIN_ATTRIBUTION,
+          },
+          // Same tiles, deliberately a second source. MapLibre warns when one
+          // raster-dem feeds both the terrain mesh and a hillshade, because the
+          // two want different tile sizes at the same moment and end up
+          // fighting over one cache. The tiles are shared by the HTTP cache
+          // anyway, so this costs nothing but a source entry.
+          demShade: {
+            type: 'raster-dem',
+            tiles: [TERRAIN_TILES],
+            tileSize: 256,
+            maxzoom: 14,
+            encoding: 'terrarium',
+          },
+        },
+        layers: [
+          { id: 'bg', type: 'background', paint: { 'background-color': '#0b1420' } },
+          {
+            id: 'base',
+            type: 'raster',
+            source: 'base',
+            // The same pull toward the masthead navy that MapBase applies to
+            // Leaflet with a CSS filter — done properly, in the style, so it
+            // tints the tiles alone and never the Three.js layer above them.
+            paint: {
+              // Held well back. The raster is here for the faint trace of
+              // roads and water, not to light the scene — the hillshade below
+              // does that, and a bright basemap flattens the relief to paper.
+              'raster-opacity': 0.5,
+              'raster-saturation': -0.5,
+              'raster-contrast': 0.15,
+              'raster-brightness-max': 0.6,
+              'raster-hue-rotate': -8,
+            },
+          },
+          {
+            id: 'shade',
+            type: 'hillshade',
+            source: 'demShade',
+            paint: {
+              'hillshade-exaggeration': 0.8,
+              'hillshade-shadow-color': '#04101c',
+              'hillshade-highlight-color': '#cfe0f2',
+              'hillshade-accent-color': '#0b2e5d',
+            },
+          },
+        ],
+        sky: {
+          'sky-color': '#0b2e5d',
+          'horizon-color': '#4a6b93',
+          'fog-color': '#0b1420',
+          'fog-ground-blend': 0.55,
+          'horizon-fog-blend': 0.6,
+          'sky-horizon-blend': 0.7,
+          'atmosphere-blend': 0.6,
+        },
+        terrain: { source: 'dem', exaggeration: EXAGGERATION },
+      };
+    }
+
+    // ── Place labels ──────────────────────────────────────────────────────
+    // Positioned by hand rather than with maplibregl.Marker, because a Marker
+    // is placed at sea level: with terrain on, its label floats ~170px away
+    // from the ground it names, and every label ends up on the wrong side of
+    // the ridge. `map.project()` *is* terrain-aware, so projecting each frame
+    // puts the label on the actual surface. The cost is seven transforms per
+    // frame, which is nothing.
+    function addLabels(map) {
+      const layer = document.createElement('div');
+      layer.className = 'wy-labels';
+      mapEl.appendChild(layer);
+
+      const labels = places.map((p) => {
+        const el = document.createElement('div');
+        el.className = 'wy-marker';
+        const dot = document.createElement('span');
+        dot.className = 'wy-marker__dot';
+        const ml = document.createElement('span');
+        ml.className = 'wy-marker__text';
+        ml.textContent = p.nameML;
+        const en = document.createElement('span');
+        en.className = 'wy-marker__en';
+        en.textContent = p.name;
+        el.append(dot, ml, en);
+        layer.appendChild(el);
+        return { place: p, el, shown: false };
+      });
+
+      let upto = 0;
+
+      function place() {
+        const w = mapEl.clientWidth;
+        const h = mapEl.clientHeight;
+
+        const live = [];
+        labels.forEach((l) => {
+          if (l.place.act > upto) {
+            if (l.shown) { l.shown = false; l.el.classList.remove('is-shown'); }
+            return;
+          }
+          const pt = map.project(l.place.coords);
+          live.push({ l, x: pt.x, y: pt.y });
+        });
+
+        // Declutter. Settlements a few hundred metres apart land on top of each
+        // other from a low camera, and two names in the same pixels are worse
+        // than one name slightly off its dot. Nudge, never hide: a label that
+        // vanishes reads as "nothing here".
+        live.sort((a, b) => a.y - b.y);
+        for (let i = 1; i < live.length; i++) {
+          for (let k = 0; k < i; k++) {
+            if (Math.abs(live[i].x - live[k].x) > 150) continue;
+            const gap = live[i].y - live[k].y;
+            if (gap < 15) live[i].y = live[k].y + 15;
+          }
+        }
+
+        // The narration owns the bottom-left corner. A place label landing in
+        // it sits on top of the sentence and both become unreadable, so the
+        // label yields — it will be back as soon as the camera moves.
+        const narr = narration ? narration.getBoundingClientRect() : null;
+        const mapBox = mapEl.getBoundingClientRect();
+
+        live.forEach(({ l, x, y }) => {
+          let on = x > -80 && x < w + 80 && y > -40 && y < h + 40;
+          if (on && narr) {
+            const ax = mapBox.left + x;
+            const ay = mapBox.top + y;
+            if (ax < narr.right + 12 && ax > narr.left - 12
+              && ay > narr.top - 12 && ay < narr.bottom + 12) on = false;
+          }
+          l.el.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
+          if (on !== l.shown) { l.shown = on; l.el.classList.toggle('is-shown', on); }
+        });
+      }
+
+      // Every terrain repaint moves the ground under the labels.
+      map.on('render', place);
+
+      return {
+        setAct(n) { upto = n; place(); },
+      };
+    }
+
+    // ── The channel ribbon — the Three.js half ────────────────────────────
+    // A map can draw a line, flat on the ground, all of it at once. This is a
+    // body with width and a lit head that travels down it as the reader
+    // scrolls. It runs as a custom layer inside MapLibre's GL context, so it
+    // shares one canvas and one camera with the terrain rather than chasing
+    // them from a second canvas stacked on top.
+    function addChannel(THREE, maplibregl, map) {
+      // Legibility figures from the story, not measurements — see Ribbon in
+      // lib/terrain.ts. A 3 km valley and a 190 km river need very different
+      // numbers, which is precisely why they are data.
+      const LIFT = RIBBON.lift;
+      const WIDTH_HEAD = RIBBON.head;
+      const WIDTH_TOE = RIBBON.toe;
+      const SUBDIV = 16;
+
+      // Local frame: metres relative to the head of the path. Building in raw
+      // mercator units would put every vertex at ~1e-6 and lose precision.
+      const origin = maplibregl.MercatorCoordinate.fromLngLat(line[0], 0);
+      const scale = origin.meterInMercatorCoordinateUnits();
+      const modelMatrix = new THREE.Matrix4()
+        .makeTranslation(origin.x, origin.y, origin.z)
+        // Mercator y grows southward; local y grows north. Hence the flip.
+        .scale(new THREE.Vector3(scale, -scale, scale));
+
+      const toLocal = (lng, lat, alt) => {
+        const m = maplibregl.MercatorCoordinate.fromLngLat([lng, lat], alt);
+        return [(m.x - origin.x) / scale, -(m.y - origin.y) / scale, (m.z - origin.z) / scale];
+      };
+
+      // Densify so the ribbon follows the ground rather than cutting corners.
+      const path = [];
+      for (let i = 0; i < line.length - 1; i++) {
+        for (let s = 0; s < SUBDIV; s++) {
+          const f = s / SUBDIV;
+          path.push([
+            lerp(line[i][0], line[i + 1][0], f),
+            lerp(line[i][1], line[i + 1][1], f),
+          ]);
+        }
+      }
+      path.push(line[line.length - 1]);
+
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          uProgress: { value: 0 },
+          uColor: { value: new THREE.Color('#4aa3e0') },
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }`,
+        fragmentShader: `
+          precision highp float;
+          varying vec2 vUv;
+          uniform float uProgress;
+          uniform vec3 uColor;
+          void main() {
+            // Nothing exists ahead of the reader.
+            if (vUv.y > uProgress) discard;
+            float head = smoothstep(uProgress - 0.05, uProgress, vUv.y);
+            float edge = 1.0 - abs(vUv.x - 0.5) * 2.0;
+            vec3 col = mix(uColor, vec3(1.0, 0.93, 0.88), head * 0.8);
+            float a = (0.5 + head * 0.45) * smoothstep(0.0, 0.35, edge);
+            gl_FragColor = vec4(col, a);
+          }`,
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+
+      let mesh = null;
+      let scene = null;
+      let camera = null;
+      let renderer = null;
+
+      /** Sum of sampled ground heights — the cheap signature of a drape. */
+      let drapedAt = -1;
+
+      function sample() {
+        let sum = 0;
+        const es = path.map(([lng, lat]) => {
+          const e = map.queryTerrainElevation([lng, lat]);
+          const v = e == null ? 0 : e;
+          sum += v;
+          return v;
+        });
+        return { es, sum };
+      }
+
+      /**
+       * `queryTerrainElevation` can only answer for DEM tiles that are loaded
+       * right now, and the camera spends act 1 eighty kilometres west of here.
+       * So the first answer is zeros, and a one-shot re-drape on first idle
+       * just bakes in a ribbon lying at sea level — visibly below the ground it
+       * is supposed to be on. Re-drape on every idle instead, and stop when the
+       * sampled heights stop changing.
+       */
+      function geometry(es) {
+        const pts = path.map(([lng, lat], i) => toLocal(lng, lat, es[i] + LIFT));
+
+        const n = pts.length;
+        const positions = new Float32Array(n * 6);
+        const uvs = new Float32Array(n * 4);
+        const indices = [];
+
+        for (let i = 0; i < n; i++) {
+          const cur = pts[i];
+          const nxt = pts[Math.min(i + 1, n - 1)];
+          const prv = pts[Math.max(i - 1, 0)];
+          let dx = nxt[0] - prv[0];
+          let dy = nxt[1] - prv[1];
+          const len = Math.hypot(dx, dy) || 1;
+          dx /= len;
+          dy /= len;
+
+          const t = i / (n - 1);
+          const half = lerp(WIDTH_HEAD, WIDTH_TOE, t) / 2;
+          // Perpendicular, in the ground plane.
+          const px = -dy * half;
+          const py = dx * half;
+
+          positions.set([cur[0] + px, cur[1] + py, cur[2]], i * 6);
+          positions.set([cur[0] - px, cur[1] - py, cur[2]], i * 6 + 3);
+          uvs.set([0, t], i * 4);
+          uvs.set([1, t], i * 4 + 2);
+
+          if (i < n - 1) {
+            const a = i * 2;
+            indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+          }
+        }
+
+        const g = new THREE.BufferGeometry();
+        g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        g.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+        g.setIndex(indices);
+        return g;
+      }
+
+      const layer = {
+        id: 'wy-channel',
+        type: 'custom',
+        renderingMode: '3d',
+        onAdd(_map, gl) {
+          scene = new THREE.Scene();
+          camera = new THREE.Camera();
+          mesh = new THREE.Mesh(geometry(sample().es), material);
+          // The camera matrix is supplied whole; Three cannot cull against it.
+          mesh.frustumCulled = false;
+          scene.add(mesh);
+          renderer = new THREE.WebGLRenderer({
+            canvas: _map.getCanvas(),
+            context: gl,
+            antialias: true,
+          });
+          renderer.autoClear = false;
+        },
+        render(_gl, options) {
+          if (!renderer) return;
+          // `defaultProjectionData.mainMatrix` is the documented matrix for a
+          // custom layer that only needs mercator — and the one that accounts
+          // for terrain. `modelViewProjectionMatrix` looks like the obvious
+          // choice and silently draws nothing you can find.
+          const mvp = (options.defaultProjectionData && options.defaultProjectionData.mainMatrix)
+            || options.modelViewProjectionMatrix;
+          camera.projectionMatrix = new THREE.Matrix4()
+            .fromArray(mvp)
+            .multiply(modelMatrix);
+          // MapLibre and Three share the context; hand it back cleanly.
+          renderer.resetState();
+          renderer.render(scene, camera);
+        },
+        onRemove() {
+          if (mesh) mesh.geometry.dispose();
+          material.dispose();
+        },
+      };
+
+      try {
+        map.addLayer(layer);
+      } catch (e) {
+        // The map is still the story without it.
+        return { setProgress() {} };
+      }
+
+      // Bounded, because the loop is otherwise circular: draping repaints, a
+      // repaint eventually goes idle, and idle drapes again. Tile coverage
+      // keeps shifting as the camera moves, so the sampled heights never settle
+      // to exactly equal and the cheap "did it change" guard alone never stops.
+      // Six passes is far more than enough to catch the tiles for a 3 km line.
+      let drapes = 0;
+      const onIdle = () => {
+        if (!mesh) return;
+        const { es, sum } = sample();
+        if (sum === 0 || Math.abs(sum - drapedAt) < 1) return;
+        drapedAt = sum;
+        mesh.geometry.dispose();
+        mesh.geometry = geometry(es);
+        map.triggerRepaint();
+        if (++drapes >= 6) map.off('idle', onIdle);
+      };
+      map.on('idle', onIdle);
+
+      let last = -1;
+      return {
+        setProgress(v) {
+          if (Math.abs(v - last) < 0.002) return;
+          last = v;
+          material.uniforms.uProgress.value = v;
+          map.triggerRepaint();
+        },
+      };
+    }
+
+    // ── The scroll model ──────────────────────────────────────────────────
+    function run(map, labels, river) {
+      const runIndex = acts.findIndex((a) => a.n === LINE_ACT);
+      let ticking = false;
+      let shownAct = -1;
+      let shownKey = null;
+
+      function narrate(act, key) {
+        if (shownKey === key) return;
+        shownKey = key;
+        if (kickerEl) kickerEl.textContent = `${act.kicker} · ${act.title}`;
+        if (mlEl) mlEl.textContent = key.ml;
+        if (enEl) enEl.textContent = key.en;
+      }
+
+      function camera(act, p) {
+        const keys = act.keys;
+        const segs = keys.length - 1;
+        const t = p * segs;
+        const i = Math.min(Math.floor(t), segs - 1);
+        const f = ease(t - i);
+        const a = keys[i];
+        const b = keys[i + 1];
+
+        map.jumpTo({
+          center: [lerp(a.center[0], b.center[0], f), lerp(a.center[1], b.center[1], f)],
+          zoom: lerp(a.zoom, b.zoom, f),
+          pitch: lerp(a.pitch, b.pitch, f),
+          bearing: lerpAngle(a.bearing, b.bearing, f),
+        });
+
+        narrate(act, keys[Math.round(t)]);
+      }
+
+      function frame() {
+        ticking = false;
+        const vh = window.innerHeight;
+        let active = -1;
+        let p = 0;
+
+        for (let i = 0; i < actEls.length; i++) {
+          const r = actEls[i].getBoundingClientRect();
+          // An act owns the camera once its middle is the middle of the screen.
+          if (r.top < vh * 0.5 && r.bottom > vh * 0.5) {
+            active = i;
+            const span = r.height - vh;
+            p = span > 0 ? clamp(-r.top / span, 0, 1) : 0;
+            break;
+          }
+        }
+
+        stage.classList.toggle('is-live', active >= 0);
+        if (active < 0) return;
+
+        // Under reduced motion an act is one still view, not a move.
+        const at = reduce ? 1 : p;
+        const act = acts[active];
+
+        camera(act, at);
+        river.setProgress(active < runIndex ? 0 : active > runIndex ? 1 : at);
+
+        if (active !== shownAct) {
+          shownAct = active;
+          labels.setAct(act.n);
+        }
+      }
+
+      function schedule() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(frame);
+      }
+
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', () => { map.resize(); schedule(); }, { passive: true });
+      frame();
+    }
+  }
+</script>

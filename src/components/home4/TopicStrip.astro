@@ -1,0 +1,39 @@
+---
+// BLOCK · TopicStrip — the trending topics, moved out of the masthead and into
+// the lead package where they sit across columns 2 and 3 as one unit. Reading
+// them next to the headline stack (rather than as a nav bar the eye skips)
+// makes them part of the front page rather than chrome.
+import type { NavLink } from '../../lib/mega-nav';
+
+export interface Props {
+  topics: NavLink[];
+  label?: string;
+  class?: string;
+}
+const { topics, label = 'Trending', class: className = '' } = Astro.props;
+---
+
+<nav
+  class:list={[
+    'mc',
+    'flex items-center gap-3 overflow-x-auto scrollbar-none border-y border-rule dark:border-ivory/10 py-2',
+    className,
+  ]}
+  aria-label="Trending topics"
+>
+  <span class="inline-flex items-center gap-1.5 shrink-0 eyebrow text-accent-red">
+    <i class="ti ti-trending-up text-sm" aria-hidden="true"></i>
+    {label}
+  </span>
+
+  <ul class="flex items-center gap-2 shrink-0">
+    {topics.map((t) => (
+      <li>
+        <a
+          href={t.href}
+          class="inline-block rounded-full border border-rule dark:border-ivory/15 px-2.5 py-[3px] caption-text font-semibold whitespace-nowrap text-text-secondary dark:text-ivory/70 hover:border-azure hover:text-azure dark:hover:border-azure-light dark:hover:text-azure-light transition-colors"
+        >#{t.label}</a>
+      </li>
+    ))}
+  </ul>
+</nav>

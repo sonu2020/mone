@@ -1,0 +1,48 @@
+---
+// ATOM · Art — story artwork for the live preview. Renders the story's own
+// image when the snapshot has one; where the live page publishes a story
+// without art, it holds the frame with a neutral tint rather than borrowing an
+// unrelated photo — a preview should never imply artwork that doesn't exist.
+import Media from "../ui/Media.astro";
+import type { LiveStory } from "../../lib/home4-data";
+
+export interface Props {
+  story: LiveStory;
+  ratio?: string;
+  w?: number;
+  zoom?: boolean;
+  loading?: "lazy" | "eager";
+  fetchpriority?: "high" | "low" | "auto";
+  class?: string;
+}
+const {
+  story,
+  ratio = "16/9",
+  w,
+  zoom = false,
+  loading,
+  fetchpriority,
+  class: className = "",
+} = Astro.props;
+---
+
+{
+  story.image ? (
+    <Media
+      seed={story.href}
+      src={story.image}
+      ratio={ratio}
+      w={w}
+      zoom={zoom}
+      loading={loading}
+      fetchpriority={fetchpriority}
+      class={className}
+    />
+  ) : (
+    <div
+      class:list={["bg-light-gray dark:bg-brand-elevated", className]}
+      style={`aspect-ratio:${ratio}`}
+      aria-hidden="true"
+    />
+  )
+}

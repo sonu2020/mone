@@ -1,0 +1,119 @@
+---
+// ── Breaking page ──────────────────────────────────────────────────────────
+// Homepage style, composed from the design system, but led by a breaking hero
+// (red badge) and a live-updates timeline. Shares the homepage data.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+import AdSlot from '../components/AdSlot.astro';
+import PhotoGallery from '../components/PhotoGallery.astro';
+
+import OverlayStory from '../components/news/OverlayStory.astro';
+import StoryCard from '../components/news/StoryCard.astro';
+import StoryList from '../components/news/StoryList.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import Pulse from '../components/ui/Pulse.astro';
+import PromoGrid from '../components/news/PromoGrid.astro';
+import NumberedList from '../components/news/NumberedList.astro';
+import Timeline from '../components/news/Timeline.astro';
+import FeaturedBand from '../components/news/FeaturedBand.astro';
+import SectionColumn from '../components/news/SectionColumn.astro';
+
+import { hero, topStories, latest, mostRead, cluster, galleryItems } from '../lib/home-data';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+const gulf = cluster('gulf');
+const entertainment = cluster('entertainment');
+const sports = cluster('sports');
+
+// Live update feed (newest first) for the breaking rail.
+const liveFeed = [
+  { time: '21:14', ...topStories[0] },
+  { time: '20:58', ...latest[1] },
+  { time: '20:40', ...topStories[1] },
+  { time: '20:12', ...kerala.items[0] },
+  { time: '19:47', ...india.items[0] },
+  { time: '19:20', ...topStories[2] },
+  { time: '18:55', ...latest[4] },
+];
+---
+
+<Layout title="Breaking News | MediaOne" description="Breaking updates from MediaOne Malayalam News.">
+  <Header isBreaking={true} />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto bg-bg-card">
+      <div class="px-4 sm:px-6 lg:px-8">
+
+        <!-- 1 · BREAKING LEAD + LIVE UPDATES -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-6 lg:py-9">
+          <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+            <OverlayStory story={hero} ratio="16/9" size="hero" badge="Breaking" badgeVariant="breaking" />
+            <p class="mt-4 lead-text text-text-secondary max-w-prose">{hero.excerpt}</p>
+            <p class="mt-2 caption-text text-accent-red font-semibold tabular-nums">{hero.date} · Breaking update</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-7 pt-7 border-t border-rule">
+              {[latest[1], india.lead, gulf.lead].map((s) => <StoryCard story={s} ratio="16/10" />)}
+            </div>
+          </div>
+
+          <!-- Live updates rail -->
+          <aside class="lg:col-span-4 mt-9 lg:mt-0">
+            <div class="flex items-center gap-2 pb-2.5 mb-5 border-b-2 border-accent-red">
+              <Pulse tone="red" />
+              <h2 class="section-header text-ink">തത്സമയം</h2>
+              <span class="eyebrow text-accent-red">Live updates</span>
+            </div>
+            <Timeline items={liveFeed} accent="red" />
+            <a href="/live" class="mt-3 inline-flex items-center gap-1 eyebrow text-azure hover:text-azure-dark transition-colors">All updates →</a>
+          </aside>
+        </section>
+      </div>
+
+      <AdSlot slot="home-1" format="leaderboard" />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 2 · LATEST + POPULAR -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-7 lg:py-10 border-t border-rule">
+          <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+            <SectionHeading title="ഏറ്റവും പുതിയത്" titleEn="Latest" viewAllHref="/latest-news" />
+            <PromoGrid items={latest.slice(0, 6)} cols={3} />
+          </div>
+          <aside class="lg:col-span-4 mt-9 lg:mt-0">
+            <SectionHeading title="ജനപ്രിയം" titleEn="Popular" />
+            <NumberedList items={mostRead} />
+          </aside>
+        </section>
+
+        <!-- 3 · KERALA -->
+        <FeaturedBand cluster={kerala} class="border-t border-rule" />
+      </div>
+
+      <AdSlot slot="home-2" format="leaderboard" />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 4 · GULF + NATIONAL -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 py-7 lg:py-10 border-t border-rule">
+          <SectionColumn cluster={gulf} class="lg:border-r border-rule lg:pr-10" />
+          <SectionColumn cluster={india} />
+        </section>
+
+        <!-- 5 · ENTERTAINMENT + SPORTS -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 py-7 lg:py-10 border-t border-rule">
+          <SectionColumn cluster={entertainment} class="lg:border-r border-rule lg:pr-10" />
+          <SectionColumn cluster={sports} />
+        </section>
+
+        <!-- 6 · PHOTO STORY -->
+        <section class="py-7 lg:py-10 border-t border-rule">
+          <SectionHeading title="ചിത്രങ്ങൾ" titleEn="Photo Story" viewAllHref="/" />
+          <PhotoGallery items={galleryItems} />
+        </section>
+      </div>
+
+      <AdSlot slot="home-3" format="rectangle" />
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

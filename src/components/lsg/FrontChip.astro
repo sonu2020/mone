@@ -1,0 +1,26 @@
+---
+// CHIP · FrontChip — the colour square + front label used everywhere a front
+// is named. The colour is the data-viz meaning; the label repeats it in words.
+import { FRONT_FILL, frontLabel, frontLabelEn, type Front } from '../../lib/lsg';
+
+export interface Props {
+  front: Front | '—';
+  size?: 'sm' | 'md';
+  /** Show the Malayalam label (default) or the Latin abbreviation. */
+  lang?: 'ml' | 'en';
+}
+
+const { front, size = 'sm', lang = 'ml' } = Astro.props;
+const fill = FRONT_FILL[front];
+const label = lang === 'ml' ? frontLabel(front) : frontLabelEn(front);
+---
+
+<span class:list={['mc', 'inline-flex items-center gap-1.5 align-middle', size === 'md' && 'gap-2']}>
+  <span aria-hidden="true" class:list={['shrink-0', fill, size === 'sm' ? 'size-2.5' : 'size-3']}></span>
+  <span
+    class:list={[
+      'font-semibold text-ink dark:text-ivory',
+      size === 'sm' ? 'caption-text' : 'meta-text',
+    ]}
+  >{label}</span>
+</span>

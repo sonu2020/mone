@@ -1,0 +1,90 @@
+---
+// DESK · LsgDesk — the head of the LSG explorer: masthead, KPI strip and the
+// state-wide seat tally. Everything here renders at build time from
+// src/data/lsg/*.json; the map and drill-down below are the client's job.
+import { LSG, FRONTS, fmt, frontLabel } from '../../lib/lsg';
+import SeatBars from './SeatBars.astro';
+import FrontChip from './FrontChip.astro';
+
+const s = LSG.state;
+const updated = new Date(LSG.attribution.builtAt).toLocaleDateString('en-IN', {
+  day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+});
+const votersCrore = (s.counts.voters / 1e7).toFixed(2);
+
+const kpis: Array<{ v: string; ml: string; en: string }> = [
+  { v: fmt(s.counts['Grama Panchayat']), ml: 'ഗ്രാമപഞ്ചായത്തുകൾ', en: 'Grama panchayats' },
+  { v: fmt(s.counts.Municipality), ml: 'മുനിസിപ്പാലിറ്റികൾ', en: 'Municipalities' },
+  { v: fmt(s.counts.Corporation), ml: 'കോർപറേഷനുകൾ', en: 'Corporations' },
+  { v: fmt(s.counts['Block Panchayat']), ml: 'ബ്ലോക്ക് പഞ്ചായത്തുകൾ', en: 'Block panchayats' },
+  { v: fmt(s.counts['District Panchayat']), ml: 'ജില്ലാ പഞ്ചായത്തുകൾ', en: 'District panchayats' },
+  { v: fmt(s.counts.declared), ml: 'വാർഡുകൾ', en: 'Wards, results declared' },
+  { v: `${votersCrore} കോടി`, ml: 'വോട്ടർമാർ', en: 'Registered voters' },
+  { v: fmt(FRONTS.reduce((n, f) => n + s.seats[f], 0)), ml: 'സീറ്റുകൾ', en: 'Seats' },
+];
+---
+
+<section class="border-b border-rule bg-bg-card dark:bg-brand-dark">
+  <div class="mx-auto max-w-site px-4 py-10 sm:py-14">
+    <p class="eyebrow text-azure dark:text-azure-light">KERALA · LOCAL BODY ELECTIONS 2025</p>
+    <h1 class="mt-3 font-malayalam text-display text-ink dark:text-ivory text-balance">
+      2025 തദ്ദേശ തിരഞ്ഞെടുപ്പ്: എല്ലാ വാർഡും, എല്ലാ സീറ്റും
+    </h1>
+    <p class="mt-3 text-lead text-ink dark:text-ivory text-pretty max-w-2xl">
+      All {fmt(s.counts.declared)} wards across Kerala's {fmt(s.counts['Grama Panchayat'] + s.counts.Municipality + s.counts.Corporation + s.counts['Block Panchayat'] + s.counts['District Panchayat'])} local
+      bodies — who leads where, mapped ward by ward from the declared results.
+    </p>
+
+    <p class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-caption text-ink-muted">
+      <span>
+        Data: <a class="text-azure hover:underline" href="https://opendatakerala.org/LSG2025/" rel="noopener"
+          >OpenDataKerala</a> — LSG2025 · LSGD2025-Results-Data
+      </span>
+      <span aria-hidden="true">·</span>
+      <span>Last built {updated}</span>
+      <span aria-hidden="true">·</span>
+      <span>Source: SEC Kerala</span>
+    </p>
+  </div>
+
+  <dl class="mx-auto max-w-site grid grid-cols-2 border-t border-rule sm:grid-cols-4 lg:grid-cols-8">
+    {kpis.map((k) => (
+      <div class="border-b border-rule px-4 py-5 sm:border-l sm:first:border-l-0 lg:border-b-0">
+        <dd class="text-title font-bold tabular-nums text-ink dark:text-ivory">{k.v}</dd>
+        <dt class="mt-1 body-small text-ink dark:text-ivory">{k.ml}</dt>
+        <p class="caption-text text-ink-muted">{k.en}</p>
+      </div>
+    ))}
+  </dl>
+
+  <div class="mx-auto max-w-site grid gap-10 px-4 py-10 sm:py-12 lg:grid-cols-[1.1fr_1fr]">
+    <div>
+      <p class="eyebrow text-ink-muted">STATE-WIDE TALLY</p>
+      <h2 class="mt-2 font-malayalam text-title text-ink dark:text-ivory">മുന്നണികളുടെ കണക്ക്</h2>
+      <div class="mt-5">
+        <SeatBars seats={s.seats} />
+      </div>
+      <p class="mt-3 caption-text text-ink-muted">
+        Seats by front across all declared wards. A ward with equal votes on top
+        is resolved by lot and counted to its front.
+      </p>
+    </div>
+    <div class="border-t border-rule pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
+      <p class="eyebrow text-ink-muted">HOW TO READ</p>
+      <h2 class="mt-2 font-malayalam text-title text-ink dark:text-ivory">എങ്ങനെ വായിക്കാം</h2>
+      <ul class="mt-4 space-y-2">
+        {FRONTS.map((f) => (
+          <li class="flex items-center justify-between gap-4 border-b border-rule-light py-2">
+            <FrontChip front={f} />
+            <span class="text-right tabular-nums text-meta text-ink dark:text-ivory">{fmt(s.seats[f])} സീറ്റുകൾ</span>
+          </li>
+        ))}
+      </ul>
+      <p class="mt-4 body-small text-ink-muted text-pretty">
+        The district map below is shaded by the front that leads each district;
+        the drill-down shades every local body. {frontLabel('LDF')} · {frontLabel('UDF')} ·
+        {frontLabel('NDA')} · {frontLabel('OTHERS')}.
+      </p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,78 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/nav/HeaderBar.astro';
+import Footer from '../../../components/Footer.astro';
+import SectionSubNav from '../../../components/nav/SectionSubNav.astro';
+import DeskMasthead from '../../../components/desk/DeskMasthead.astro';
+import ShowViewer from '../../../components/ShowViewer.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import DummyImage from '../../../components/DummyImage.astro';
+import { shows, getShowEpisodes } from '../../../lib/videos';
+
+export function getStaticPaths() {
+  return shows.map((show) => ({
+    params: { slug: show.slug },
+    props: { show },
+  }));
+}
+
+const { show } = Astro.props;
+const episodes = getShowEpisodes(show);
+const host = show.host
+  ? { name: show.host, title: show.hostTitle || 'Presenter' }
+  : { name: 'MediaOne', title: 'Production Team' };
+const moreShows = shows.filter((s) => s.slug !== show.slug).slice(0, 4);
+---
+
+<Layout title={`${show.titleML} — ${show.title} | MediaOne Shows`} description={show.description}>
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full lg:max-w-site lg:mx-auto px-4 sm:px-6 md:px-8 py-6 lg:py-8">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-5" aria-label="Breadcrumb">
+        <a href="/videos" class="hover:text-azure transition-colors">Videos</a>
+        <span aria-hidden="true">/</span>
+        <a href="/videos/shows" class="hover:text-azure transition-colors">Shows</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">{show.title}</span>
+      </nav>
+
+      <ShowViewer
+        title={show.title}
+        titleML={show.titleML}
+        kicker={show.category}
+        description={show.description}
+        descriptionML={show.descriptionML}
+        schedule={show.schedule}
+        host={host}
+        episodes={episodes}
+      />
+
+      <!-- More shows -->
+      <section class="mt-10">
+        <SectionHeader title="കൂടുതൽ ഷോകൾ" titleEn="More Shows" href="/videos/shows" sticky={false} />
+        <div class="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-5">
+          {moreShows.map((s) => (
+            <a href={`/videos/shows/${s.slug}`} class="group block bg-bg-card border border-rule hover:border-azure transition-colors rounded-sm overflow-hidden">
+              <div class="relative aspect-video overflow-hidden bg-placeholder">
+                <DummyImage class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" w={640} h={360} seed={s.slug} />
+                <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="size-10 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center border border-white/40"><i class="ti ti-player-play text-base ml-0.5" aria-hidden="true"></i></span>
+                </span>
+              </div>
+              <div class="p-3">
+                <span class="eyebrow text-azure">{s.category}</span>
+                <h3 class="mt-1 article-title text-text-primary group-hover:text-azure transition-colors line-clamp-2 leading-snug">{s.titleML}</h3>
+                <p class="mt-1 caption-text text-text-muted tabular-nums">{s.episodeCount} episodes</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

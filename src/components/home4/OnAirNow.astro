@@ -1,0 +1,134 @@
+---
+// BLOCK · OnAirNow — one control, 36px tall:
+//
+//   ┌──────────────────┐
+//   │ ● Watch Live     │  36px
+//   └──────────────────┘
+//
+// Click plays the 24×7 stream in the shared VideoModal; hover or focus drops
+// the broadcast day beneath it. Nothing sits beside it — the chevron that used
+// to advertise the panel is gone, because a control that does one thing on
+// click reads better without a second affordance arguing about it.
+//
+// The block does not name what is on air. In the masthead that readout competed
+// with the headline it sat above, and the panel opens on the live programme, so
+// the question is answered by the thing that answers it.
+//
+// Red on navy and red on white both carry, so there is no tone to set — it is
+// the same button wherever it lands. The panel is always a light card.
+import { LIVE_CHANNEL, SCHEDULE_HREF } from "../../lib/live-tv";
+import ScheduleList from "../live/ScheduleList.astro";
+
+export interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<section
+  class:list={["mc", "group relative", className]}
+  data-onair
+  aria-label="MediaOne Live TV — on air now"
+>
+  <!-- One control, no affordance beside it. Click plays; hover or focus drops
+       the day. On touch there is no hover and the tap plays — the schedule is
+       under the video in the modal that opens, so it is still one gesture away. -->
+  <button
+    type="button"
+    data-onair-live
+    data-video-open={LIVE_CHANNEL.id}
+    class="inline-flex h-9 items-center gap-2 rounded-xs px-3.5 bg-accent-red text-white hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-[filter]"
+    aria-label={`Watch ${LIVE_CHANNEL.title}`}
+  >
+    <span
+      class="relative inline-flex size-2 items-center justify-center"
+      aria-hidden="true"
+    >
+      <span class="absolute inset-0 rounded-full bg-white/80 heartbeat-ring"
+      ></span>
+      <span class="relative size-2 rounded-full bg-white heartbeat"></span>
+    </span>
+    <span
+      class="eyebrow text-[0.8125rem] leading-none tracking-[0.06em] whitespace-nowrap"
+      >Watch Live</span
+    >
+  </button>
+
+  <!-- The day. pt-2 (not mt-2) keeps the hover bridge from pill to panel
+       unbroken, so the pointer can travel into the list without it closing. -->
+  <div
+    id="onair-schedule"
+    data-onair-panel
+    class="absolute z-50 top-full right-0 pt-2 w-[min(19rem,calc(100vw-2rem))]
+           opacity-0 invisible translate-y-1 transition-[opacity,transform] duration-200 ease-out"
+  >
+    <ScheduleList
+      layout="list"
+      maxHeight="max-h-[17rem]"
+      viewAllHref={SCHEDULE_HREF}
+    />
+  </div>
+</section>
+
+<script>
+  // Hover or focus on the Watch Live control (and the panel itself) opens the
+  // day. There is no toggle affordance any more — a pointer or a keyboard finds
+  // it, and a tap plays the stream, whose modal carries the schedule anyway.
+  document.querySelectorAll("[data-onair]").forEach((root) => {
+    const pill = root.querySelector("[data-onair-live]");
+    const panel = root.querySelector("[data-onair-panel]");
+    if (!pill || !panel) return;
+
+    let timer;
+
+    const open = () => {
+      clearTimeout(timer);
+      root.setAttribute("data-open", "");
+    };
+
+    const close = () => {
+      clearTimeout(timer);
+      root.removeAttribute("data-open");
+    };
+
+    // A grace period so crossing the gap between pill and panel doesn't close it.
+    const closeSoon = () => {
+      clearTimeout(timer);
+      timer = setTimeout(close, 180);
+    };
+
+    [pill, panel].forEach((el) => {
+      el.addEventListener("mouseenter", open);
+      el.addEventListener("mouseleave", closeSoon);
+    });
+
+    pill.addEventListener("focus", open);
+    // Playing the stream hands the screen to the modal — get the panel out of it.
+    pill.addEventListener("click", close);
+    panel.addEventListener("focusin", open);
+    panel.addEventListener("focusout", (e) => {
+      if (!panel.contains(e.relatedTarget)) closeSoon();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!root.contains(e.target)) close();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && root.hasAttribute("data-open")) {
+        close();
+        pill.focus();
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Visibility is driven entirely by the flag the script sets, so hover,
+     focus and tap all take the same path. */
+  [data-onair][data-open] [data-onair-panel] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+</style>

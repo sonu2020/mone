@@ -1,0 +1,243 @@
+---
+// A price chart for any PriceSeries. Knows nothing about gold.
+//
+// Every range x variant path is computed here, at build time, and all of them
+// are emitted. The client only changes which one is visible — so the correct
+// chart is in the HTML before any JavaScript runs, a reader with JS disabled
+// still sees the default range, and switching costs no computation.
+//
+// Switching *unit* is deliberately not a path change: a unit factor is a linear
+// scale, so rupees-per-pavan draws the identical curve to rupees-per-gram. Only
+// the labels move. See PriceDesk.astro.
+import {
+  buildPath, downsample, formatINR, stats, toUnit, windowSeries,
+} from '../../lib/price-series';
+import type { PriceSeries, RangeId, VariantId } from '../../lib/price-series';
+
+interface Props {
+  series: PriceSeries;
+  unitId: string;
+  variantIds?: VariantId[];
+  ranges?: RangeId[];
+  markers?: { id: string; date: string; label: string }[];
+  /** Which range shows first. Defaults to 1Y, or the only range if there is one. */
+  initialRange?: RangeId;
+  /** The screen-reader data table. One per page is enough; a second chart on the
+   *  same page repeats thousands of rows for no gain. */
+  dataTable?: boolean;
+  id?: string;
+}
+
+const {
+  series,
+  unitId,
+  variantIds = series.variants.map((v) => v.id),
+  ranges = ['1W', '1M', '1Y', '5Y', 'ALL'],
+  markers = [],
+  initialRange,
+  dataTable = true,
+  id = 'price-chart',
+} = Astro.props;
+
+// A fixed coordinate space, scaled by CSS. Nothing here depends on the rendered
+// pixel size, so the same markup serves every breakpoint.
+const W = 1000;
+const H = 320;
+const MAX_POINTS = 400;
+
+const unit = series.units.find((u) => u.id === unitId) ?? series.units[0];
+const activeRange: RangeId = initialRange ?? (ranges.includes('1Y') ? '1Y' : ranges[0]);
+const activeVariant = variantIds[0];
+
+const display = (n: number) => formatINR(toUnit(n, unit, series.precision), series.precision);
+
+// Downsampling is per-variant (it keeps *that* variant's extremes), so each
+// range holds one point list per variant. The date column is identical across
+// variants of a range in every real series, so it is emitted once per range
+// rather than once per view — the difference is tens of kilobytes on the wire.
+const rangeViews = ranges.map((range) => {
+  const windowed = windowSeries(series, range);
+  const perVariant = variantIds.map((vid) => {
+    const points = downsample(windowed, vid, MAX_POINTS);
+    const s = stats(points, vid);
+    const variant = series.variants.find((v) => v.id === vid)!;
+
+    const describe = s === null
+      ? `${variant.label} per ${unit.label}: no data for this range.`
+      : `${variant.label} per ${unit.label}, ${range === 'ALL' ? 'all time' : range}: `
+        + `${s.change === 0 ? 'unchanged at' : s.change > 0 ? 'up to' : 'down to'} `
+        + `₹${display(s.last)} from ₹${display(s.first)}, `
+        + `ranging ₹${display(s.min)} to ₹${display(s.max)}.`;
+
+    return {
+      key: `${range}:${vid}`,
+      range,
+      variantId: vid,
+      points,
+      d: buildPath(points, vid, W, H, s?.min ?? 0, s?.max ?? 1),
+      describe,
+      values: points.map((p) => {
+        const v = p.values[vid];
+        return typeof v === 'number' ? toUnit(v, unit, series.precision) : null;
+      }),
+    };
+  });
+  return { range, perVariant, dates: perVariant[0].points.map((p) => p.date) };
+});
+
+const views = rangeViews.flatMap((r) => r.perVariant);
+const initialView = views.find((v) => v.range === activeRange && v.variantId === activeVariant)!;
+
+// Markers must be placed against the SAME array the ALL path is drawn from —
+// the downsampled one. Measuring against the raw 6,000-point series would put
+// every marker at the wrong x, because thinning is not uniform.
+const allView = rangeViews.find((r) => r.range === 'ALL');
+const allDates = allView?.dates ?? [];
+const placedMarkers = markers
+  .map((m) => {
+    // The exact day may have been thinned away, so take the nearest kept day.
+    let best = -1;
+    let bestGap = Infinity;
+    allDates.forEach((d, i) => {
+      const gap = Math.abs(Date.parse(d) - Date.parse(m.date));
+      if (gap < bestGap) { bestGap = gap; best = i; }
+    });
+    return best === -1 ? null : { ...m, x: (best / Math.max(allDates.length - 1, 1)) * W };
+  })
+  .filter((m): m is NonNullable<typeof m> => m !== null);
+
+const label = (r: RangeId) => (r === 'ALL' ? 'All' : r);
+---
+
+<figure
+  class:list={['mc', 'not-prose m-0']}
+  data-price-chart
+  data-chart-id={id}
+  data-precision={series.precision}
+  data-unit-label={unit.label}
+  data-initial-range={activeRange}
+  data-active-variant={activeVariant}
+>
+  {ranges.length > 1 && (
+    <div role="tablist" aria-label="Time range" class="flex gap-4 border-b border-rule">
+      {ranges.map((range) => (
+        <button
+          type="button"
+          role="tab"
+          data-range-pill={range}
+          aria-selected={range === activeRange}
+          aria-controls={`${id}-plot`}
+          class="eyebrow -mb-px border-b-2 border-transparent px-1 py-2 text-eyebrow
+                 text-ink-muted transition-colors duration-150 hover:text-ink
+                 aria-selected:border-azure aria-selected:text-azure
+                 focus-visible:outline-2 focus-visible:outline-azure"
+        >{label(range)}</button>
+      ))}
+    </div>
+  )}
+
+  <div class="relative">
+    <svg
+      id={`${id}-plot`}
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="none"
+      class="block h-56 w-full sm:h-72"
+      role="img"
+      aria-label={initialView.describe}
+      data-plot
+      data-w={W}
+      data-h={H}
+    >
+      <!-- Behind the line: the act highlight band, moved by the story rail. -->
+      <rect data-act-band x="0" y="0" width="0" height={H} class="fill-rule-light"
+            style="opacity:0" />
+
+      <!-- Baseline only. No gridlines, no fill under the line. -->
+      <line x1="0" y1={H} x2={W} y2={H} class="stroke-rule" stroke-width="1"
+            vector-effect="non-scaling-stroke" />
+
+      {views.map((v) => (
+        <path
+          d={v.d}
+          data-range-path={v.range}
+          data-variant-path={v.variantId}
+          fill="none"
+          class="stroke-azure"
+          stroke-width="1.5"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          vector-effect="non-scaling-stroke"
+          style={v.key === initialView.key ? '' : 'opacity:0;visibility:hidden'}
+        />
+      ))}
+
+      {placedMarkers.map((m) => (
+        <line
+          data-marker={m.id}
+          x1={m.x} y1={H - 14} x2={m.x} y2={H}
+          class="stroke-azure"
+          stroke-width="2"
+          vector-effect="non-scaling-stroke"
+        />
+      ))}
+
+      <line data-crosshair x1="0" y1="0" x2="0" y2={H} class="stroke-ink-muted"
+            stroke-width="1" vector-effect="non-scaling-stroke" style="opacity:0" />
+    </svg>
+
+    <!-- Marker hit targets, as real links so keyboard and screen readers get them. -->
+    {placedMarkers.length > 0 && (
+      <div class="pointer-events-none absolute inset-0" data-marker-layer>
+        {placedMarkers.map((m) => (
+          <a
+            href={`#report-${m.id}`}
+            data-marker-link={m.id}
+            style={`left:${(m.x / W) * 100}%`}
+            class="pointer-events-auto absolute bottom-0 size-4 -translate-x-1/2
+                   focus-visible:outline-2 focus-visible:outline-azure"
+          ><span class="sr-only">{m.label}</span></a>
+        ))}
+      </div>
+    )}
+
+    <!-- Scrub readout. Positioned by the client; hidden until hover. -->
+    <div data-readout
+         class="pointer-events-none absolute top-0 left-0 hidden border border-rule
+                bg-ivory px-2 py-1 text-meta tabular-nums text-ink
+                dark:bg-brand-elevated">
+    </div>
+  </div>
+
+  {dataTable && (
+    <figcaption class="sr-only">
+      <table>
+        <caption>{initialView.describe}</caption>
+        <thead>
+          <tr><th scope="col">Date</th><th scope="col">Rate in rupees per {unit.label}</th></tr>
+        </thead>
+        <tbody>
+          {initialView.points.map((p, i) => (
+            <tr>
+              <th scope="row">{p.date}</th>
+              <td>{initialView.values[i] === null
+                ? 'no rate quoted'
+                : formatINR(initialView.values[i]!, series.precision)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </figcaption>
+  )}
+
+  <script type="application/json" data-chart-data set:html={JSON.stringify({
+    dates: Object.fromEntries(rangeViews.map((r) => [r.range, r.dates])),
+    views: Object.fromEntries(views.map((v) => [v.key, { v: v.values, d: v.describe }])),
+    allRange: allView ? 'ALL' : ranges[0],
+  })} />
+</figure>
+
+<script>
+  import { initPriceCharts } from '../../lib/price-chart';
+  initPriceCharts();
+  document.addEventListener('astro:page-load', initPriceCharts);
+</script>

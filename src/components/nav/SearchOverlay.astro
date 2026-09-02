@@ -1,0 +1,422 @@
+---
+// NAV · SearchOverlay — the search sheet behind every header search button.
+//
+// A static site has no query endpoint, so the whole index (lib/search-index.ts)
+// ships as JSON and the sheet filters it on the client: results appear as you
+// type, with no round trip and no results page to land on. Picking a result
+// goes straight to the thing.
+//
+// Shape follows the surface it opens on. On a phone it is the screen — a full
+// sheet, a 16px field so iOS doesn't zoom the page, 48px rows a thumb can hit.
+// From sm up it becomes a centred dialog under the masthead. One component
+// either way; the header only has to carry `data-search-open`.
+//
+// Drop it once per page (the headers do this themselves) and any trigger with
+// `data-search-open` opens it.
+import { searchIndex, searchShortcuts } from '../../lib/search-index';
+import { trendingTopics } from '../../lib/mega-nav';
+
+const payload = JSON.stringify(searchIndex).replace(/</g, '\\u003c');
+---
+
+<div
+  id="site-search"
+  class="fixed inset-0 z-50 hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Search MediaOne"
+>
+  <div class="absolute inset-0 bg-ink/60 backdrop-blur-sm" data-search-close></div>
+
+  <!-- The sheet. Full screen on a phone; a dialog under the masthead from sm. -->
+  <div
+    class="absolute inset-0 sm:inset-x-0 sm:top-0 sm:bottom-auto sm:mx-auto sm:mt-16 sm:max-w-2xl sm:px-4
+           flex flex-col sm:block"
+  >
+    <div class="flex min-h-0 flex-1 flex-col bg-bg-card dark:bg-brand-dark sm:border sm:border-rule dark:sm:border-ivory/10">
+      <!-- ══ FIELD ══ -->
+      <form data-search-form class="flex items-center gap-2 border-b border-rule dark:border-ivory/10 px-2 sm:px-3">
+        <button
+          type="button"
+          data-search-close
+          class="sm:hidden inline-flex size-11 shrink-0 items-center justify-center text-ink dark:text-ivory"
+          aria-label="Close search"
+        >
+          <i class="ti ti-arrow-left text-2xl" aria-hidden="true"></i>
+        </button>
+
+        <i class="ti ti-search hidden sm:block text-xl text-text-muted dark:text-ivory/45" aria-hidden="true"></i>
+
+        <!-- text-base, not smaller: anything under 16px makes iOS zoom the page
+             the moment the field takes focus. -->
+        <input
+          id="site-search-input"
+          type="search"
+          name="q"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+          enterkeyhint="search"
+          placeholder="Search news, videos, sections…"
+          aria-controls="site-search-results"
+          aria-autocomplete="list"
+          class="h-14 min-w-0 flex-1 bg-transparent text-base text-ink dark:text-ivory placeholder:text-text-light dark:placeholder:text-ivory/35
+                 outline-none [&::-webkit-search-cancel-button]:hidden"
+        />
+
+        <button
+          type="button"
+          data-search-clear
+          hidden
+          class="inline-flex size-11 shrink-0 items-center justify-center text-text-muted dark:text-ivory/45 hover:text-ink dark:hover:text-ivory transition-colors"
+          aria-label="Clear search"
+        >
+          <i class="ti ti-x text-xl" aria-hidden="true"></i>
+        </button>
+
+        <button
+          type="button"
+          data-search-close
+          class="hidden sm:inline-flex h-9 shrink-0 items-center px-2 eyebrow text-text-muted dark:text-ivory/45 hover:text-ink dark:hover:text-ivory transition-colors"
+        >
+          Esc
+        </button>
+      </form>
+
+      <!-- ══ RESULTS ══ -->
+      <div
+        class="min-h-0 flex-1 overflow-y-auto overscroll-contain sm:max-h-[60vh]
+               pb-[env(safe-area-inset-bottom)]"
+      >
+        <ul id="site-search-results" role="listbox" aria-label="Search results" class="divide-y divide-rule dark:divide-ivory/10" hidden></ul>
+
+        <p data-search-empty hidden class="px-4 py-10 text-center body-small text-text-muted dark:text-ivory/45">
+          Nothing matched. Try a desk name, a place, or a programme.
+        </p>
+
+        <!-- Before a key is pressed: what was searched before, then where to go. -->
+        <div data-search-idle>
+          <section data-search-recent hidden class="px-4 pt-4">
+            <div class="flex items-center justify-between">
+              <p class="eyebrow text-text-muted dark:text-ivory/45">Recent</p>
+              <button
+                type="button"
+                data-search-forget
+                class="caption-text text-text-muted dark:text-ivory/45 hover:text-azure dark:hover:text-azure-light transition-colors"
+              >Clear</button>
+            </div>
+            <ul data-search-recent-list class="mt-2 -mx-4 divide-y divide-rule dark:divide-ivory/10 border-y border-rule dark:border-ivory/10"></ul>
+          </section>
+
+          <section class="px-4 pt-4">
+            <p class="eyebrow text-text-muted dark:text-ivory/45">Go to</p>
+            <ul class="mt-2 -mx-4 divide-y divide-rule dark:divide-ivory/10 border-y border-rule dark:border-ivory/10">
+              {searchShortcuts.map((s) => (
+                <li>
+                  <a
+                    href={s.href}
+                    class="flex min-h-12 items-center gap-3 px-4 py-2.5 nav-text text-ink dark:text-ivory active:bg-light-gray dark:active:bg-brand-elevated"
+                  >
+                    <i class="ti ti-arrow-right text-base text-text-light dark:text-ivory/35" aria-hidden="true"></i>
+                    {s.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section class="px-4 py-4">
+            <p class="eyebrow text-text-muted dark:text-ivory/45">Trending</p>
+            <ul class="mt-2 flex flex-wrap gap-2">
+              {trendingTopics.map((t) => (
+                <li>
+                  <a
+                    href={t.href}
+                    class="inline-flex min-h-9 items-center border border-rule dark:border-ivory/15 px-3 meta-text text-text-secondary dark:text-ivory/70 hover:border-azure hover:text-azure dark:hover:text-azure-light transition-colors"
+                  >{t.label}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="site-search-data" set:html={payload}></script>
+
+<script>
+  // The sheet is one instance per page and every trigger is delegated, so a
+  // header can add a search button anywhere without wiring anything.
+  const sheet = document.getElementById('site-search');
+  const dataEl = document.getElementById('site-search-data');
+
+  if (sheet && dataEl) {
+    const input = document.getElementById('site-search-input') as HTMLInputElement | null;
+    const list = document.getElementById('site-search-results');
+    const empty = sheet.querySelector('[data-search-empty]');
+    const idle = sheet.querySelector('[data-search-idle]');
+    const clearBtn = sheet.querySelector('[data-search-clear]');
+    const recentBox = sheet.querySelector('[data-search-recent]');
+    const recentList = sheet.querySelector('[data-search-recent-list]');
+
+    const entries = JSON.parse(dataEl.textContent || '[]');
+    const RECENT_KEY = 'mone:recent-searches';
+    const MAX_RESULTS = 12;
+    const MAX_RECENT = 5;
+
+    // Same fold as the index builder: case-flattened, punctuation dropped.
+    // Malayalam has no case, so one path serves both scripts.
+    const normalize = (s) =>
+      String(s || '')
+        .toLowerCase()
+        .replace(/[‘’“”'"|,.:;!?()\[\]{}\-–—/\\]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const haystack = entries.map((e) => normalize(e.label + ' ' + (e.hint || '')));
+    const KIND_RANK = { section: 0, topic: 1, story: 2, video: 3 };
+    const KIND_ICON = { section: 'ti-hash', topic: 'ti-trending-up', story: 'ti-news', video: 'ti-player-play' };
+
+    const esc = (s) =>
+      String(s || '').replace(/[&<>"']/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // ── Ranking ──────────────────────────────────────────────────────────────
+    // A word that starts with the query beats one that merely contains it, and
+    // a desk beats a story that happens to mention it — a reader typing
+    // "kerala" wants the desk, not the fourteenth headline about it.
+    function score(hay, q) {
+      const at = hay.indexOf(q);
+      if (at < 0) return -1;
+      if (at === 0) return 0;
+      return hay[at - 1] === ' ' ? 1 : 2;
+    }
+
+    function search(raw) {
+      const q = normalize(raw);
+      if (!q) return [];
+      const hits = [];
+      for (let i = 0; i < entries.length; i++) {
+        const s = score(haystack[i], q);
+        if (s < 0) continue;
+        hits.push({ entry: entries[i], rank: s * 10 + KIND_RANK[entries[i].kind] });
+        if (hits.length > 300) break;
+      }
+      hits.sort((a, b) => a.rank - b.rank);
+      return hits.slice(0, MAX_RESULTS).map((h) => h.entry);
+    }
+
+    // ── Rendering ────────────────────────────────────────────────────────────
+    function row(e, i) {
+      // A video result opens the player in place where the page carries the
+      // modal, and falls back to /videos where it does not — the same contract
+      // every other video trigger on the site uses.
+      const open = e.videoId ? ` data-video-open="${esc(e.videoId)}"` : '';
+      return `
+        <li role="presentation">
+          <a href="${esc(e.href)}"${open} role="option" aria-selected="${i === 0}" data-sr
+            class="flex min-h-12 items-center gap-3 px-4 py-2.5 active:bg-light-gray dark:active:bg-brand-elevated aria-selected:bg-light-gray dark:aria-selected:bg-brand-elevated">
+            <i class="ti ${KIND_ICON[e.kind] || 'ti-search'} shrink-0 text-base text-text-light dark:text-ivory/35" aria-hidden="true"></i>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate nav-text text-ink dark:text-ivory">${esc(e.label)}</span>
+              ${e.hint ? `<span class="block truncate caption-text text-text-muted dark:text-ivory/45">${esc(e.hint)}</span>` : ''}
+            </span>
+          </a>
+        </li>`;
+    }
+
+    function render(q) {
+      const has = Boolean(normalize(q));
+      if (clearBtn) clearBtn.hidden = !has;
+      if (idle) idle.hidden = has;
+
+      if (!has) {
+        if (list) { list.hidden = true; list.innerHTML = ''; }
+        if (empty) empty.hidden = true;
+        return;
+      }
+
+      const results = search(q);
+      if (list) {
+        list.innerHTML = results.map(row).join('');
+        list.hidden = results.length === 0;
+      }
+      if (empty) empty.hidden = results.length > 0;
+    }
+
+    // ── Recent queries ───────────────────────────────────────────────────────
+    function readRecent() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+        return Array.isArray(raw) ? raw.filter((s) => typeof s === 'string').slice(0, MAX_RECENT) : [];
+      } catch { return []; }
+    }
+
+    function writeRecent(items) {
+      try { localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, MAX_RECENT))); } catch {}
+    }
+
+    function rememberQuery(q) {
+      const term = String(q || '').trim();
+      if (term.length < 2) return;
+      const kept = readRecent().filter((s) => normalize(s) !== normalize(term));
+      writeRecent([term, ...kept]);
+    }
+
+    function paintRecent() {
+      if (!recentBox || !recentList) return;
+      const items = readRecent();
+      recentBox.hidden = items.length === 0;
+      recentList.innerHTML = items
+        .map(
+          (s) => `
+          <li>
+            <button type="button" data-search-again="${esc(s)}"
+              class="flex w-full min-h-12 items-center gap-3 px-4 py-2.5 text-left active:bg-light-gray dark:active:bg-brand-elevated">
+              <i class="ti ti-history shrink-0 text-base text-text-light dark:text-ivory/35" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1 truncate nav-text text-ink dark:text-ivory">${esc(s)}</span>
+            </button>
+          </li>`
+        )
+        .join('');
+    }
+
+    // ── Open / close ─────────────────────────────────────────────────────────
+    let lastFocused = null;
+
+    function isOpen() { return !sheet.classList.contains('hidden'); }
+
+    function open() {
+      if (isOpen()) return;
+      lastFocused = document.activeElement;
+      paintRecent();
+      sheet.classList.remove('hidden');
+      document.documentElement.style.overflow = 'hidden';
+      document.querySelectorAll('[data-search-open]').forEach((b) => b.setAttribute('aria-expanded', 'true'));
+      // iOS only raises the keyboard for a focus inside the gesture's frame or
+      // shortly after it, so focus lands on the next frame rather than later.
+      requestAnimationFrame(() => { if (input) input.focus(); fitToKeyboard(); });
+    }
+
+    function close() {
+      if (!isOpen()) return;
+      sheet.classList.add('hidden');
+      releaseKeyboardFit();
+      document.documentElement.style.overflow = '';
+      document.querySelectorAll('[data-search-open]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+      if (input) input.blur();
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    // ── The keyboard ─────────────────────────────────────────────────────────
+    // A phone keyboard does not shrink the layout viewport, so `inset-0` leaves
+    // the bottom of the list sitting behind it. The visual viewport does know,
+    // so the sheet is sized from it while it is open and handed back to CSS on
+    // close. Browsers without the API keep the plain full-screen behaviour.
+    const vv = window.visualViewport;
+
+    function fitToKeyboard() {
+      if (!vv || !isOpen()) return;
+      sheet.style.height = vv.height + 'px';
+      sheet.style.top = vv.offsetTop + 'px';
+    }
+
+    function releaseKeyboardFit() {
+      sheet.style.height = '';
+      sheet.style.top = '';
+    }
+
+    if (vv) {
+      vv.addEventListener('resize', fitToKeyboard);
+      vv.addEventListener('scroll', fitToKeyboard);
+    }
+
+    // ── Selection ────────────────────────────────────────────────────────────
+    function options() {
+      return list && !list.hidden ? Array.from(list.querySelectorAll('[data-sr]')) : [];
+    }
+
+    function move(by) {
+      const opts = options();
+      if (!opts.length) return;
+      const at = opts.findIndex((o) => o.getAttribute('aria-selected') === 'true');
+      const next = (at + by + opts.length) % opts.length;
+      opts.forEach((o, i) => o.setAttribute('aria-selected', String(i === next)));
+      const el = opts[next];
+      if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+    }
+
+    function activate() {
+      const opts = options();
+      const chosen = opts.find((o) => o.getAttribute('aria-selected') === 'true') || opts[0];
+      if (!chosen) return;
+      rememberQuery(input ? input.value : '');
+      chosen.click();
+    }
+
+    // ── Wiring ───────────────────────────────────────────────────────────────
+    document.addEventListener('click', (e) => {
+      const opener = e.target.closest('[data-search-open]');
+      if (opener) { e.preventDefault(); open(); return; }
+      if (!isOpen()) return;
+      if (e.target.closest('[data-search-close]')) { close(); return; }
+      if (e.target.closest('[data-search-clear]')) {
+        if (input) { input.value = ''; input.focus(); }
+        render('');
+        return;
+      }
+      if (e.target.closest('[data-search-forget]')) { writeRecent([]); paintRecent(); return; }
+      const again = e.target.closest('[data-search-again]');
+      if (again) {
+        if (input) { input.value = again.getAttribute('data-search-again') || ''; input.focus(); }
+        render(input ? input.value : '');
+        return;
+      }
+      // A result was picked: keep the term, and get out of the way — a result
+      // that opens the video modal never navigates, so the sheet must not stay
+      // sitting on top of the player.
+      const hit = e.target.closest('[data-sr]');
+      if (hit) { rememberQuery(input ? input.value : ''); close(); }
+    });
+
+    if (input) {
+      input.addEventListener('input', () => render(input.value));
+      input.addEventListener('search', () => render(input.value));
+    }
+
+    const form = sheet.querySelector('[data-search-form]');
+    if (form) {
+      form.addEventListener('submit', (e) => { e.preventDefault(); activate(); });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!isOpen()) {
+        // ⌘K / Ctrl-K anywhere, and / when the reader is not already typing.
+        const typing = e.target && typeof e.target.closest === 'function'
+          ? Boolean(e.target.closest('input, textarea, select, [contenteditable]'))
+          : false;
+        if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); open(); }
+        else if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) { e.preventDefault(); open(); }
+        return;
+      }
+      if (e.key === 'Escape') { e.preventDefault(); close(); }
+      else if (e.key === 'Tab') {
+        // A modal sheet keeps the keyboard inside it.
+        const f = Array.from(sheet.querySelectorAll('a[href], button:not([disabled]), input'))
+          .filter((el) => el.offsetParent !== null);
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+      else if (e.key === 'Enter') { e.preventDefault(); activate(); }
+    });
+
+    // Coming back through the bfcache should not land on an open sheet.
+    window.addEventListener('pageshow', close);
+  }
+</script>

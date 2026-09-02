@@ -1,0 +1,747 @@
+---
+// COMPONENT · VideoModal — the video browser. A theater player with a browsable
+// library beside it, so a viewer who opens one clip can keep watching without
+// going back to a page. Drop it once and give any trigger
+// `data-video-open="<id>"`; <a> triggers still navigate without JS.
+//
+// Browsing is three tabs rather than one long scroll — Up Next, Today, Library
+// — because those are different questions, and a single list answers none of
+// them well. Library holds two shelves: MediaOne's desk YouTube channels
+// (lib/channels.ts, with their own playlists under each) and the programme
+// catalogue swept off the live site (lib/program-catalogue.ts), the same list
+// the /programs directory and the /videos filter read, so all of them stay in
+// step. A trigger carrying data-video-shows="<slug>" opens the modal straight
+// at one of those shelves — that is what a band's "View all" does.
+//
+// The playing item is marked wherever it appears, and ← → step through the
+// queue without touching the sidebar at all.
+//
+// Theater surface is intentionally dark in both themes (video wants dark), but
+// every colour is a brand token: brand-dark panel, azure controls/accents,
+// ivory text. Video.js skin is re-tinted to the MediaOne azure below.
+import Logo from './Logo.astro';
+import AdSlot from './AdSlot.astro';
+import { shareChannels } from '../lib/share-channels';
+import type { ModalVideo, ModalProgram } from '../lib/video-modal';
+
+export interface Props {
+  videos: ModalVideo[];
+  /** Published today — rendered as its own sidebar block with clock times. */
+  today?: { id: string; title: string; time?: string; poster: string }[];
+  /** Programmes, each with playable episodes — the Programmes tab drills into these. */
+  programs?: ModalProgram[];
+}
+
+const { videos, today = [], programs = [] } = Astro.props;
+
+// Programme episodes are not part of any page's video pool, so the modal folds
+// them into its own payload rather than making every page that renders the
+// Programmes tab remember to append them — a page that forgot would render a
+// grid of rows that open an empty player. Anything the page already supplied
+// wins, so a page can still override an entry.
+const supplied = new Set(videos.map((v) => v.id));
+const fromPrograms: ModalVideo[] = programs.flatMap((p) => [
+  ...p.episodes
+    .filter((ep) => ep.youtubeId && !supplied.has(ep.id))
+    .map((ep) => ({
+      id: ep.id,
+      title: ep.title,
+      category: p.title,
+      meta: ep.meta,
+      duration: ep.duration,
+      poster: ep.poster,
+      src: '',
+      youtubeId: ep.youtubeId,
+      programTitle: p.title,
+      programHref: p.href,
+    })),
+  // A channel's playlists are playable in the same payload: an embedUrl runs
+  // the whole list in order, which is what watching a show means.
+  ...(p.shows ?? [])
+    .filter((s) => !supplied.has(s.id))
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      category: p.title,
+      meta: s.meta,
+      poster: s.poster,
+      src: '',
+      embedUrl: s.embedUrl,
+      programTitle: p.title,
+      programHref: p.href,
+    })),
+]);
+const payload = [...videos, ...fromPrograms];
+
+// Two shelves, because a YouTube channel and a programme are not the same kind
+// of thing to a reader even though they carry the same shape here. Order within
+// each is the caller's — the page leads with the desk's own channel.
+const channels = programs.filter((p) => p.kind === 'channel');
+const shows = programs.filter((p) => p.kind !== 'channel');
+---
+
+<div
+  id="video-modal"
+  class:list={['mc', 'fixed inset-0 z-[100] opacity-0 invisible pointer-events-none transition-opacity duration-200 data-[open]:opacity-100 data-[open]:visible data-[open]:pointer-events-auto']}
+  role="dialog"
+  aria-modal="true"
+  aria-label="Video player"
+  aria-hidden="true"
+>
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" data-close></div>
+
+  <!-- Panel. Below sm it is the screen: the panel takes the full height, its
+       head is fixed and everything under it scrolls in one column, so the way
+       out is always on screen and nothing runs off the bottom. -->
+  <div class="relative h-full w-full flex items-stretch sm:items-center justify-center sm:p-4 lg:p-6">
+    <div class="relative w-full max-w-[1440px] min-h-0 sm:max-h-full flex flex-col bg-brand-dark sm:rounded-lg border-y sm:border border-white/10 shadow-2xl overflow-hidden">
+
+      <!-- Header: the mark, what is playing, and the way out. The live badge
+           only appears for a live feed — a recorded clip has no channel. -->
+      <div class="shrink-0 flex items-center gap-3 sm:gap-4 px-3 sm:px-5 py-2.5 sm:py-3 border-b border-white/10 pt-[max(0.625rem,env(safe-area-inset-top))] sm:pt-3">
+        <a href="/" class="inline-flex items-center shrink-0 text-ivory hover:text-azure-light transition-colors" aria-label="MediaOne home">
+          <Logo class="h-9 sm:h-11 w-auto" />
+        </a>
+
+        <!-- Where the playing item comes from, credited beside the mark the way
+             a channel ident sits next to a broadcaster's logo. A programme
+             episode names its show and links to it; anything else names its
+             category. Mutually exclusive with the live badge — a recorded clip
+             is not a channel. -->
+        <a id="modal-source-head" class="hidden min-w-0 items-center gap-1.5 group">
+          <i class="ti ti-chevron-right shrink-0 text-lg text-ivory/35" aria-hidden="true"></i>
+          <span id="modal-source-name" class="min-w-0 truncate nav-text text-ivory group-hover:text-azure-light transition-colors"></span>
+        </a>
+
+        <div id="modal-live-head" class="hidden min-w-0 items-center gap-2.5 border-l border-white/15 pl-3 sm:pl-4">
+          <span class="inline-flex items-center gap-1.5 shrink-0 rounded-xs bg-accent-red px-2 py-1 text-white">
+            <span class="relative inline-flex size-1.5 items-center justify-center" aria-hidden="true">
+              <span class="absolute inset-0 rounded-full bg-white/80 heartbeat-ring"></span>
+              <span class="relative size-1.5 rounded-full bg-white heartbeat"></span>
+            </span>
+            <span class="eyebrow text-micro tracking-[0.08em]">Live</span>
+          </span>
+          <span class="min-w-0 truncate nav-text text-ivory">MediaOne Live TV</span>
+        </div>
+
+        <span class="ml-auto"></span>
+        <button
+          type="button"
+          data-close
+          class="size-11 sm:size-9 shrink-0 rounded-full bg-black/60 text-ivory/80 hover:text-white hover:bg-black/80 border border-white/15 flex items-center justify-center backdrop-blur-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light"
+          aria-label="Close player"
+        >
+          <i class="ti ti-x text-xl" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 flex-1 min-h-0 lg:max-h-[82vh] overflow-y-auto overscroll-contain scrollbar-none pb-[env(safe-area-inset-bottom)] lg:pb-0">
+        <!-- Main: player + info -->
+        <div class="lg:col-span-7 xl:col-span-8 min-w-0">
+          <!-- The picture holds the top of the scroller below lg, so browsing
+               the list underneath never scrolls the thing you are watching off
+               the screen. From lg the two columns sit side by side and there is
+               nothing to pin. -->
+          <!-- lg:relative, never lg:static: the iframe inside is absolutely
+               positioned, so dropping the positioning context at lg makes it
+               anchor to the whole panel and cover the sidebar. -->
+          <div class="bg-black aspect-video sticky top-0 z-10 lg:relative lg:z-auto">
+            <!-- YouTube iframe mounts here (primary). Poster is painted as a
+                 background so there's no black flash before the iframe loads. -->
+            <div id="yt-stage" class="absolute inset-0 bg-black bg-cover bg-center"></div>
+            <!-- Native <video> fallback for any ModalVideo without a youtubeId -->
+            <video id="modal-mp4" class="absolute inset-0 w-full h-full hidden" controls playsinline preload="auto"></video>
+          </div>
+
+          <!-- The broadcast day, sitting on the bottom edge of the picture —
+               only while a live feed is playing. A page supplies it through the
+               slot, so the modal itself stays unaware of what a schedule is. -->
+          {Astro.slots.has('live-panel') && (
+            <div id="modal-live-panel" class="hidden border-t border-white/10 bg-black/40">
+              <slot name="live-panel" />
+            </div>
+          )}
+
+          <!-- Transport. The queue is whatever list the viewer is browsing. -->
+          <div class="flex items-center gap-2 px-4 sm:px-6 py-2.5 border-b border-white/10">
+            <button type="button" data-step="-1"
+              class="inline-flex items-center gap-1.5 rounded-xs border border-white/15 px-3 min-h-10 lg:min-h-0 lg:px-2.5 py-1.5 caption-text font-semibold text-ivory/70 hover:text-white hover:border-white/35 disabled:opacity-30 disabled:pointer-events-none transition-colors">
+              <i class="ti ti-player-track-prev text-sm" aria-hidden="true"></i> Prev
+            </button>
+            <button type="button" data-step="1"
+              class="inline-flex items-center gap-1.5 rounded-xs border border-white/15 px-3 min-h-10 lg:min-h-0 lg:px-2.5 py-1.5 caption-text font-semibold text-ivory/70 hover:text-white hover:border-white/35 disabled:opacity-30 disabled:pointer-events-none transition-colors">
+              Next <i class="ti ti-player-track-next text-sm" aria-hidden="true"></i>
+            </button>
+            <span id="modal-position" class="ml-auto caption-text tabular-nums text-ivory/40"></span>
+          </div>
+
+          <div class="p-4 sm:p-6">
+            <span id="modal-category" class="eyebrow text-azure-light"></span>
+            <h2 id="modal-title" class="mt-2 text-headline lg:text-title font-bold text-ivory text-balance leading-snug"></h2>
+            <div id="modal-meta" class="mt-2 meta-text text-ivory/50 tabular-nums"></div>
+
+            <div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <span class="eyebrow text-ivory/40">Share</span>
+              {shareChannels.map((c) => (
+                <a href="#" aria-label={`Share on ${c.name}`} title={c.name}
+                  class="grid place-items-center size-9 border border-white/15 text-ivory/70 hover:border-azure-light hover:text-azure-light transition-colors rounded-sm">
+                  <i class:list={['ti', c.icon, 'text-[17px]']} aria-hidden="true"></i>
+                </a>
+              ))}
+              <a href="/videos" class="ml-auto inline-flex items-center gap-1.5 meta-text text-azure-light hover:text-white transition-colors">
+                All videos <i class="ti ti-arrow-right text-base" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar: recommended -->
+        <aside class="lg:col-span-5 xl:col-span-4 flex flex-col border-t lg:border-t-0 lg:border-l border-white/10 bg-white/[0.02] min-w-0">
+          <!-- The house ad sits above the browser and outside its scroller, so
+               it holds its place while the lists move. Below lg that column is
+               under the player rather than beside it, so the ad drops to the
+               foot of it — a rectangle between the video and the list would
+               push every clip off the screen. -->
+          <AdSlot slot="video-modal" format="rectangle" class="order-last lg:order-none border-t lg:border-t-0 lg:border-b border-white/10" />
+
+          <!-- Tabs. Same strip pattern as the site's sub-nav: underline for
+               the active one, no filled pill inside a dark surface. -->
+          <div role="tablist" aria-label="Browse videos" class="flex items-stretch gap-1 px-3 border-b border-white/10 overflow-x-auto scrollbar-none">
+            {[
+              ['next', 'Up Next'],
+              ...(today.length ? [['today', 'Today']] : []),
+              ...(programs.length ? [['shows', 'Library']] : []),
+            ].map(([id, label], i) => (
+              <button
+                type="button"
+                role="tab"
+                data-vtab={id}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                class="inline-flex shrink-0 items-center h-12 lg:h-10 px-3 lg:px-2.5 border-b-2 border-transparent caption-text font-semibold whitespace-nowrap text-ivory/50 hover:text-ivory aria-selected:border-azure-light aria-selected:text-ivory transition-colors"
+              >{label}</button>
+            ))}
+          </div>
+
+          <div data-browser class="p-3 sm:p-4 lg:max-h-[52vh] overflow-y-auto scrollbar-none">
+            <ol id="modal-reco" data-vpanel="next" class="space-y-1"></ol>
+
+            {today.length > 0 && (
+              <ol data-vpanel="today" class="space-y-1" hidden>
+                {today.map((v) => (
+                  <li>
+                    <button type="button" data-video-open={v.id} data-item={v.id}
+                      class="vitem group w-full text-left flex gap-3 p-2 rounded-md hover:bg-white/5 transition-colors">
+                      <span class="relative w-28 shrink-0 aspect-video rounded overflow-hidden bg-black border border-white/10">
+                        <img src={v.poster} alt="" loading="lazy" class="w-full h-full object-cover" />
+                        <span class="vnow absolute inset-0 hidden place-items-center bg-black/55">
+                          <i class="ti ti-player-play text-lg text-white" aria-hidden="true"></i>
+                        </span>
+                      </span>
+                      <span class="min-w-0 flex-1">
+                        {v.time && <span class="block caption-text tabular-nums font-bold text-accent-red">{v.time}</span>}
+                        <span class="mt-0.5 block article-title text-sm text-ivory group-hover:text-azure-light transition-colors line-clamp-2 leading-snug">
+                          {v.title}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            {programs.length > 0 && (
+              <div data-vpanel="shows" hidden>
+                <!-- Level 1 · what there is to browse, in two shelves.
+                     A channel is drawn as a channel — round picture, handle,
+                     subscriber-scale counts — because presenting it as another
+                     poster tile would tell the reader it is another show. -->
+                <div data-show-grid>
+                  {channels.length > 0 && (
+                    <>
+                      <p class="eyebrow text-accent-red flex items-center gap-1.5 pb-2">
+                        <i class="ti ti-brand-youtube text-base" aria-hidden="true"></i>
+                        Channels
+                      </p>
+                      <ul class="grid grid-cols-2 gap-x-2.5 gap-y-1">
+                        {channels.map((p) => (
+                          <li>
+                            <button type="button" data-show={p.slug}
+                              class="group w-full text-left flex items-center gap-2.5 p-2 rounded-md hover:bg-white/5 transition-colors">
+                              <img
+                                src={p.avatar ?? p.poster}
+                                alt=""
+                                width="36"
+                                height="36"
+                                loading="lazy"
+                                class="size-9 shrink-0 rounded-full object-cover bg-black border border-white/10"
+                              />
+                              <span class="min-w-0 flex-1">
+                                <span class="block article-title text-[0.8125rem] text-ivory group-hover:text-azure-light transition-colors line-clamp-1">
+                                  {p.title}
+                                </span>
+                                <span class="block caption-text text-ivory/35 tabular-nums line-clamp-1">
+                                  {p.shows?.length
+                                    ? `${p.shows.length} shows`
+                                    : `${p.episodeCount ?? p.episodes.length} uploads`}
+                                </span>
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+
+                  {shows.length > 0 && (
+                    <>
+                      <p class:list={['eyebrow text-ivory/40 pb-2', channels.length > 0 && 'mt-4 pt-3 border-t border-white/10']}>
+                        Programmes
+                      </p>
+                      <ul class="grid grid-cols-2 gap-2.5">
+                        {shows.map((p) => (
+                          <li>
+                            <button type="button" data-show={p.slug} class="group w-full text-left">
+                              <span class="block relative aspect-video rounded overflow-hidden bg-black border border-white/10">
+                                <img src={p.poster} alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <span class="absolute inset-0 grid place-items-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <i class="ti ti-player-play text-xl text-white" aria-hidden="true"></i>
+                                </span>
+                              </span>
+                              <span class="mt-1.5 block article-title text-[0.8125rem] text-ivory group-hover:text-azure-light transition-colors line-clamp-1">
+                                {p.title}
+                              </span>
+                              <span class="block caption-text text-ivory/35 tabular-nums">
+                                {p.episodeCount ?? p.episodes.length} episodes{p.freshness && ` · ${p.freshness}`}
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+
+                <!-- Level 2 · one show's episodes, playable in place -->
+                {programs.map((p) => (
+                  <div data-show-list={p.slug} hidden>
+                    <div class="flex items-center gap-2 pb-2.5 mb-2 border-b border-white/10">
+                      <button type="button" data-show-back
+                        class="inline-flex items-center gap-1 caption-text font-semibold text-ivory/60 hover:text-white transition-colors">
+                        <i class="ti ti-arrow-left text-sm" aria-hidden="true"></i> Back
+                      </button>
+                      {p.avatar && (
+                        <img src={p.avatar} alt="" width="24" height="24" loading="lazy"
+                          class="size-6 shrink-0 rounded-full object-cover bg-black border border-white/10" />
+                      )}
+                      <span class="min-w-0 truncate nav-text text-ivory">{p.title}</span>
+                      {/* A channel is credited by its mark, not by the word
+                          "Page" — the icon is the link a reader is looking for
+                          when they want the channel itself. */}
+                      {p.kind === 'channel' ? (
+                        <a href={p.href} rel="noopener"
+                          class="ml-auto shrink-0 inline-flex items-center gap-1 text-ivory/50 hover:text-accent-red transition-colors"
+                          aria-label={`${p.title} on YouTube${p.handle ? ` — ${p.handle}` : ''}`}>
+                          <i class="ti ti-brand-youtube text-xl" aria-hidden="true"></i>
+                        </a>
+                      ) : (
+                        <a href={p.href} class="ml-auto shrink-0 caption-text font-semibold text-azure-light hover:text-white transition-colors">Page</a>
+                      )}
+                    </div>
+
+                    {/* The channel's own shows, above its loose uploads: a
+                        playlist embed plays the run in order, so a show here is
+                        as playable as a single clip. */}
+                    {p.shows && p.shows.length > 0 && (
+                      <div class="mb-3">
+                        <p class="eyebrow text-ivory/40 pb-1.5">Shows on this channel</p>
+                        <ul class="grid grid-cols-2 gap-2">
+                          {p.shows.map((s) => (
+                            <li>
+                              <button type="button" data-video-open={s.id} data-item={s.id} class="vitem group w-full text-left">
+                                <span class="block relative aspect-video rounded overflow-hidden bg-black border border-white/10">
+                                  <img src={s.poster} alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                  <span class="absolute inset-0 grid place-items-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="ti ti-playlist text-xl text-white" aria-hidden="true"></i>
+                                  </span>
+                                  <span class="vnow absolute inset-0 hidden place-items-center bg-black/55">
+                                    <i class="ti ti-player-play text-lg text-white" aria-hidden="true"></i>
+                                  </span>
+                                  {s.meta && (
+                                    <span class="absolute bottom-1 right-1 bg-black/80 text-white text-micro px-1 py-0.5 rounded-xs tabular-nums">{s.meta}</span>
+                                  )}
+                                </span>
+                                <span class="mt-1 block article-title text-[0.8125rem] text-ivory group-hover:text-azure-light transition-colors line-clamp-1">
+                                  {s.title}
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {p.shows && p.shows.length > 0 && (
+                      <p class="eyebrow text-ivory/40 pb-1.5 pt-1 border-t border-white/10 mt-1">Latest uploads</p>
+                    )}
+
+                    <ol class="space-y-1">
+                      {p.episodes.map((ep, n) => (
+                        <li>
+                          <button type="button" data-video-open={ep.id} data-item={ep.id}
+                            class="vitem group w-full text-left flex gap-3 p-2 rounded-md hover:bg-white/5 transition-colors">
+                            <span class="w-6 shrink-0 pt-1 caption-text tabular-nums text-ivory/30">{n + 1}</span>
+                            <span class="relative w-24 shrink-0 aspect-video rounded overflow-hidden bg-black border border-white/10">
+                              <img src={ep.poster} alt="" loading="lazy" class="w-full h-full object-cover" />
+                              {ep.duration && (
+                                <span class="absolute bottom-1 right-1 bg-black/80 text-white text-micro px-1 rounded-xs tabular-nums">{ep.duration}</span>
+                              )}
+                              <span class="vnow absolute inset-0 hidden place-items-center bg-black/55">
+                                <i class="ti ti-player-play text-lg text-white" aria-hidden="true"></i>
+                              </span>
+                            </span>
+                            <span class="min-w-0 flex-1 article-title text-sm text-ivory group-hover:text-azure-light transition-colors line-clamp-2 leading-snug">
+                              {ep.title}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ))}
+              </div>
+            )}
+
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Video list payload (escape < so a title can't break out of the script) -->
+<script type="application/json" id="video-modal-data" set:html={JSON.stringify(payload).replace(/</g, '\\u003c')}></script>
+
+<script>
+  const modal = document.getElementById('video-modal');
+  const dataEl = document.getElementById('video-modal-data');
+  if (modal && dataEl) {
+    const videos = JSON.parse(dataEl.textContent || '[]');
+    const byId = new Map(videos.map((v) => [v.id, v]));
+
+    const ytStage = document.getElementById('yt-stage');
+    const mp4El = document.getElementById('modal-mp4');
+    const recoEl = document.getElementById('modal-reco');
+    const livePanel = document.getElementById('modal-live-panel');
+    const titleEl = document.getElementById('modal-title');
+    const metaEl = document.getElementById('modal-meta');
+    const catEl = document.getElementById('modal-category');
+
+    let currentId = null;
+    let lastFocused = null;
+
+    // The queue is whichever list the viewer is browsing, so Next follows what
+    // they can see rather than a hidden canonical order.
+    const panels = Array.from(modal.querySelectorAll('[data-vpanel]'));
+    const tabs = Array.from(modal.querySelectorAll('[data-vtab]'));
+    let queue = videos.map((v) => v.id);
+
+    function activePanel() {
+      return panels.find((p) => !p.hidden) || panels[0];
+    }
+
+    function refreshQueue() {
+      const panel = activePanel();
+      if (!panel) return;
+      // querySelectorAll still returns rows inside a hidden show list, so the
+      // queue has to filter by what is actually on screen — otherwise Next
+      // would step into episodes the viewer cannot see.
+      const ids = Array.from(panel.querySelectorAll('[data-video-open]'))
+        .filter((n) => !n.closest('[hidden]'))
+        .map((n) => n.getAttribute('data-video-open'))
+        .filter(Boolean);
+      // A view with nothing playable (the shows grid) keeps the queue it had.
+      if (ids.length) queue = ids;
+    }
+
+    function markNowPlaying() {
+      modal.querySelectorAll('[data-item]').forEach((n) => {
+        const on = n.getAttribute('data-item') === currentId;
+        n.classList.toggle('is-playing', on);
+        const badge = n.querySelector('.vnow');
+        if (badge) badge.classList.toggle('hidden', !on), badge.classList.toggle('grid', on);
+      });
+      const pos = document.getElementById('modal-position');
+      const i = queue.indexOf(currentId);
+      if (pos) pos.textContent = i >= 0 ? `${i + 1} of ${queue.length}` : '';
+      modal.querySelectorAll('[data-step]').forEach((b) => {
+        const step = Number(b.getAttribute('data-step'));
+        b.disabled = i < 0 || (i + step) < 0 || (i + step) >= queue.length;
+      });
+    }
+
+    function step(by) {
+      const i = queue.indexOf(currentId);
+      const next = i + by;
+      if (i < 0 || next < 0 || next >= queue.length) return;
+      const v = byId.get(queue[next]);
+      if (v) playVideo(v);
+    }
+
+    function selectTab(id) {
+      tabs.forEach((t) => t.setAttribute('aria-selected', String(t.getAttribute('data-vtab') === id)));
+      panels.forEach((p) => { p.hidden = p.getAttribute('data-vpanel') !== id; });
+      // Coming back to Shows should start at the grid, not inside whichever
+      // show was open three clips ago.
+      if (id !== 'shows') resetShows();
+      refreshQueue();
+      markNowPlaying();
+    }
+
+    function resetShows() {
+      const grid = modal.querySelector('[data-show-grid]');
+      if (grid) grid.hidden = false;
+      modal.querySelectorAll('[data-show-list]').forEach((l) => { l.hidden = true; });
+    }
+
+    tabs.forEach((t) => {
+      t.addEventListener('click', () => selectTab(t.getAttribute('data-vtab')));
+    });
+
+    modal.querySelectorAll('[data-step]').forEach((b) => {
+      b.addEventListener('click', () => step(Number(b.getAttribute('data-step'))));
+    });
+
+    // ── Shows: grid → one show's episodes → play, without leaving the modal.
+    const showGrid = modal.querySelector('[data-show-grid]');
+    const showLists = Array.from(modal.querySelectorAll('[data-show-list]'));
+
+    function openShow(slug) {
+      if (showGrid) showGrid.hidden = Boolean(slug);
+      showLists.forEach((l) => { l.hidden = l.getAttribute('data-show-list') !== slug; });
+      refreshQueue();
+      markNowPlaying();
+      const scroller = modal.querySelector('[data-browser]');
+      if (scroller) scroller.scrollTop = 0;
+    }
+
+    modal.querySelectorAll('[data-show]').forEach((b) => {
+      b.addEventListener('click', () => openShow(b.getAttribute('data-show')));
+    });
+    modal.querySelectorAll('[data-show-back]').forEach((b) => {
+      b.addEventListener('click', () => openShow(null));
+    });
+
+    const esc = (s) =>
+      String(s || '').replace(/[&<>"']/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // Inject a fresh autoplaying YouTube iframe. Recreating the element (rather
+    // than just swapping src) reliably restarts playback across browsers.
+    function playYouTube(v) {
+      if (mp4El) { mp4El.pause(); mp4El.classList.add('hidden'); mp4El.removeAttribute('src'); }
+      if (!ytStage) return;
+      ytStage.style.backgroundImage = `url("${esc(v.poster || '')}")`;
+      const iframe = document.createElement('iframe');
+      // Live feeds ship a whole embed URL (live_stream?channel=…); on-demand
+      // clips are built from their video id.
+      iframe.src = v.embedUrl
+        ? v.embedUrl + (v.embedUrl.indexOf('?') === -1 ? '?' : '&') + 'autoplay=1'
+        : `https://www.youtube.com/embed/${encodeURIComponent(v.youtubeId)}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+      iframe.title = v.title || 'Video player';
+      iframe.className = 'absolute inset-0 w-full h-full border-0';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      ytStage.innerHTML = '';
+      ytStage.appendChild(iframe);
+    }
+
+    // Native <video> fallback for ModalVideos without a youtubeId.
+    function playMp4(v) {
+      if (ytStage) ytStage.innerHTML = '';
+      if (!mp4El) return;
+      mp4El.classList.remove('hidden');
+      mp4El.src = v.src || '';
+      const p = mp4El.play();
+      if (p && p.catch) p.catch(() => {});
+    }
+
+    function renderReco(activeId) {
+      if (!recoEl) return;
+      recoEl.innerHTML = videos
+        .map(
+          (v) => `
+          <li>
+            <button type="button" data-video-open="${esc(v.id)}" data-item="${esc(v.id)}"
+              class="vitem reco group w-full text-left flex gap-3 p-2 rounded-md hover:bg-white/5 transition-colors">
+              <span class="relative w-28 shrink-0 aspect-video rounded overflow-hidden bg-black border border-white/10">
+                <img src="${esc(v.poster)}" alt="" loading="lazy" class="w-full h-full object-cover" />
+                <span class="vnow absolute inset-0 hidden place-items-center bg-black/55">
+                  <i class="ti ti-player-play text-lg text-white" aria-hidden="true"></i>
+                </span>
+                ${v.isLive
+                  ? `<span class="absolute bottom-1 right-1 inline-flex items-center gap-1 bg-accent-red text-white text-micro font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-xs"><span class="size-1.5 rounded-full bg-white heartbeat"></span>Live</span>`
+                  : v.duration ? `<span class="absolute bottom-1 right-1 bg-black/80 text-white text-micro px-1 py-0.5 rounded-xs tabular-nums">${esc(v.duration)}</span>` : ''}
+              </span>
+              <span class="min-w-0 flex-1">
+                ${v.category ? `<span class="eyebrow text-azure-light text-micro">${esc(v.category)}</span>` : ''}
+                <span class="mt-0.5 block article-title text-sm text-ivory group-hover:text-azure-light transition-colors line-clamp-2 leading-snug">${esc(v.title)}</span>
+                ${v.meta ? `<span class="mt-1 block caption-text text-ivory/45 tabular-nums">${esc(v.meta)}</span>` : ''}
+              </span>
+            </button>
+          </li>`
+        )
+        .join('');
+    }
+
+    function playVideo(v) {
+      if (!v) return;
+      currentId = v.id;
+      if (v.youtubeId || v.embedUrl) playYouTube(v);
+      else playMp4(v);
+
+      if (catEl) catEl.textContent = v.category || '';
+      if (titleEl) titleEl.textContent = v.title || '';
+      if (metaEl) metaEl.textContent = v.meta || '';
+      renderReco(v.id);
+      refreshQueue();
+      markNowPlaying();
+
+      // Keep the playing row in view when stepping with the keyboard.
+      const row = modal.querySelector(`[data-item="${v.id}"]`);
+      if (row && row.scrollIntoView) row.scrollIntoView({ block: 'nearest' });
+
+      // The day's track and the channel identity belong to a live feed only.
+      if (livePanel) livePanel.classList.toggle('hidden', !v.isLive);
+      const liveHead = document.getElementById('modal-live-head');
+      if (liveHead) {
+        liveHead.classList.toggle('hidden', !v.isLive);
+        liveHead.classList.toggle('flex', Boolean(v.isLive));
+      }
+
+      // Credit the source beside the mark instead: the show for a programme
+      // episode, the category for anything else. Never alongside the live
+      // badge — that already names the channel.
+      setSourceHead(v);
+    }
+
+    // The caret reads as a path continuing from the mark — MediaOne › Mid East
+    // Hour — so the source needs no label telling you which kind it is. A
+    // programme links to its show; a category is just the name. The
+    // under-player category line is cleared either way: the header is the one
+    // place the source is stated.
+    function setSourceHead(v) {
+      const head = document.getElementById('modal-source-head');
+      const name = document.getElementById('modal-source-name');
+      if (!head || !name) return;
+
+      const isProgram = Boolean(v.programTitle);
+      const label = isProgram ? v.programTitle : v.category;
+      const show = Boolean(label) && !v.isLive;
+
+      head.classList.toggle('hidden', !show);
+      head.classList.toggle('flex', show);
+      if (!show) {
+        head.removeAttribute('href');
+        return;
+      }
+
+      name.textContent = label;
+
+      // An <a> with no href is inert and unfocusable, which is what a
+      // category label should be.
+      if (isProgram && v.programHref) head.setAttribute('href', v.programHref);
+      else head.removeAttribute('href');
+
+      if (catEl) catEl.textContent = '';
+    }
+
+    function showModal() {
+      lastFocused = document.activeElement;
+      modal.setAttribute('data-open', '');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      const scroller = modal.querySelector('.overflow-y-auto');
+      if (scroller) scroller.scrollTop = 0;
+      const closeBtn = modal.querySelector('[data-close]');
+      if (closeBtn && closeBtn.focus) closeBtn.focus();
+    }
+
+    function openModal(id) {
+      const v = byId.get(id);
+      if (!v) return;
+      showModal();
+      playVideo(v);
+    }
+
+    // Open straight at one shelf of the Library — a channel or a programme —
+    // with its list already drilled into. The first thing on the shelf starts
+    // playing, because a player that opens holding nothing is a dead screen;
+    // the list beside it is the point, and it is already open.
+    function openShelf(slug) {
+      const list = modal.querySelector(`[data-show-list="${CSS.escape(slug)}"]`);
+      if (!list) return;
+      showModal();
+      selectTab('shows');
+      openShow(slug);
+      const first = list.querySelector('[data-video-open]');
+      const v = first && byId.get(first.getAttribute('data-video-open'));
+      if (v) playVideo(v);
+    }
+
+    function closeModal() {
+      modal.removeAttribute('data-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      // Tear down whichever player is active so audio stops.
+      if (ytStage) ytStage.innerHTML = '';
+      if (mp4El) { mp4El.pause(); mp4El.classList.add('hidden'); mp4El.removeAttribute('src'); }
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    // Delegated triggers (page cards + reco items). <a> triggers navigate w/o JS.
+    document.addEventListener('click', (e) => {
+      // Checked first: a shelf trigger is the more specific intent, and an
+      // element carrying both should open the shelf rather than one clip.
+      const shelf = e.target.closest('[data-video-shows]');
+      if (shelf) {
+        e.preventDefault();
+        openShelf(shelf.getAttribute('data-video-shows'));
+        return;
+      }
+      const trigger = e.target.closest('[data-video-open]');
+      if (trigger) {
+        // Only claim the click when this page's payload actually holds the
+        // clip. A trigger for something the page never shipped — the header's
+        // live control on a page with no live entry — keeps its href and
+        // navigates, which is the whole point of the fallback.
+        const id = trigger.getAttribute('data-video-open');
+        if (!byId.has(id)) return;
+        e.preventDefault();
+        openModal(id);
+        return;
+      }
+      if (e.target.closest('[data-close]')) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.hasAttribute('data-open')) return;
+      if (e.key === 'Escape') { closeModal(); return; }
+      // Not while the viewer is typing. `closest` only exists on elements —
+      // a keydown with no focused element targets the document, which has none.
+      const t = e.target;
+      if (t && typeof t.closest === 'function' && t.closest('input, textarea')) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+    });
+  }
+</script>
+
+<style is:global>
+  /* The playing row keeps the azure the rest of the theater uses for state. */
+  #video-modal .vitem.is-playing {
+    background-color: color-mix(in oklch, var(--color-text-inverse) 6%, transparent);
+    box-shadow: inset 2px 0 0 var(--color-azure-light);
+  }
+  #video-modal .vitem.is-playing .article-title { color: var(--color-azure-light); }
+</style>

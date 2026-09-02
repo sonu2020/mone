@@ -1,0 +1,105 @@
+---
+// BLOCK · ArticleBody — renders the ordered block run. Every layout shares this
+// renderer, so a story reads the same whichever page shape wraps it; only the
+// column it sits in changes.
+//
+// `dropCap` sets the first paragraph's initial as a display letter (magazine
+// opener). `adDensity="light"` drops the inline ad blocks — the focus layout
+// keeps paid space out of the measure and defers it to the end of the story.
+import AdSlot from '../AdSlot.astro';
+import Media from '../ui/Media.astro';
+import ReadAlsoCard from './ReadAlsoCard.astro';
+import VideoBlock from './VideoBlock.astro';
+import type { ArticleBlock } from '../../lib/article-data';
+
+export interface Props {
+  blocks: ArticleBlock[];
+  dropCap?: boolean;
+  adDensity?: 'normal' | 'light';
+  class?: string;
+}
+const { blocks, dropCap = false, adDensity = 'normal', class: className = '' } = Astro.props;
+
+const rendered = adDensity === 'light' ? blocks.filter((b) => b.type !== 'ad') : blocks;
+const firstParagraph = rendered.find((b) => b.type === 'p');
+---
+<div class:list={['mc article-body', className]}>
+  {rendered.map((block) => {
+    if (block.type === 'p') {
+      const isFirst = dropCap && block === firstParagraph;
+      return (
+        <p
+          class:list={[
+            'text-body text-text-primary mb-5',
+            isFirst &&
+              'first-letter:float-left first-letter:mr-2.5 first-letter:mt-1 first-letter:text-[3.25rem] first-letter:leading-[0.82] first-letter:font-bold first-letter:text-azure',
+          ]}
+        >{block.text}</p>
+      );
+    }
+
+    if (block.type === 'subhead') {
+      return <h2 class="section-header text-text-primary mt-9 mb-3">{block.text}</h2>;
+    }
+
+    if (block.type === 'quote') {
+      return (
+        <blockquote class="my-8 py-6 border-y border-ink/10 dark:border-ivory/15">
+          <p class="section-header text-text-primary text-balance">{block.text}</p>
+          {block.cite && (
+            <cite class="mt-3 block eyebrow text-azure dark:text-azure-light not-italic">{block.cite}</cite>
+          )}
+        </blockquote>
+      );
+    }
+
+    if (block.type === 'highlights') {
+      return (
+        <aside class="my-8 p-5 border border-rule dark:border-ivory/10 bg-bg-page/60 dark:bg-brand-elevated">
+          <p class="eyebrow text-azure dark:text-azure-light">{block.title ?? 'Story Highlights'}</p>
+          <ul class="mt-3 space-y-2.5">
+            {block.items.map((item) => (
+              <li class="flex gap-3">
+                <span class="mt-2 size-1.5 shrink-0 bg-azure" aria-hidden="true"></span>
+                <span class="body-small text-text-secondary">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      );
+    }
+
+    if (block.type === 'readAlso') {
+      return <ReadAlsoCard title={block.title} href={block.href} image={block.image} />;
+    }
+
+    if (block.type === 'ad') {
+      return (
+        <AdSlot
+          slot={block.slot ?? 'story-inline'}
+          format={block.format ?? 'rectangle'}
+          tone="gray"
+          lazy={true}
+          class="my-8"
+        />
+      );
+    }
+
+    if (block.type === 'image') {
+      return (
+        <figure class="my-8">
+          <Media src={block.src} ratio={block.ratio ?? '16/9'} class="w-full" />
+          {block.caption && (
+            <figcaption class="pt-2 caption-text text-text-muted">{block.caption}</figcaption>
+          )}
+        </figure>
+      );
+    }
+
+    if (block.type === 'video') {
+      return <VideoBlock title={block.title} src={block.src} duration={block.duration} class="my-8" />;
+    }
+
+    return null;
+  })}
+</div>

@@ -1,0 +1,92 @@
+---
+// /magazine/<slug> — a single magazine article.
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/nav/HeaderBar.astro';
+import Footer from '../../components/Footer.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import StickyFooterAd from '../../components/ads/StickyFooterAd.astro';
+import { magazineArticles } from '../../lib/magazine';
+
+export function getStaticPaths() {
+  return magazineArticles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+---
+
+<Layout title={`${article.title} — Magazine | MediaOne`} description={article.description}>
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-meta text-ink-muted dark:text-ivory/45 mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure dark:hover:text-azure-light transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="/magazine" class="hover:text-azure dark:hover:text-azure-light transition-colors">Magazine</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-ink dark:text-ivory">{article.category}</span>
+      </nav>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
+        <!-- Main content -->
+        <div class="lg:col-span-8">
+          <span class="eyebrow text-azure dark:text-azure-light">{article.category}</span>
+          <h1 class="mt-3 text-hero font-bold text-text-primary text-balance">{article.titleML}</h1>
+          <p class="mt-2 text-title text-text-secondary">{article.title}</p>
+
+          <div class="mt-5 flex items-center gap-3 text-caption text-text-muted tabular-nums">
+            <span>{article.date}</span>
+          </div>
+
+          <figure class="mt-8">
+            <div class="aspect-[16/9] w-full bg-placeholder overflow-hidden">
+              <img
+                src={article.image}
+                alt={article.title}
+                class="w-full h-full object-cover"
+              />
+            </div>
+          </figure>
+
+          <article class="mt-8 space-y-5">
+            {article.body.map((paragraph) => (
+              <p class="text-body text-text-primary leading-relaxed text-pretty">{paragraph}</p>
+            ))}
+          </article>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="hidden lg:block lg:col-span-4 lg:border-l lg:border-rule lg:dark:border-ivory/10 lg:pl-8">
+          <div class="space-y-8">
+            <div>
+              <h2 class="eyebrow text-azure dark:text-azure-light mb-4">More from Magazine</h2>
+              <ul class="space-y-4">
+                {magazineArticles
+                  .filter((a) => a.slug !== article.slug)
+                  .slice(0, 5)
+                  .map((related) => (
+                    <li>
+                      <a href={`/magazine/${related.slug}`} class="group block">
+                        <p class="article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2 leading-snug">
+                          {related.titleML}
+                        </p>
+                        <p class="mt-1 caption-text text-text-muted tabular-nums">{related.date}</p>
+                      </a>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+  <StickyFooterAd />
+</Layout>

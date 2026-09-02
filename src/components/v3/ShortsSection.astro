@@ -1,0 +1,17 @@
+---
+// SECTION · ShortsSection — the 40-second version. A horizontal snap-scroll rail
+// of vertical (9/16) reels. Phone-native framing inside a desktop page: the
+// broadcaster's concession to how the audience actually consumes short video.
+import ShortsRail from '../news/ShortsRail.astro';
+import type { VideoItem } from '../../lib/video-data';
+
+export interface Props {
+  items: VideoItem[];
+  title?: string;
+  class?: string;
+}
+const { items, title = 'മീഡിയവൺ ഷോർട്സ്', class: className = '' } = Astro.props;
+---
+<section class:list={['mc', 'py-7 lg:py-10 border-t border-rule', className]}>
+  <ShortsRail items={items} title={title} />
+</section>

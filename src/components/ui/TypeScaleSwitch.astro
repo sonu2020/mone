@@ -1,0 +1,89 @@
+---
+// UI · TypeScaleSwitch — the live type-scale toggle for testing. Renders the
+// Current | Tailwind | Editorial segmented control and its one script. The
+// class-scoped `--text-*` overrides in src/styles/type-scales/*.css swap the
+// tokens for whatever element the switch targets:
+//
+//   scope (default "html") — CSS selector for the element the .type-scale-{id}
+//   class toggles on. The guided tour scopes it to its step container
+//   ([data-scale-root]) so the compare step stays immune; the homepage panel
+//   leaves it on the document.
+//
+// State rides on aria-pressed / aria-current, so the script flips attributes
+// only. The choice persists in localStorage. The floating test panel on the
+// homepage wraps this in tabs and owns the hide/restore control (ui/TestUiPanel).
+import { TYPE_SCALE_IDS, SCALE_LABELS } from '../../lib/type-scales';
+
+interface Props {
+  scope?: string;
+  class?: string;
+}
+const { scope = 'html', class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={['mc', 'inline-flex items-center gap-px', className]}
+  data-scale-switch
+  data-scale-scope={scope}
+  role="group"
+  aria-label="Type scale"
+>
+  {TYPE_SCALE_IDS.map((id) => (
+    <button
+      type="button"
+      data-scale={id}
+      aria-pressed={id === 'current' ? 'true' : 'false'}
+      class="scale-switch px-2 py-1 caption-text font-semibold text-ink-muted transition-colors hover:text-azure dark:text-ivory/60 dark:hover:text-azure-light"
+    >{SCALE_LABELS[id]}</button>
+  ))}
+</div>
+
+<script>
+  (function () {
+    if (window.__typeScaleInit) return;
+    window.__typeScaleInit = true;
+
+    var KEY = 'mone-type-scale';
+    var switchers = Array.prototype.slice.call(document.querySelectorAll('[data-scale-switch]'));
+    if (!switchers.length) return;
+
+    // Pages carry one switch; its scope decides what the class lands on.
+    var scopeSel = switchers[0].getAttribute('data-scale-scope') || 'html';
+    var root = scopeSel === 'html' ? document.documentElement : document.querySelector(scopeSel);
+
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-scale]'));
+    var columns = Array.prototype.slice.call(document.querySelectorAll('[data-scale-column]'));
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+
+    function apply(id) {
+      if (root) {
+        root.classList.remove('type-scale-tailwind', 'type-scale-editorial');
+        if (id !== 'current') root.classList.add('type-scale-' + id);
+      }
+      buttons.forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-scale') === id ? 'true' : 'false');
+      });
+      columns.forEach(function (c) {
+        c.setAttribute('aria-current', c.getAttribute('data-scale-column') === id ? 'true' : 'false');
+      });
+      try { localStorage.setItem(KEY, id); } catch (e) {}
+    }
+
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { apply(b.getAttribute('data-scale')); });
+    });
+    apply(buttons.some(function (b) { return b.getAttribute('data-scale') === saved; }) ? saved : 'current');
+  })();
+</script>
+
+<style>
+  .scale-switch {
+    border: 1px solid transparent;
+  }
+  [data-scale-switch] [aria-pressed='true'] {
+    border-color: var(--color-azure);
+    color: var(--color-azure);
+    background: color-mix(in oklab, var(--color-azure) 8%, transparent);
+  }
+</style>

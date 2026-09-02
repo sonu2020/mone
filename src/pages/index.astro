@@ -1,0 +1,277 @@
+---
+// ── / · MediaOne homepage ────────────────────────────────────────────────────
+// The Paper composition, built from the band set in src/components/home4/ and
+// rendered on a snapshot of the live mediaoneonline.com homepage (see
+// src/lib/home4-data.ts). Band order tracks the live site — Lead → Shelf →
+// Video → Kerala → Magazine → Entertainment → Sports → Gulf → National → World
+// — so it sits on the real editorial mix, not fixtures. The live site's Latest
+// News band is dropped here: the lead package's own rows and timestamped feed
+// already carry the same stories at the top of the page.
+//
+// This shipped as /home4 while it was in review; that path now redirects here
+// (see astro.config.mjs). The homepage it replaced is archived at /old-home,
+// and every earlier direction stays browsable at /home/<id>.
+import Layout from "../layouts/Layout.astro";
+// Three masthead variants share one prop shape, so this line is the whole swap:
+//   nav/HeaderBar.astro   one 64px rail — logo, desks, Watch Live, search
+//   nav/HeaderFlat.astro  tall masthead over its own section bar
+//   Header.astro          the original, with mega panels
+import Header from "../components/nav/HeaderBar.astro";
+import Footer from "../components/Footer.astro";
+import AdSlot from "../components/AdSlot.astro";
+import VideoModal from "../components/VideoModal.astro";
+import ScheduleList from "../components/live/ScheduleList.astro";
+
+import LeadPackage from "../components/home4/LeadPackage.astro";
+import VideoBand from "../components/home4/VideoBand.astro";
+import ShelfBand from "../components/home4/ShelfBand.astro";
+import OpinionBand from "../components/home4/OpinionBand.astro";
+import FeatureBand from "../components/home4/FeatureBand.astro";
+import SplitBand from "../components/home4/SplitBand.astro";
+import TestUiPanel from "../components/ui/TestUiPanel.astro";
+
+import {
+  leadStories,
+  latest,
+  shelf,
+  magazine,
+  feed,
+  section,
+} from "../lib/home4-data";
+import { allVideos } from "../lib/videos";
+import { todaysVideos } from "../lib/videos";
+import {
+  toModalVideos,
+  modalShows,
+  featuredFromPrograms,
+  type ModalVideo,
+} from "../lib/video-modal";
+import { trendingTopics } from "../lib/mega-nav";
+import { LIVE_CHANNEL } from "../lib/live-tv";
+
+// Where the on-air strip lives. true → the masthead (replacing its plain Live
+// link at lg+); false → the head of the lead rail. Flip this one line to move
+// it; both placements are wired, only one renders.
+// The floating test panel is a development instrument, not part of the page.
+// It rides the same switch as every other inspection visual — the McInspector
+// toolbar, the .mc outlines, the lead-package inspection — so one env var
+// decides whether this build shows its workings: PUBLIC_MC_OUTLINE=true.
+// Unset (the default, and every deploy), the panel is not rendered at all, and
+// its scripts never reach the bundle.
+const SHOW_TEST_UI = import.meta.env.PUBLIC_MC_OUTLINE === "true";
+
+const LIVE_IN_HEADER = true;
+
+// Same call for the trending topics: the header's white band under the nav, or
+// the wider TopicStrip across columns 2+3 of the lead package. Never both — it
+// is the same four topics inside one screen of each other.
+const TOPICS_IN_HEADER = true;
+
+const [hero, ...heroRest] = leadStories;
+
+const kerala = section("kerala");
+const entertainment = section("entertainment");
+const sports = section("sports");
+const gulf = section("gulf");
+const national = section("national");
+const world = section("world");
+
+// Featured videos from across the shows for the band's right column. The band
+// used to carry three whole runs behind tabs; it now carries the newest of each
+// as one list, so the column answers "what should I watch" without being
+// operated first.
+
+// The 24×7 webcast, pinned to the front of the modal's list so OnAirNow's LIVE
+// button has something to open and the "up next" rail always offers a way back
+// to the live feed.
+// The modal doubles as a video browser, so it needs more than a queue.
+const modalToday = todaysVideos().map((v) => ({
+  id: v.slug,
+  title: v.title,
+  time: v.publishTime,
+  poster: v.thumbnailUrl || "",
+}));
+const shows = await modalShows();
+const bandPicks = await featuredFromPrograms(2, 6);
+
+const liveModalVideo: ModalVideo = {
+  id: LIVE_CHANNEL.id,
+  title: `${LIVE_CHANNEL.titleML} | ${LIVE_CHANNEL.title}`,
+  category: "Live TV",
+  meta: "Streaming now · 24×7",
+  poster: LIVE_CHANNEL.poster,
+  src: "",
+  embedUrl: LIVE_CHANNEL.embedUrl,
+  isLive: true,
+};
+
+// Eight for the video band: a 2x2 of stills leads it, four run compact beneath.
+const bandVideos = allVideos.slice(0, 8).map((v) => ({
+  title: v.title,
+  href: "/videos",
+  category: v.category,
+  duration: v.duration,
+  views: v.views,
+  date: v.publishDate,
+  seed: v.thumbnail,
+  imageUrl: v.thumbnailUrl,
+  modalId: v.slug,
+}));
+
+// Real destinations rather than dead tabs — "Latest" is the view being shown.
+const videoTabs = [
+  { label: "Latest", href: "/videos", current: true },
+  { label: "Live", href: "/live" },
+  { label: "Explainers", href: "/shelf" },
+  { label: "Programmes", href: "/programs" },
+];
+---
+
+<Layout
+  title="MediaOne | വാർത്തകൾ, ലൈവ് ടിവി, വിശകലനം"
+  description="വാർത്തകൾ, ലൈവ് ടിവി, വിശകലനം — കേരളം, ഇന്ത്യ, ഗൾഫ്, ലോകം. MediaOne: Malayalam news, live TV and analysis."
+  adTone="gray"
+>
+  <Header
+    isBreaking={false}
+    showTopics={TOPICS_IN_HEADER}
+    liveUnit={LIVE_IN_HEADER}
+  />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto bg-bg-card">
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 1 · LEAD -->
+        <LeadPackage
+          lead={hero}
+          rows={[...heroRest, ...latest]}
+          feed={feed}
+          topics={TOPICS_IN_HEADER ? [] : trendingTopics}
+          onAir={!LIVE_IN_HEADER}
+          flushTop
+        />
+      </div>
+
+      <AdSlot slot="home4-1" format="leaderboard" lazy />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 2 · SHELF -->
+        <ShelfBand
+          label="Shelf"
+          href="/shelf"
+          viewAllHref="/shelf"
+          lead={shelf[0]}
+          cards={shelf.slice(1, 4)}
+          rail={shelf.slice(4, 7)}
+        />
+      </div>
+    </div>
+
+    <!-- 3 · VIDEO — the shelf and the featured shows as one band -->
+    <VideoBand
+      title="വീഡിയോ"
+      titleEn="Videos"
+      viewAllHref="/videos"
+      videos={bandVideos}
+      tabs={videoTabs}
+      picks={bandPicks}
+    />
+
+    <div class="w-full max-w-site mx-auto bg-bg-card">
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 4 · KERALA -->
+        <SplitBand
+          label={kerala.label}
+          href={kerala.href}
+          viewAllHref={kerala.href}
+          lead={kerala.stories[0]}
+          cards={kerala.stories.slice(1, 5)}
+          rail={kerala.stories.slice(5, 7)}
+          authors={kerala.stories.slice(7, 8)}
+        />
+
+        <!-- 5 · MAGAZINE -->
+        <OpinionBand
+          label="Magazine"
+          href="/magazine"
+          viewAllHref="/magazine"
+          stories={magazine}
+        />
+
+        <!-- 6 · ENTERTAINMENT -->
+        <ShelfBand
+          label={entertainment.label}
+          href={entertainment.href}
+          viewAllHref={entertainment.href}
+          lead={entertainment.stories[0]}
+          cards={entertainment.stories.slice(1, 4)}
+          rail={entertainment.stories.slice(4, 7)}
+        />
+
+        <!-- 7 · SPORTS -->
+        <FeatureBand
+          label={sports.label}
+          href={sports.href}
+          viewAllHref={sports.href}
+          feature={sports.stories[0]}
+          stack={sports.stories.slice(1, 3)}
+          rail={sports.stories.slice(3, 5)}
+        />
+      </div>
+
+      <AdSlot slot="home4-2" format="leaderboard" lazy />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 8 · GULF -->
+        <ShelfBand
+          label={gulf.label}
+          href={gulf.href}
+          viewAllHref={gulf.href}
+          lead={gulf.stories[0]}
+          cards={gulf.stories.slice(1, 4)}
+          rail={gulf.stories.slice(4, 7)}
+        />
+
+        <!-- 9 · NATIONAL -->
+        <FeatureBand
+          label={national.label}
+          href={national.href}
+          viewAllHref={national.href}
+          feature={national.stories[0]}
+          stack={national.stories.slice(1, 3)}
+          rail={national.stories.slice(3, 8)}
+        />
+
+        <!-- 10 · WORLD -->
+        <SplitBand
+          label={world.label}
+          href={world.href}
+          viewAllHref={world.href}
+          lead={world.stories[0]}
+          cards={world.stories.slice(1, 5)}
+        />
+      </div>
+
+      <AdSlot slot="home4-3" format="leaderboard" lazy />
+    </div>
+  </main>
+
+  <Footer />
+
+  <VideoModal
+    videos={[liveModalVideo, ...toModalVideos(allVideos)]}
+    today={modalToday}
+    programs={shows}
+  >
+    <ScheduleList slot="live-panel" tone="dark" />
+  </VideoModal>
+
+  <!-- Test UI — floating bottom-left: tabs for the type scale and the spacing
+       scenarios; the ✕ hides it and every inspection visual. Only under
+       PUBLIC_MC_OUTLINE=true, alongside the rest of the inspection kit. -->
+  {
+    SHOW_TEST_UI && (
+      <TestUiPanel class="fixed bottom-4 left-4 z-50 border border-rule bg-bg-card dark:bg-brand-dark" />
+    )
+  }
+</Layout>

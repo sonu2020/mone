@@ -1,0 +1,20 @@
+---
+// TOKENS · CopyChip — one click-to-copy token reference. Clicking swaps the
+// label to "Copied ✓" for a moment (wired by the token browser's script).
+interface Props {
+  copy: string;           // clipboard payload
+  label?: string;         // shown text (defaults to the payload)
+  kind?: 'value' | 'class'; // class chips are azure-tinted
+  class?: string;
+}
+const { copy, label = copy, kind = 'value', class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['token-chip', kind === 'class' && 'class-chip', className]}
+  data-copy={copy}
+  title={`Copy ${copy}`}
+>
+  <span class="copy-label max-w-56 truncate">{label}</span>
+</button>

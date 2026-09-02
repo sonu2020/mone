@@ -1,0 +1,355 @@
+---
+// HEADER · the masthead + mega nav. Follows the Paper header (node G-0): a navy
+// #0B2E5D masthead with the logo left, date centred and LIVE right, a #177AA5
+// hairline, then the section bar on the same navy. The bar carries the IA in
+// docs/navigation-ia.md — every desk except Home opens a mega panel.
+// The previous header is kept intact as OldHeader.astro for the other pages.
+import Logo from "./Logo.astro";
+import Pulse from "./ui/Pulse.astro";
+import MegaPanel from "./nav/MegaPanel.astro";
+import SearchOverlay from "./nav/SearchOverlay.astro";
+import { navItems, trendingTopics } from "../lib/mega-nav";
+import { LIVE_CHANNEL } from "../lib/live-tv";
+
+export interface Props {
+  isBreaking?: boolean;
+  date?: string;
+  /** Pages that carry the topics themselves (see /home4's TopicStrip) turn the
+   *  masthead strip off so the list isn't printed twice. */
+  showTopics?: boolean;
+  /** Promote the masthead's Live link to the full on-air strip — what is
+   *  broadcasting now, plus the day on hover. Desktop only; the plain link
+   *  stays below lg, where there is no room and no hover to speak of. */
+  liveUnit?: boolean;
+}
+const {
+  isBreaking = false,
+  date,
+  showTopics = true,
+  liveUnit = false,
+} = Astro.props;
+
+const today =
+  date ??
+  new Date().toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+// Wide panels on the last desks would run off the right edge — anchor them there.
+const alignEndFrom = navItems.length - 3;
+---
+
+<header id="site-header" class="bg-nav-bg text-white">
+  <!-- ══ MASTHEAD ══ -->
+  <div class="border-b border-nav-rule/60">
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        class="grid grid-cols-[auto_1fr_auto] items-center gap-4 h-16 lg:h-[112px]"
+      >
+        <a href="/" class="shrink-0" aria-label="MediaOne — home">
+          <Logo class="h-8 lg:h-12 w-auto text-white" />
+        </a>
+
+        <p
+          class="hidden md:block text-center text-meta text-white/70 tabular-nums"
+        >
+          {today}
+        </p>
+
+        <div class="flex items-center gap-3 lg:gap-5 justify-self-end">
+          <!-- `data-video-open` hands the tap to the shared player, the same
+               control desktop's Watch Live opens; the href is the fallback. -->
+          <a
+            href={LIVE_CHANNEL.href}
+            data-video-open={LIVE_CHANNEL.id}
+            class:list={[
+              "inline-flex h-9 items-center gap-2 rounded-xs px-3 bg-accent-red text-white hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-[filter]",
+              liveUnit && "lg:hidden",
+            ]}
+            aria-label={`Watch ${LIVE_CHANNEL.title}`}
+          >
+            <Pulse tone="white" beat />
+            <span
+              class="eyebrow text-[0.8125rem] leading-none tracking-[0.06em]"
+              >Live</span
+            >
+          </a>
+
+          <!-- Search is a phone's primary way into a site this deep, so the
+               button is there at every width now, not from sm up. -->
+          <button
+            type="button"
+            data-search-open
+            class="inline-flex size-11 lg:size-9 items-center justify-center text-white/80 hover:text-white transition-colors"
+            aria-label="Search"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="site-search"
+          >
+            <i class="ti ti-search text-xl" aria-hidden="true"></i>
+          </button>
+
+          <button
+            type="button"
+            id="nav-drawer-open"
+            class="lg:hidden -mr-2 inline-flex size-11 items-center justify-center text-white"
+            aria-label="Open menu"
+            aria-controls="nav-drawer"
+            aria-expanded="false"
+          >
+            <i class="ti ti-menu-2 text-2xl" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION BAR ══ -->
+  <div
+    class="hidden lg:block border-b border-black/20 shadow-[0_1px_1.5px_rgba(0,0,0,0.10)]"
+  >
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+      <nav aria-label="Sections">
+        <ul class="flex items-stretch" data-mega-root>
+          {
+            navItems.map((item, i) => {
+              const panelId = `mega-${item.label.toLowerCase().replace(/[^a-z]+/g, "-")}`;
+              return (
+                <li class="relative group" data-mega-item>
+                  <a
+                    href={item.href ?? undefined}
+                    data-mega-trigger={item.columns ? panelId : undefined}
+                    aria-haspopup={item.columns ? "true" : undefined}
+                    aria-expanded={item.columns ? "false" : undefined}
+                    aria-controls={item.columns ? panelId : undefined}
+                    class="flex items-center gap-1 h-12 px-3 nav-text whitespace-nowrap text-white/90 hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light transition-colors"
+                  >
+                    {item.label}
+                    {item.columns && (
+                      <i
+                        class="ti ti-chevron-down text-xs opacity-60"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </a>
+                  {item.columns && (
+                    <MegaPanel
+                      item={item}
+                      id={panelId}
+                      align={i >= alignEndFrom ? "end" : "start"}
+                    />
+                  )}
+                </li>
+              );
+            })
+          }
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ══ TRENDING ══ -->
+  {
+    showTopics && !isBreaking && (
+      <div class="border-b border-white/10 bg-nav-bg">
+        <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="font-sans flex items-center gap-3 h-9 overflow-x-auto scrollbar-none">
+            <span class="eyebrow text-white/45 shrink-0">Topics</span>
+            <ul class="flex items-center gap-3 shrink-0">
+              {trendingTopics.map((t, i) => (
+                <li class="flex items-center gap-3">
+                  {i > 0 && (
+                    <span class="text-white/20" aria-hidden="true">
+                      |
+                    </span>
+                  )}
+                  <a
+                    href={t.href}
+                    class="meta-text text-sm text-white/75 hover:text-azure-light transition-colors whitespace-nowrap"
+                  >
+                    {t.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  <!-- ══ MOBILE DRAWER ══ -->
+  <div
+    id="nav-drawer"
+    class="lg:hidden fixed inset-0 z-50 hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Menu"
+  >
+    <div class="absolute inset-0 bg-black/50" data-drawer-close></div>
+    <div
+      class="absolute inset-y-0 right-0 w-[min(20rem,90vw)] bg-nav-bg overflow-y-auto"
+    >
+      <div
+        class="flex items-center justify-between h-16 px-4 border-b border-nav-rule/60"
+      >
+        <Logo class="h-7 w-auto text-white" />
+        <button
+          type="button"
+          class="size-9 inline-flex items-center justify-center text-white"
+          aria-label="Close menu"
+          data-drawer-close
+        >
+          <i class="ti ti-x text-2xl" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <ul class="divide-y divide-white/10">
+        {
+          navItems.map((item) => (
+            <li>
+              {item.columns ? (
+                <details class="group/acc">
+                  <summary class="flex items-center justify-between gap-2 px-4 py-3 nav-text text-white cursor-pointer list-none">
+                    {item.label}
+                    <i
+                      class="ti ti-chevron-down text-sm transition-transform group-open/acc:rotate-180"
+                      aria-hidden="true"
+                    />
+                  </summary>
+                  <ul class="pb-2">
+                    {item.columns
+                      .flatMap((c) => c.links)
+                      .map((link) => (
+                        <li>
+                          <a
+                            href={link.href}
+                            class="block pl-7 pr-4 py-2 body-small text-white/70 hover:text-white transition-colors"
+                          >
+                            {link.label}
+                          </a>
+                        </li>
+                      ))}
+                    {item.href && (
+                      <li>
+                        <a
+                          href={item.href}
+                          class="block pl-7 pr-4 py-2 eyebrow text-azure-light"
+                        >
+                          All {item.label} →
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                </details>
+              ) : (
+                <a href={item.href} class="block px-4 py-3 nav-text text-white">
+                  {item.label}
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="p-4 border-t border-white/10">
+        <p class="eyebrow text-white/45 mb-2">Topics</p>
+        <ul class="font-sans flex flex-wrap gap-x-3 gap-y-2">
+          {
+            trendingTopics.map((t) => (
+              <li>
+                <a
+                  href={t.href}
+                  class="meta-text text-white/70 hover:text-white transition-colors"
+                >
+                  {t.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ SEARCH — the sheet the masthead's search button opens ══ -->
+<SearchOverlay />
+
+<script is:inline>
+  (function () {
+    // ── Mega panels: hover opens, focus opens, Escape closes ────────────────
+    var items = Array.prototype.slice.call(
+      document.querySelectorAll("[data-mega-item]"),
+    );
+    var open = null;
+
+    function show(li) {
+      if (open && open !== li) hide(open);
+      var panel = li.querySelector("[data-panel]");
+      var trigger = li.querySelector("[data-mega-trigger]");
+      if (!panel) return;
+      panel.classList.remove("invisible", "opacity-0");
+      if (trigger) trigger.setAttribute("aria-expanded", "true");
+      open = li;
+    }
+
+    function hide(li) {
+      var panel = li.querySelector("[data-panel]");
+      var trigger = li.querySelector("[data-mega-trigger]");
+      if (panel) panel.classList.add("invisible", "opacity-0");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+      if (open === li) open = null;
+    }
+
+    items.forEach(function (li) {
+      if (!li.querySelector("[data-panel]")) return;
+      li.addEventListener("mouseenter", function () {
+        show(li);
+      });
+      li.addEventListener("mouseleave", function () {
+        hide(li);
+      });
+      li.addEventListener("focusin", function () {
+        show(li);
+      });
+      li.addEventListener("focusout", function (e) {
+        if (!li.contains(e.relatedTarget)) hide(li);
+      });
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape" || !open) return;
+      var trigger = open.querySelector("[data-mega-trigger]");
+      hide(open);
+      if (trigger) trigger.focus();
+    });
+
+    // ── Mobile drawer ───────────────────────────────────────────────────────
+    var drawer = document.getElementById("nav-drawer");
+    var opener = document.getElementById("nav-drawer-open");
+    if (!drawer || !opener) return;
+
+    function setDrawer(isOpen) {
+      drawer.classList.toggle("hidden", !isOpen);
+      opener.setAttribute("aria-expanded", String(isOpen));
+      document.documentElement.style.overflow = isOpen ? "hidden" : "";
+    }
+
+    opener.addEventListener("click", function () {
+      setDrawer(true);
+    });
+    drawer.addEventListener("click", function (e) {
+      if (e.target.closest("[data-drawer-close]")) setDrawer(false);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !drawer.classList.contains("hidden")) {
+        setDrawer(false);
+        opener.focus();
+      }
+    });
+  })();
+</script>

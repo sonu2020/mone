@@ -1,0 +1,175 @@
+---
+// BAND · VideoBand — video and the flagship programme as one unit.
+//
+//   VIDEOS  വീഡിയോ        Latest · Live · Explainers · Programs   All →
+//   ┌────┐ ┌────┐ ┌────┐ ┌────┐          four lead stills
+//   ▭ ─── ▭ ─── ▭ ───                    three more, thumb + line
+//   PROGRAMMES  [Special Edition] Nilapadu  Mid East Hour   All shows →
+//   ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐              the selected show's run
+//
+// One navy band instead of two stacked sections: the shelf used to sit above a
+// full ProgramBand, which repeated the heading, the rules and the padding for
+// what is the same invitation — watch something. Folding the shows in as a
+// footer strip keeps that invitation in one place.
+//
+// Three programmes share that strip rather than one getting the whole band.
+// All three runs ship in the markup and the tabs swap which is shown, so
+// browsing the shows costs nothing — and neither does playing anything here,
+// since every tile opens in the shared modal.
+import Media from '../ui/Media.astro';
+import ProgramFeed from '../videos/ProgramFeed.astro';
+import type { VideoItem } from '../../lib/video-data';
+import type { ProgramPick } from '../../lib/video-modal';
+
+// `modalId` marks a tile as a VideoModal trigger (data-video-open) — the href
+// stays as the no-JS fallback. `imageUrl` overrides the seeded dummy still.
+type ShelfVideo = VideoItem & { modalId?: string; imageUrl?: string };
+
+export interface Props {
+  title?: string;                                        // Malayalam
+  titleEn?: string;
+  viewAllHref?: string;
+  /** First four lead the band; the next three run as compact rows beneath. */
+  videos: ShelfVideo[];
+  tabs?: { label: string; href: string; current?: boolean }[];
+  /** Featured videos from across the shows, for the right column. */
+  picks: ProgramPick[];
+  programsLabel?: string;
+  programsHref?: string;
+  class?: string;
+}
+
+const {
+  title = 'വീഡിയോ',
+  titleEn = 'Videos',
+  viewAllHref = '/videos',
+  videos,
+  tabs = [],
+  picks,
+  programsLabel = 'From the Shows',
+  programsHref = '/programs',
+  class: className = '',
+} = Astro.props;
+
+// A 2×2 of stills over two compact rows. Four large stills read as the band's
+// lead; the four beneath are the tail, and at two across they stay legible in
+// a seven-column half rather than shrinking to thumbnails.
+const lead = videos.slice(0, 4);
+const more = videos.slice(4, 8);
+---
+
+<!-- Near-black rather than the masthead navy: this band is a player surface,
+     and giving it the brand blue made it read as a second masthead sitting in
+     the middle of the page. -->
+<section class:list={['mc', 'w-full bg-header-bg-deep text-white border-y border-white/10 my-6 lg:my-8', className]}>
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-7">
+
+    <!-- ══ Heading and tabs, one row ══════════════════════════════════════ -->
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2.5 pb-2.5 border-b border-white/15">
+      <a href={viewAllHref} class="group inline-flex items-baseline gap-2 shrink-0">
+        <span class="band-label text-[1.0625rem] text-white group-hover:text-azure-light transition-colors">{titleEn}</span>
+        <span class="font-malayalam text-[0.8125rem] text-white/45">{title}</span>
+      </a>
+
+      <nav class="ml-auto flex items-center gap-0.5" aria-label="Video categories">
+        {tabs.map((tab) => (
+          <a
+            href={tab.href}
+            aria-current={tab.current ? 'page' : undefined}
+            class="rounded-xs px-2.5 py-1 caption-text font-semibold whitespace-nowrap text-white/55 hover:bg-white/10 hover:text-white aria-[current=page]:bg-white aria-[current=page]:text-nav-bg transition-colors"
+          >{tab.label}</a>
+        ))}
+        <a
+          href={viewAllHref}
+          class="ml-1.5 inline-flex items-center gap-1 caption-text font-semibold whitespace-nowrap text-azure-light hover:text-white transition-colors"
+        >All <i class="ti ti-arrow-right text-xs" aria-hidden="true"></i></a>
+      </nav>
+    </div>
+
+    <!-- ══ SEVEN + FIVE ═══════════════════════════════════════════════════
+         Video and the shows were stacked, which put the shows below the fold
+         on a band that is already tall. Side by side they are one choice
+         rather than two sections: what is new on the left, what is running on
+         the right. ══ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-x-8">
+
+    <!-- ══ Seven · the videos ═════════════════════════════════════════════ -->
+    <div class="lg:col-span-7 min-w-0">
+
+    <!-- A 2×2 of lead stills -->
+    <ul class="mt-5 grid grid-cols-2 gap-x-5 gap-y-6">
+      {lead.map((video) => (
+        <li>
+          <a href={video.href} data-video-open={video.modalId} class="group block">
+            <div class="relative aspect-video overflow-hidden bg-black/40">
+              <Media seed={video.seed || video.href} src={video.imageUrl} ratio="16/9" w={480} class="w-full h-full object-cover" zoom />
+              <span class="absolute inset-0 grid place-items-center bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="grid size-9 place-items-center rounded-full bg-white/90 text-nav-bg">
+                  <i class="ti ti-player-play text-lg" aria-hidden="true"></i>
+                </span>
+              </span>
+              {video.duration && (
+                <span class="absolute left-1.5 bottom-1.5 bg-black/75 px-1.5 py-0.5 text-[10px] font-bold tabular-nums">
+                  {video.duration}
+                </span>
+              )}
+            </div>
+            <h3 class="mt-2.5 headline-deck text-white group-hover:text-azure-light line-clamp-2 transition-colors">
+              {video.title}
+            </h3>
+            <p class="mt-1 caption-text text-white/40 tabular-nums">
+              {[video.category, video.views && `${video.views} views`].filter(Boolean).join(' · ')}
+            </p>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- ══ Four more, thumb and line ══════════════════════════════════════ -->
+    {more.length > 0 && (
+      <ul class="mt-5 pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-3.5">
+        {more.map((video) => (
+          <li>
+            <a href={video.href} data-video-open={video.modalId} class="group flex items-start gap-3">
+              <span class="relative w-[6.5rem] shrink-0 aspect-video overflow-hidden bg-black/40">
+                <Media seed={video.seed || video.href} src={video.imageUrl} ratio="16/9" w={240} class="w-full h-full object-cover" zoom />
+                {video.duration && (
+                  <span class="absolute right-1 bottom-1 bg-black/80 px-1 text-[10px] tabular-nums">{video.duration}</span>
+                )}
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="block font-malayalam text-[0.8125rem] leading-4 [font-variation-settings:'wdth'_95,'wght'_580] text-white group-hover:text-azure-light line-clamp-2 transition-colors">
+                  {video.title}
+                </span>
+                {video.views && (
+                  <span class="mt-1 block caption-text text-white/35 tabular-nums">{video.views} views</span>
+                )}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    </div>{/* ── /seven ─────────────────────────────────────────────────── */}
+
+    <!-- ══ Five · from the shows ══════════════════════════════════════
+         Was three whole runs behind a tab strip. A band already carrying its
+         own category tabs did not need a second set inside it, and the reader
+         had to operate one before seeing anything. Now it is the newest of
+         each show as one list, each row naming where it came from. -->
+    <div class="lg:col-span-5 min-w-0 mt-5 lg:mt-5 lg:border-l border-white/15 lg:pl-8">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-3">
+        <span class="band-label text-white/45 shrink-0">{programsLabel}</span>
+        <a
+          href={programsHref}
+          class="ml-auto inline-flex items-center gap-1 caption-text font-semibold whitespace-nowrap text-azure-light hover:text-white transition-colors"
+        >All shows <i class="ti ti-arrow-right text-xs" aria-hidden="true"></i></a>
+      </div>
+
+      <ProgramFeed items={picks} class="border-white/10" />
+    </div>{/* ── /five ──────────────────────────────────────────────────── */}
+
+    </div>{/* ── /seven + five ─────────────────────────────────────────── */}
+  </div>
+</section>

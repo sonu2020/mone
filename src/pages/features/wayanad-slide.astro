@@ -1,0 +1,163 @@
+---
+// ── /features/wayanad-slide · the terrain, told in acts ────────────────────
+// A storytelling prototype. The reader meets a hero, gets their bearings on a
+// small flat locator map, and then four times the ground itself takes the
+// viewport and moves under them as they scroll.
+//
+// PROTOTYPE, NOT REPORTING. Every coordinate, elevation and place name is real
+// and the terrain is streamed from open DEM tiles — but every word of narration
+// is placeholder, written to describe the land and nothing else. See the header
+// of src/lib/wayanad.ts for the rule it follows and why it matters here.
+//
+// Stacking: TerrainStage is `position: fixed` at z-index 0, so every other
+// block on this page carries `relative z-10` and its own background. That is
+// what lets the terrain show through the act sections and be covered by
+// everything else, without a single scroll-driven show/hide of page content.
+import Layout from '../../layouts/Layout.astro';
+import ImmersiveBar from '../../components/travel/ImmersiveBar.astro';
+import Footer from '../../components/Footer.astro';
+import PinMap from '../../components/map/PinMap.astro';
+import TerrainStage from '../../components/terrain/TerrainStage.astro';
+import BandHeading from '../../components/home4/BandHeading.astro';
+
+import { wayanad, places, archive } from '../../lib/wayanad';
+import { TERRAIN_ATTRIBUTION } from '../../lib/terrain';
+
+// PinMap is Leaflet and speaks [lat, lng]; the terrain data is MapLibre's
+// [lng, lat]. One flip, here, rather than two coordinate orders in the data.
+const locatorPins = places.map((p) => ({
+  id: p.id,
+  label: p.name,
+  labelML: p.nameML,
+  coords: [p.coords[1], p.coords[0]] as [number, number],
+  icon: 'ti-mountain',
+}));
+
+// Every figure is read off the DEM or measured on the OSM geometry in
+// lib/wayanad.ts — none is typed in by hand.
+const peak = places.find((p) => p.id === 'chembra')!;
+const town = places.find((p) => p.id === 'chooralmala')!;
+
+const facts: [string, string, string][] = [
+  ['ചെമ്പ്ര', 'Chembra', `${peak.elevation.toLocaleString('en-IN')} m`],
+  ['ചൂരല്‍മല', 'Chooralmala', `${town.elevation} m`],
+  ['വ്യത്യാസം', 'Between them', `${(peak.elevation - town.elevation).toLocaleString('en-IN')} m`],
+  ['ചാൽ', 'Channel', '≈3 km'],
+];
+---
+
+<Layout
+  title="വയനാട് — ഭൂപ്രകൃതിയിലൂടെ | Wayanad, through the terrain | MediaOne"
+  description="A scroll-driven 3D terrain feature over Wayanad. Design prototype."
+  topAd={false}
+  noindex
+>
+  <ImmersiveBar title="വയനാട് — ഭൂപ്രകൃതിയിലൂടെ" backHref="/latest-news" backLabel="Latest" />
+
+  <main class="flex-1">
+    <!-- ══ HERO ═════════════════════════════════════════════════════════ -->
+    <section
+      data-immersive-hero
+      class="relative z-10 flex min-h-[100svh] flex-col justify-end bg-nav-bg"
+    >
+      <div class="mx-auto w-full max-w-[68rem] px-5 pb-16 sm:pb-20">
+        <p class="eyebrow text-white/55">ഭൂപ്രകൃതി · Wayanad</p>
+        <h1 class="mt-3 font-malayalam text-display font-bold text-white text-balance">
+          ഭൂപ്രകൃതിയിലൂടെ ഒരു വായന
+        </h1>
+        <p class="mt-1 text-title font-bold text-white/65">Wayanad, through the terrain</p>
+        <p class="mt-5 max-w-2xl font-malayalam text-[1.0625rem] leading-[1.8] text-white/80 text-pretty">
+          പശ്ചിമഘട്ടത്തിന്റെ മുകൾത്തട്ടിലാണ് വയനാട്. ആ നിലം എങ്ങനെ കിടക്കുന്നു എന്നത്
+          ഒരു ഭൂപടത്തിന് പറയാനാവില്ല — അതിലൂടെ സഞ്ചരിക്കണം.
+        </p>
+        <p class="mt-3 max-w-2xl body-small text-white/50 text-pretty">
+          Wayanad sits on top of the Western Ghats. How that ground lies is not
+          something a flat map can tell you — you have to move through it.
+        </p>
+
+        <p
+          class="mt-8 inline-block border border-white/25 px-3 py-1.5 caption-text text-white/60"
+        >
+          Design prototype — real terrain and coordinates, placeholder narration.
+        </p>
+      </div>
+
+      <span
+        class="absolute inset-x-0 bottom-5 flex justify-center text-white/45 motion-safe:animate-bounce"
+        aria-hidden="true"
+      ><i class="ti ti-chevron-down text-2xl"></i></span>
+    </section>
+
+    <!-- ══ THE FACTS + LOCATOR ══════════════════════════════════════════ -->
+    <section class="relative z-10 bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto max-w-[68rem] px-5 py-14 sm:py-20">
+        <div class="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-start lg:gap-14">
+          <div>
+            <p class="eyebrow text-azure dark:text-azure-light">Where this is</p>
+            <p class="mt-3 font-malayalam text-[1.1875rem] leading-[1.85] text-text-primary dark:text-ivory text-pretty">
+              കോഴിക്കോടിന് കിഴക്ക്, ചുരം കയറിക്കഴിഞ്ഞാൽ ഭൂമി പെട്ടെന്ന് ഉയരുന്നു.
+              താഴെയുള്ള സമതലവും മുകളിലുള്ള പീഠഭൂമിയും തമ്മിൽ ആയിരം മീറ്ററിന്റെ വ്യത്യാസം.
+            </p>
+            <p class="mt-3 body-small text-text-muted dark:text-ivory/50 text-pretty">
+              East of Kozhikode, past the ghat passes, the ground rises abruptly.
+              A thousand metres separate the plain below from the plateau above.
+            </p>
+
+            <dl class="mt-8 flex flex-wrap gap-x-8 gap-y-3 border-t border-rule pt-6 dark:border-ivory/10">
+              {facts.map(([ml, en, v]) => (
+                <div>
+                  <dt class="font-malayalam caption-text text-text-muted dark:text-ivory/45">
+                    {ml} <span class="text-text-light dark:text-ivory/25">{en}</span>
+                  </dt>
+                  <dd class="mt-0.5 article-title tabular-nums text-text-primary dark:text-ivory">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <PinMap
+            id="wayanad-locator"
+            pins={locatorPins}
+            center={[11.505, 76.145]}
+            zoom={11}
+            label="Locator map — the places named in this feature"
+            class="h-[20rem] sm:h-[24rem]"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ THE ACTS ═════════════════════════════════════════════════════ -->
+    <TerrainStage story={wayanad} />
+
+    <!-- ══ ARCHIVE ══════════════════════════════════════════════════════ -->
+    <section class="relative z-10 bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto max-w-[68rem] px-5 py-16 sm:py-20">
+        <BandHeading label="From the archive" href="/latest-news" viewAllHref="/latest-news" class="mb-6" />
+        <ul class="grid gap-x-6 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
+          {archive.map((s) => (
+            <li class="border-t border-rule pt-3 dark:border-ivory/12">
+              <a href={s.href} class="group block">
+                <p class="eyebrow text-azure dark:text-azure-light">{s.kicker}</p>
+                <h3 class="mt-1.5 font-malayalam article-title text-text-primary transition-colors group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light text-balance">
+                  {s.titleML}
+                </h3>
+                <p class="mt-1 caption-text text-text-muted dark:text-ivory/45">{s.title}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <p class="mt-12 border-t border-rule pt-4 caption-text text-text-light dark:border-ivory/10 dark:text-ivory/35">
+          Elevation data: <Fragment set:html={TERRAIN_ATTRIBUTION} />, sampled at zoom 13
+          (≈19 m per pixel). Place names, coordinates and the Punnappuzha's course:
+          © OpenStreetMap contributors. Basemap © OpenStreetMap contributors, © CARTO.
+          The blue line is the river as OSM maps it — not a landslide runout, which no
+          open dataset here can source.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="relative z-10"><Footer /></div>
+</Layout>

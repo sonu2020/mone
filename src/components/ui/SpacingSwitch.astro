@@ -1,0 +1,85 @@
+---
+// UI · SpacingSwitch — the live spacing-scenario toggle for testing: tight,
+// medium, spacious. Same pattern as TypeScaleSwitch: class-scoped overrides
+// (src/styles/spacing-scales/*.css) of Tailwind's --spacing base and the fluid
+// --spacing-* vars, toggled on the target element:
+//
+//   scope (default "html") — CSS selector for the element the .spacing-{id}
+//   class toggles on (the guided tour scopes its type switch to a container;
+//   spacing defaults to the whole document).
+//
+// State rides on aria-pressed. The choice persists in localStorage.
+interface Props {
+  scope?: string;
+  class?: string;
+}
+const { scope = 'html', class: className = '' } = Astro.props;
+
+const SPACING_SCENARIOS = [
+  { id: 'tight', label: 'Tight' },
+  { id: 'medium', label: 'Medium' },
+  { id: 'spacious', label: 'Spacious' },
+] as const;
+---
+
+<div
+  class:list={['mc', 'inline-flex items-center gap-px', className]}
+  data-spacing-switch
+  data-spacing-scope={scope}
+  role="group"
+  aria-label="Spacing"
+>
+  {SPACING_SCENARIOS.map((s) => (
+    <button
+      type="button"
+      data-spacing={s.id}
+      aria-pressed={s.id === 'medium' ? 'true' : 'false'}
+      class="spacing-switch px-2 py-1 caption-text font-semibold text-ink-muted transition-colors hover:text-azure dark:text-ivory/60 dark:hover:text-azure-light"
+    >{s.label}</button>
+  ))}
+</div>
+
+<script>
+  (function () {
+    if (window.__spacingInit) return;
+    window.__spacingInit = true;
+
+    var KEY = 'mone-spacing';
+    var switchers = Array.prototype.slice.call(document.querySelectorAll('[data-spacing-switch]'));
+    if (!switchers.length) return;
+
+    var scopeSel = switchers[0].getAttribute('data-spacing-scope') || 'html';
+    var root = scopeSel === 'html' ? document.documentElement : document.querySelector(scopeSel);
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-spacing]'));
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+
+    function apply(id) {
+      if (root) {
+        root.classList.remove('spacing-tight', 'spacing-spacious');
+        if (id === 'tight') root.classList.add('spacing-tight');
+        if (id === 'spacious') root.classList.add('spacing-spacious');
+      }
+      buttons.forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-spacing') === id ? 'true' : 'false');
+      });
+      try { localStorage.setItem(KEY, id); } catch (e) {}
+    }
+
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { apply(b.getAttribute('data-spacing')); });
+    });
+    apply(buttons.some(function (b) { return b.getAttribute('data-spacing') === saved; }) ? saved : 'medium');
+  })();
+</script>
+
+<style>
+  .spacing-switch {
+    border: 1px solid transparent;
+  }
+  [data-spacing-switch] [aria-pressed='true'] {
+    border-color: var(--color-azure);
+    color: var(--color-azure);
+    background: color-mix(in oklab, var(--color-azure) 8%, transparent);
+  }
+</style>

@@ -1,0 +1,98 @@
+---
+// BLOCK · StoryListItem — the horizontal row a category listing is built from.
+//
+//   ┌──────────────┐  Out Of Focus │ 7 Aug 2024 9:01 PM
+//   │              │  ഫോഗട്ടിനെ വീഴ്ത്തിയതാര്? | Vinesh Phogat…
+//   │   16:9       │  Vinesh Phogat disqualified from Paris Olympics
+//   └──────────────┘
+//
+// Follows the live site's `.list-item`: a large still on the left, then a meta
+// line pairing a linked source with a timestamp across a divider bar, the
+// headline, and a standfirst that the live markup hides below md (`d-none
+// d-md-block`) — kept here, since at phone width the still already takes half
+// the row and a third line of text would crowd it out.
+//
+// This is the Feature Lockup from /design/system#components made real: same
+// still-beside-text lockup, resolved to one component with the site's tokens
+// instead of a static demo.
+import Art from '../home4/Art.astro';
+import type { LiveStory } from '../../lib/home4-data';
+
+export interface Props {
+  story: LiveStory;
+  /** Overrides the story's own category on the meta line — a programme, a
+   *  sub-section, whatever published it. */
+  kicker?: string;
+  /** Makes that kicker a link, as the live markup does for programmes. */
+  kickerHref?: string;
+  /** 'lg' leads a listing; 'md' is for denser runs and rails. */
+  size?: 'lg' | 'md';
+  /** Overrides the story's own excerpt — a listing that fills missing copy
+   *  passes what it wants shown, so this component never invents any. */
+  blurb?: string;
+  class?: string;
+}
+const {
+  story,
+  kicker = story.category,
+  kickerHref,
+  size = 'lg',
+  blurb = story.excerpt,
+  class: className = '',
+} = Astro.props;
+
+const still = size === 'lg'
+  ? 'w-[7.5rem] sm:w-[12rem] lg:w-[14rem]'
+  : 'w-[6rem] sm:w-[8.5rem]';
+
+const title = size === 'lg' ? 'headline-feature' : 'headline-deck';
+---
+
+<li class:list={['mc', 'list-none', className]}>
+  <div class="flex flex-wrap items-start gap-3 sm:gap-4">
+    <a href={story.href} class="group shrink-0 block" tabindex="-1" aria-hidden="true">
+      <span class:list={['block', still]}>
+        <Art story={story} ratio="16/9" w={560} zoom />
+      </span>
+    </a>
+
+    <div class="min-w-0 flex-1">
+      <!-- Meta line: source, divider bar, time -->
+      {(kicker || story.date) && (
+        <p class="flex flex-wrap items-center gap-x-2 mb-1.5">
+          {kicker && (
+            kickerHref ? (
+              <a
+                href={kickerHref}
+                class="eyebrow text-azure dark:text-azure-light hover:text-azure-dark dark:hover:text-white transition-colors"
+              >{kicker}</a>
+            ) : (
+              <span class="eyebrow text-azure dark:text-azure-light">{kicker}</span>
+            )
+          )}
+          {kicker && story.date && (
+            <span class="text-rule dark:text-ivory/20" aria-hidden="true">|</span>
+          )}
+          {story.date && (
+            <span class="caption-text tabular-nums text-text-muted dark:text-ivory/45">{story.date}</span>
+          )}
+        </p>
+      )}
+
+      <a href={story.href} class="group block">
+        <h3
+          class:list={[
+            title,
+            'text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance',
+          ]}
+        >{story.title}</h3>
+
+        {blurb && (
+          <p class="hidden md:block mt-1.5 body-small text-text-secondary dark:text-ivory/60 line-clamp-2">
+            {blurb}
+          </p>
+        )}
+      </a>
+    </div>
+  </div>
+</li>

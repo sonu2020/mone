@@ -1,0 +1,167 @@
+---
+// ── Modular 3-Column (BBC homage asymmetric variant) ───────────────────────
+// Three parallel columns: 2 image-top stories on the left, a large lead story
+// in the center, and 4 text-only stories on the right.
+import DummyImage from '../DummyImage.astro';
+import { hero, latest, mostRead, cluster, topStories } from '../../lib/home-data';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+const gulf = cluster('gulf');
+const sports = cluster('sports');
+
+const centerStory = hero;
+const leftStories = [latest[0], latest[1]];
+const rightStories = topStories.slice(0, 4);
+
+const grid1 = [
+  india.lead,
+  gulf.lead,
+  sports.lead,
+  kerala.items[0],
+  latest[3],
+  india.items[0],
+  gulf.items[0],
+  sports.items[0]
+];
+---
+
+<div class:list={['mc', 'bg-bg-page']}>
+  <div class="w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-7">
+
+    <!-- Top: 3-Column Asymmetric Grid Hero Layout -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pb-7 border-b border-rule">
+      <!-- Left Column (3/12 cols): 2 image-top stories -->
+      <div class="lg:col-span-3 flex flex-col gap-6 lg:border-r lg:border-rule lg:dark:border-ivory/10 lg:pr-6">
+        {leftStories.map((story) => (
+          <a href={story.href} class="group block">
+            <div class="relative aspect-[16/10] overflow-hidden rounded-sm">
+              <DummyImage class="w-full h-full" w={640} h={400} seed={story.href + 'bbc-left'} />
+            </div>
+            <div class="pt-3">
+              {story.category && (
+                <span class="eyebrow text-azure dark:text-azure-light mb-1.5 block">{story.category}</span>
+              )}
+              <h3 class="article-title font-bold text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors leading-snug">
+                {story.title}
+              </h3>
+              {story.excerpt && (
+                <p class="mt-1.5 body-small text-text-secondary dark:text-ivory/70 line-clamp-2">
+                  {story.excerpt}
+                </p>
+              )}
+              {story.date && (
+                <p class="mt-2 caption-text text-text-muted dark:text-ivory/45 tabular-nums">
+                  {story.date}
+                </p>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <!-- Center Column (6/12 cols): 1 large image-top lead story -->
+      <div class="lg:col-span-6 flex flex-col gap-4">
+        <a href={centerStory.href} class="group block">
+          <div class="relative aspect-[16/10] overflow-hidden rounded-sm">
+            <DummyImage class="w-full h-full" w={960} h={600} seed={centerStory.href + 'bbc-center'} />
+          </div>
+          <div class="pt-4">
+            {centerStory.category && (
+              <span class="eyebrow text-azure dark:text-azure-light mb-1.5 block">{centerStory.category}</span>
+            )}
+            <h1 class="text-hero font-bold text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance leading-tight">
+              {centerStory.title}
+            </h1>
+            {centerStory.excerpt && (
+              <p class="mt-3 lead-text text-text-secondary dark:text-ivory/70 max-w-prose">
+                {centerStory.excerpt}
+              </p>
+            )}
+            {centerStory.date && (
+              <p class="mt-3 caption-text text-text-muted dark:text-ivory/45 tabular-nums">
+                {centerStory.date}
+              </p>
+            )}
+          </div>
+        </a>
+      </div>
+
+      <!-- Right Column (3/12 cols): 4 text-only stories separated by lines -->
+      <aside class="lg:col-span-3 flex flex-col divide-y divide-rule dark:divide-ivory/10 lg:border-l lg:border-rule lg:dark:border-ivory/10 lg:pl-6">
+        {rightStories.map((story, i) => (
+          <div class:list={[
+            i === 0 ? 'pb-4' : 'py-4',
+            i === rightStories.length - 1 ? 'pb-0' : '',
+          ]}>
+            <a href={story.href} class="group block">
+              {story.category && (
+                <span class="eyebrow text-azure dark:text-azure-light mb-1.5 block">{story.category}</span>
+              )}
+              <h3 class="article-title font-semibold text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors leading-snug">
+                {story.title}
+              </h3>
+              {story.excerpt && (
+                <p class="mt-1.5 body-small text-text-secondary dark:text-ivory/70 line-clamp-2">
+                  {story.excerpt}
+                </p>
+              )}
+              {story.date && (
+                <p class="mt-2 caption-text text-text-muted dark:text-ivory/45 tabular-nums">
+                  {story.date}
+                </p>
+              )}
+            </a>
+          </div>
+        ))}
+      </aside>
+    </section>
+
+    <!-- Modular promo grid -->
+    <section class="py-7">
+      <div class="flex items-baseline justify-between mb-5">
+        <h2 class="section-header text-ink dark:text-ivory">കൂടുതൽ വാർത്തകൾ</h2>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-7">
+        {grid1.map((s) => (
+          <a href={s.href} class="group block">
+            <div class="relative aspect-[16/9] overflow-hidden rounded-sm">
+              <DummyImage class="w-full h-full" w={520} h={293} seed={s.href + 'm'} />
+            </div>
+            <div class="pt-3">
+              <h3 class="article-title font-bold text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors leading-snug">{s.title}</h3>
+              {s.excerpt && <p class="mt-1.5 body-small text-text-secondary dark:text-ivory/70 line-clamp-2 hidden sm:block">{s.excerpt}</p>}
+              {s.date && <p class="mt-2 caption-text text-text-muted dark:text-ivory/45 tabular-nums">{s.date}</p>}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Section strip: label + 1 lead + 3 text links, repeated -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-8 pt-7 border-t border-rule">
+      {[kerala, india, sports].map((sec) => (
+        <div>
+          <h2 class="section-header text-ink dark:text-ivory pb-2 mb-4 border-b-2 border-azure inline-block">{sec.name}</h2>
+          <a href={sec.lead.href} class="group block mb-4">
+            <div class="relative aspect-[16/9] overflow-hidden rounded-sm">
+              <DummyImage class="w-full h-full" w={520} h={293} seed={sec.id + 'bbcsec'} />
+            </div>
+            <h3 class="article-title font-bold text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors leading-snug pt-3">{sec.lead.title}</h3>
+          </a>
+          <ul class="divide-y divide-rule border-t border-rule">
+            {sec.items.slice(0, 3).map((s) => (
+              <li>
+                <a href={s.href} class="group flex items-start gap-2 py-2.5">
+                  <span class="text-azure mt-1.5 shrink-0 size-1.5 rounded-full bg-azure"></span>
+                  <h3 class="article-title text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors leading-snug">{s.title}</h3>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </section>
+
+  </div>
+</div>

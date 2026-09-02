@@ -1,0 +1,51 @@
+---
+// SECTION · LiveBar — the broadcaster's "now" signal. A breaking strip (accent-red,
+// reserved for genuine urgency) + a horizontal trending-topics rail. Sits at the
+// very top of the stream so the first thing a reader sees is the present tense.
+import Pulse from '../ui/Pulse.astro';
+
+export interface Props {
+  label?: string;
+  text?: string;
+  href?: string;
+  topics?: { label: string; href: string }[];
+  class?: string;
+}
+const {
+  label = 'LIVE',
+  text = 'കോഴിക്കോട് മുട്ടായി മഴ; ജില്ലയിൽ സന്തോഷം',
+  href = '/breaking',
+  topics = [
+    { label: '#RainAlert', href: '/story/rain-alert' },
+    { label: '#GoldPrice', href: '/story/gold-price-record' },
+    { label: '#KeralaElection', href: '/story/pala-election' },
+    { label: '#Sabarimala', href: '/story/sabarimala-traffic' },
+    { label: '#KochiMetro', href: '/story/kochi-metro' },
+  ],
+  class: className = '',
+} = Astro.props;
+---
+<div class:list={['mc', 'w-full', className]}>
+  <!-- Breaking strip -->
+  <a href={href} class="group flex items-center gap-3 bg-accent-red px-4 sm:px-6 lg:px-8 h-10 overflow-hidden">
+    <span class="flex items-center gap-1.5 shrink-0">
+      <Pulse tone="white" class="size-2" />
+      <span class="eyebrow tracking-[0.15em] text-white">{label}</span>
+    </span>
+    <span class="h-3.5 w-px bg-white/40 shrink-0"></span>
+    <span class="nav-text font-semibold text-white truncate group-hover:underline">{text}</span>
+  </a>
+
+  <!-- Trending topics rail -->
+  {topics.length > 0 && (
+    <div class="flex items-center gap-3 px-4 sm:px-6 lg:px-8 h-9 bg-bg-card border-b border-rule overflow-hidden">
+      <span class="eyebrow text-text-muted shrink-0">ട്രെൻഡിംഗ്</span>
+      <span class="h-3 w-px bg-rule shrink-0"></span>
+      <div class="flex items-center gap-4 overflow-x-auto scrollbar-none">
+        {topics.map((t) => (
+          <a href={t.href} class="caption-text font-semibold text-ink-light hover:text-azure transition-colors whitespace-nowrap">{t.label}</a>
+        ))}
+      </div>
+    </div>
+  )}
+</div>

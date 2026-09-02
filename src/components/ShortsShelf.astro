@@ -1,0 +1,421 @@
+---
+import DummyImage from './DummyImage.astro';
+
+// Vertical short-form news videos data
+const shorts = [
+  {
+    id: 'short-1',
+    title: 'മീഡിയവൺ സ്റ്റുഡിയോയിൽ നിന്നും തത്സമയ വാർത്തകൾ',
+    category: 'News Live',
+    views: '154K views',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-to-camera-in-studio-34062-large.mp4',
+    likes: '12K',
+    shares: '4.8K'
+  },
+  {
+    id: 'short-2',
+    title: 'കേരളത്തിൽ കനത്ത മഴ തുടരുന്നു; റെഡ് അലർട്ട് പ്രഖ്യാപിച്ചു',
+    category: 'Rain Alert',
+    views: '243K views',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-monsoon-rain-drops-falling-on-leaves-33420-large.mp4',
+    likes: '22K',
+    shares: '9.1K'
+  },
+  {
+    id: 'short-3',
+    title: 'വയനാട്ടിൽ ഉരുൾപൊട്ടൽ; രക്ഷാപ്രവർത്തനം സജീവം',
+    category: 'Wayanad',
+    views: '98K views',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-reporter-taking-notes-on-a-notebook-34066-large.mp4',
+    likes: '8.4K',
+    shares: '3.2K'
+  },
+  {
+    id: 'short-4',
+    title: 'മൊബൈൽ ഫോൺ തട്ടിപ്പുകൾ; ശ്രദ്ധിക്കേണ്ട കാര്യങ്ങൾ',
+    category: 'Cyber Alert',
+    views: '115K views',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-man-holding-smartphone-recording-video-41710-large.mp4',
+    likes: '10K',
+    shares: '5.6K'
+  },
+  {
+    id: 'short-5',
+    title: 'വാർത്താ ക്യാമറയ്ക്ക് പിന്നിലെ തത്സമയ നിമിഷങ്ങൾ',
+    category: 'Behind the Scenes',
+    views: '67K views',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-videographer-adjusting-a-camera-settings-34069-large.mp4',
+    likes: '4.9K',
+    shares: '1.2K'
+  }
+];
+---
+
+<section class:list={['mc', 'px-4 py-8 sm:px-6 md:px-8 border-b border-rule bg-bg-card']}>
+  <div class="flex items-baseline justify-between mb-6">
+    <div class="flex items-center gap-2">
+      <!-- Minimal red dot/badge indicating live shorts -->
+      <span class="size-2 bg-accent-red rounded-full animate-pulse"></span>
+      <h2 class="section-header text-text-primary">മീഡിയവൺ ഷോർട്സ്</h2>
+      <span class="eyebrow text-accent-red font-bold text-[10px] bg-accent-red/10 px-1.5 py-0.5 rounded-sm">REELS</span>
+    </div>
+    <span class="meta-text text-text-muted">Swipe left/right to view all</span>
+  </div>
+
+  <!-- Horizontal scroll container of vertical short cards -->
+  <div class="flex gap-4 overflow-x-auto scrollbar-none pb-4" id="shorts-shelf-scroll">
+    {shorts.map((item, index) => (
+      <button
+        type="button"
+        class="short-card-trigger shrink-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2 rounded-sm group relative aspect-[9/16] w-[200px] sm:w-[220px] overflow-hidden bg-black"
+        data-index={index}
+        aria-label={`Open Shorts video: ${item.title}`}
+      >
+        <!-- Thumbnail with fallback -->
+        <div class="absolute inset-0 bg-zinc-950 transition-transform duration-300 group-hover:scale-105">
+          <DummyImage class="w-full h-full object-cover opacity-80" w={360} h={640} seed={`short-${index + 1}`} />
+        </div>
+
+        <!-- Dark Bottom Overlay Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent z-10"></div>
+
+        <!-- Play overlay icon -->
+        <div class="absolute inset-0 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div class="size-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white border border-white/40">
+            <i class="ti ti-player-play text-2xl ml-0.5" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <!-- Meta Overlays -->
+        <div class="absolute top-3 left-3 z-20 flex gap-1">
+          <span class="eyebrow text-white text-[9px] bg-black/40 px-1.5 py-0.5 rounded-sm backdrop-blur-xs font-semibold uppercase">{item.category}</span>
+        </div>
+
+        <div class="absolute bottom-3 left-3 right-3 z-20">
+          <h3 class="article-title text-white text-xs leading-snug line-clamp-2 mb-1 group-hover:text-azure-light transition-colors">
+            {item.title}
+          </h3>
+          <p class="caption-text text-white/60 text-[10px] tabular-nums font-medium flex items-center gap-1">
+            <i class="ti ti-eye text-xs text-white/50" aria-hidden="true"></i>
+            {item.views}
+          </p>
+        </div>
+      </button>
+    ))}
+  </div>
+</section>
+
+<!-- Reels Fullscreen/Dynamic Modal Player Overlay -->
+<div
+  id="shorts-modal"
+  class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden items-center justify-center px-4"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Shorts Video Player"
+>
+  <!-- Main Centered Reels Frame -->
+  <div class="relative w-full max-w-[400px] h-[85vh] bg-zinc-950 rounded-lg overflow-hidden flex flex-col border border-white/10 shadow-2xl">
+    
+    <!-- Top Action Headers -->
+    <div class="absolute top-0 inset-x-0 z-30 bg-gradient-to-b from-black/80 to-transparent p-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="size-2 bg-accent-red rounded-full animate-pulse"></span>
+        <span class="eyebrow text-white text-[10px] tracking-widest font-bold">MEDIAONE SHORTS</span>
+      </div>
+      <button
+        id="shorts-modal-close"
+        type="button"
+        class="p-2 text-white/80 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2 rounded"
+        aria-label="Close video player"
+      >
+        <i class="ti ti-x text-2xl" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- Active Video Player Element -->
+    <div class="flex-1 w-full h-full relative overflow-hidden bg-black flex items-center justify-center">
+      <video
+        id="shorts-video"
+        class="w-full h-full object-cover"
+        playsinline
+        loop
+        preload="auto"
+      >
+        Your browser does not support vertical video playback.
+      </video>
+
+      <!-- Central Large Play/Pause Toggle Indicator -->
+      <button id="shorts-video-overlay-btn" class="absolute inset-0 z-10 w-full h-full flex items-center justify-center bg-black/0 cursor-pointer focus:outline-none">
+        <div id="play-pause-indicator" class="size-16 rounded-full bg-black/50 border border-white/20 flex items-center justify-center text-white opacity-0 transform scale-75 transition-all duration-200 pointer-events-none">
+          <i class="ti ti-player-play text-4xl" id="indicator-icon" aria-hidden="true"></i>
+        </div>
+      </button>
+
+      <!-- Bottom Gradient Overlay -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent pointer-events-none z-20"></div>
+
+      <!-- Left / Right Desktop Side Navigation Handles -->
+      <button
+        id="shorts-prev-btn"
+        type="button"
+        class="absolute left-3 top-1/2 -translate-y-1/2 z-30 size-10 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center border border-white/10 hover:border-white/30 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure"
+        aria-label="Previous short"
+      >
+        <i class="ti ti-chevron-left text-xl" aria-hidden="true"></i>
+      </button>
+
+      <button
+        id="shorts-next-btn"
+        type="button"
+        class="absolute right-3 top-1/2 -translate-y-1/2 z-30 size-10 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center border border-white/10 hover:border-white/30 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure"
+        aria-label="Next short"
+      >
+        <i class="ti ti-chevron-right text-xl" aria-hidden="true"></i>
+      </button>
+
+      <!-- Right Action Sidebar (Likes, Shares, Sound) -->
+      <div class="absolute right-3 bottom-20 z-30 flex flex-col gap-5 items-center">
+        <!-- Sound Mute Toggle -->
+        <button
+          id="shorts-audio-toggle"
+          type="button"
+          class="size-11 rounded-full bg-white/15 hover:bg-white/25 border border-white/10 text-white flex items-center justify-center backdrop-blur-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure"
+          aria-label="Toggle mute"
+        >
+          <i id="shorts-audio-icon-unmuted" class="ti ti-volume text-xl hidden" aria-hidden="true"></i>
+          <i id="shorts-audio-icon-muted" class="ti ti-volume-off text-xl block" aria-hidden="true"></i>
+        </button>
+
+        <!-- Likes Badge -->
+        <div class="flex flex-col items-center">
+          <button
+            type="button"
+            class="size-11 rounded-full bg-white/15 hover:bg-white/25 border border-white/10 text-white flex items-center justify-center backdrop-blur-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure"
+            aria-label="Like video"
+          >
+            <i class="ti ti-heart-filled text-xl" aria-hidden="true"></i>
+          </button>
+          <span id="shorts-likes-count" class="text-[10px] text-white/80 font-bold mt-1 tabular-nums"></span>
+        </div>
+
+        <!-- Shares Badge -->
+        <div class="flex flex-col items-center">
+          <button
+            type="button"
+            class="size-11 rounded-full bg-white/15 hover:bg-white/25 border border-white/10 text-white flex items-center justify-center backdrop-blur-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure"
+            aria-label="Share video"
+          >
+            <i class="ti ti-share text-xl" aria-hidden="true"></i>
+          </button>
+          <span id="shorts-shares-count" class="text-[10px] text-white/80 font-bold mt-1 tabular-nums"></span>
+        </div>
+      </div>
+
+      <!-- Bottom Headline Information Overlay -->
+      <div class="absolute bottom-4 left-4 right-16 z-30">
+        <span id="shorts-overlay-category" class="eyebrow text-azure-light text-[10px] font-bold"></span>
+        <h3 id="shorts-overlay-title" class="text-sm font-semibold text-white leading-snug text-balance mt-1"></h3>
+      </div>
+    </div>
+
+    <!-- Video Scroll Timeline Progress Indicator -->
+    <div class="h-1 bg-white/20 w-full relative z-40">
+      <div id="shorts-playback-progress" class="h-full bg-azure w-0 transition-all duration-75"></div>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ shorts }}>
+  (function () {
+    var modal = document.getElementById('shorts-modal');
+    var video = document.getElementById('shorts-video');
+    var closeBtn = document.getElementById('shorts-modal-close');
+    
+    var prevBtn = document.getElementById('shorts-prev-btn');
+    var nextBtn = document.getElementById('shorts-next-btn');
+
+    var overlayTitle = document.getElementById('shorts-overlay-title');
+    var overlayCategory = document.getElementById('shorts-overlay-category');
+    var likesCount = document.getElementById('shorts-likes-count');
+    var sharesCount = document.getElementById('shorts-shares-count');
+    
+    var audioToggle = document.getElementById('shorts-audio-toggle');
+    var soundMutedIcon = document.getElementById('shorts-audio-icon-muted');
+    var soundUnmutedIcon = document.getElementById('shorts-audio-icon-unmuted');
+    
+    var playPauseBtn = document.getElementById('shorts-video-overlay-btn');
+    var playPauseIndicator = document.getElementById('play-pause-indicator');
+    var indicatorIcon = document.getElementById('indicator-icon');
+    
+    var playbackProgress = document.getElementById('shorts-playback-progress');
+
+    var currentIndex = 0;
+    var isMuted = true; // Auto-muted by default to allow autoplay
+
+    if (!modal || !video) return;
+
+    // Load a short by index
+    function loadShort(index) {
+      if (index < 0 || index >= shorts.length) return;
+      currentIndex = index;
+      var item = shorts[currentIndex];
+
+      // Update Video element source
+      video.src = item.videoUrl;
+      video.load();
+
+      // Update Text Overlays
+      if (overlayTitle) overlayTitle.textContent = item.title;
+      if (overlayCategory) overlayCategory.textContent = item.category;
+      if (likesCount) likesCount.textContent = item.likes;
+      if (sharesCount) sharesCount.textContent = item.shares;
+
+      // Reset mute settings
+      video.muted = isMuted;
+
+      // Play video
+      var playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(function(error) {
+          console.log("Autoplay was prevented by browser security. Audio muted state remains active.");
+        });
+      }
+    }
+
+    // Toggle mute/unmute
+    if (audioToggle) {
+      audioToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        isMuted = !isMuted;
+        video.muted = isMuted;
+        
+        if (isMuted) {
+          soundMutedIcon.classList.remove('hidden');
+          soundMutedIcon.classList.add('block');
+          soundUnmutedIcon.classList.remove('block');
+          soundUnmutedIcon.classList.add('hidden');
+        } else {
+          soundMutedIcon.classList.remove('block');
+          soundMutedIcon.classList.add('hidden');
+          soundUnmutedIcon.classList.remove('hidden');
+          soundUnmutedIcon.classList.add('block');
+        }
+      });
+    }
+
+    // Show indicator overlay for play/pause
+    function triggerIndicator(state) {
+      if (!playPauseIndicator || !indicatorIcon) return;
+      if (state === 'play') {
+        indicatorIcon.className = 'ti ti-player-play text-4xl';
+      } else {
+        indicatorIcon.className = 'ti ti-player-pause text-4xl';
+      }
+      playPauseIndicator.classList.remove('opacity-0', 'scale-75');
+      playPauseIndicator.classList.add('opacity-100', 'scale-100');
+      
+      setTimeout(function () {
+        playPauseIndicator.classList.remove('opacity-100', 'scale-100');
+        playPauseIndicator.classList.add('opacity-0', 'scale-75');
+      }, 500);
+    }
+
+    // Toggle Play/Pause on click
+    if (playPauseBtn) {
+      playPauseBtn.addEventListener('click', function () {
+        if (video.paused) {
+          video.play();
+          triggerIndicator('play');
+        } else {
+          video.pause();
+          triggerIndicator('pause');
+        }
+      });
+    }
+
+    // Tracking progress timeline
+    video.addEventListener('timeupdate', function () {
+      if (playbackProgress && video.duration) {
+        var percentage = (video.currentTime / video.duration) * 100;
+        playbackProgress.style.width = percentage + '%';
+      }
+    });
+
+    // Close Modal
+    function closeModal() {
+      video.pause();
+      video.src = ""; // Stop network stream
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden'); // unlock background scroll
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeModal);
+    }
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Navigation triggers
+    function navigateNext() {
+      var nextIndex = (currentIndex + 1) % shorts.length;
+      loadShort(nextIndex);
+    }
+
+    function navigatePrev() {
+      var prevIndex = (currentIndex - 1 + shorts.length) % shorts.length;
+      loadShort(prevIndex);
+    }
+
+    if (nextBtn) nextBtn.addEventListener('click', navigateNext);
+    if (prevBtn) prevBtn.addEventListener('click', navigatePrev);
+
+    // Keyboard bindings
+    window.addEventListener('keydown', function (e) {
+      if (modal.classList.contains('hidden')) return;
+      if (e.key === 'Escape') {
+        closeModal();
+      } else if (e.key === 'ArrowRight') {
+        navigateNext();
+      } else if (e.key === 'ArrowLeft') {
+        navigatePrev();
+      }
+    });
+
+    // Open Modal and trigger player for elements
+    document.querySelectorAll('.short-card-trigger').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = parseInt(btn.getAttribute('data-index') || '0', 10);
+        document.body.classList.add('overflow-hidden'); // Lock background scrolling
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        loadShort(idx);
+      });
+    });
+
+    // Mobile Swipe gesture integration
+    var touchStartY = 0;
+    var touchEndY = 0;
+    
+    modal.addEventListener('touchstart', function (e) {
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+    
+    modal.addEventListener('touchend', function (e) {
+      touchEndY = e.changedTouches[0].screenY;
+      var swipeDiff = touchStartY - touchEndY;
+      if (Math.abs(swipeDiff) > 50) {
+        if (swipeDiff > 0) {
+          // Swipe up -> Next Video
+          navigateNext();
+        } else {
+          // Swipe down -> Prev Video
+          navigatePrev();
+        }
+      }
+    }, { passive: true });
+  })();
+</script>

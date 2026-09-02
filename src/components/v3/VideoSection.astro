@@ -1,0 +1,25 @@
+---
+// SECTION · VideoSection — the broadcaster's core. A watch module (large inline
+// player + "up next" rail) followed by a 4-up landscape video grid. Elevated to
+// the center of the page because for MediaOne video is the spine, not a section.
+import SectionHeading from '../ui/SectionHeading.astro';
+import VideoFeature from '../news/VideoFeature.astro';
+import VideoGrid from '../news/VideoGrid.astro';
+import type { VideoItem } from '../../lib/video-data';
+
+export interface Props {
+  feature: VideoItem;
+  upNext: VideoItem[];
+  grid: VideoItem[];
+  viewAllHref?: string;
+  class?: string;
+}
+const { feature, upNext, grid, viewAllHref = '/videos', class: className = '' } = Astro.props;
+---
+<section class:list={['mc', 'py-7 lg:py-10 border-t border-rule', className]}>
+  <SectionHeading title="വീഡിയോ" titleEn="Videos" viewAllHref={viewAllHref} />
+  <VideoFeature feature={feature} items={upNext} />
+  <div class="mt-8 pt-8 border-t border-rule">
+    <VideoGrid items={grid} cols={4} />
+  </div>
+</section>

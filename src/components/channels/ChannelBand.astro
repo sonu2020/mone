@@ -1,0 +1,137 @@
+---
+// BLOCK · ChannelBand — a desk's own YouTube channel, on the desk's page.
+//
+// MediaOne runs Business, ShowMall and Gulf channels beside the main one, and
+// their uploads are usually the freshest thing on the desk. This band credits
+// the channel rather than absorbing the videos anonymously: a reader who wants
+// more should end up subscribed, not just scrolled.
+//
+// House standard: square, hairline, no shadow, flat cards. The band sits on the
+// page surface rather than in a filled box so it reads as part of the desk.
+import { channelForDesk, channelVideos } from '../../lib/channels';
+import { programEpisodeId, channelSlug } from '../../lib/video-modal';
+
+export interface Props {
+  desk: string;
+  limit?: number;
+  /** Play in the page's VideoModal instead of sending the reader to YouTube.
+   *  Requires the page to pass this desk's channel to VideoModal as a
+   *  programme — see channelAsProgram() — which is what puts the videos in the
+   *  modal's payload and in its Library picker. */
+  playable?: boolean;
+  class?: string;
+}
+
+const { desk, limit = 4, playable = false, class: className = '' } = Astro.props;
+
+const channel = channelForDesk(desk);
+const videos = channelVideos(desk, limit);
+const shelf = channelSlug(desk);
+---
+
+{channel && videos.length > 0 && (
+  <section class:list={['mc py-3', className]} aria-labelledby={`channel-${desk}`}>
+    <!-- Heading. The channel is the subject, so it is introduced the way a
+         channel introduces itself: its own picture, its name and its handle.
+         The picture is the site's own copy of the avatar — see
+         scrape-channel.py's download_avatar(). -->
+    <div class="flex items-center gap-3 sm:gap-4 pb-3 border-b-1 border-ink dark:border-ivory/30">
+      {channel.avatar && (
+        <img
+          src={channel.avatar}
+          alt=""
+          width="52"
+          height="52"
+          loading="lazy"
+          class="size-11 sm:size-13 shrink-0 rounded-full object-cover bg-placeholder"
+        />
+      )}
+
+      <div class="min-w-0 flex-1">
+        <h2 id={`channel-${desk}`} class="section-header text-ink dark:text-ivory">{channel.label}</h2>
+        <p class="caption-text text-text-muted">{channel.handle}</p>
+      </div>
+      
+      {playable && (
+        <div class="mt-3 flex justify-end">
+          {/* View all stays on the site: it opens the player with this channel
+              already selected in the Library, its shows and its uploads listed
+              beside the picture. The href is the real channel as a no-JS
+              fallback. */}
+          <a
+            href={channel.channelUrl}
+            rel="noopener"
+            data-video-shows={shelf}
+            class="shrink-0 eyebrow inline-flex items-center gap-1 text-azure dark:text-azure-light hover:text-azure-dark transition-colors"
+          >
+            View all <i class="ti ti-arrow-right text-base" aria-hidden="true"></i>
+          </a>
+        </div>
+      )}
+    </div>
+
+    
+
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-9">
+      {videos.map(({ video, duration, views, published }) => (
+        <article>
+          {/* The href stays the real YouTube URL so the card still works with
+              no JS; data-video-open makes the modal intercept it when there is. */}
+          <a
+            href={video.href}
+            rel="noopener"
+            data-video-open={playable ? programEpisodeId(video.youtubeId) : undefined}
+            class="group block"
+          >
+            <div class="relative aspect-[16/9] overflow-hidden bg-placeholder">
+              <img
+                src={video.thumbnail.small}
+                alt=""
+                width="320"
+                height="180"
+                loading="lazy"
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <span class="absolute inset-0 flex items-center justify-center bg-ink/0 group-hover:bg-ink/20 transition-colors">
+                <span class="size-11 bg-accent-red text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <i class="ti ti-player-play text-lg ml-0.5" aria-hidden="true"></i>
+                </span>
+              </span>
+              {duration && (
+                <span class="absolute bottom-0 right-0 bg-ink/85 text-ivory eyebrow px-2 py-1 tabular-nums">
+                  {duration}
+                </span>
+              )}
+            </div>
+
+            <h3 class="mt-3 article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2">
+              {video.title}
+            </h3>
+            <p class="mt-1.5 caption-text text-text-muted tabular-nums">
+              {published}{views && ` · ${views} views`}
+            </p>
+          </a>
+        </article>
+      ))}
+    </div>
+
+    {channel.social.length > 0 && (
+      <p class="mt-6 pt-4 border-t border-rule dark:border-ivory/10 caption-text text-text-muted">
+        {/* Handles only. Instagram is login-walled and scraping it is against
+            their terms, so the account is credited and linked, never fetched. */}
+        Also on
+        {channel.social.map((s, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">,</span>}
+            {' '}
+            {/* One expression, not two — JSX collapses the whitespace between
+                adjacent expressions and the network ran into the handle. */}
+            <a href={s.href} rel="noopener" class="text-azure hover:underline">
+              {`${s.network} ${s.handle}`}
+            </a>
+          </>
+        ))}
+      </p>
+    )}
+  </section>
+)}

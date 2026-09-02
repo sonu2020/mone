@@ -1,0 +1,498 @@
+---
+// PAGE · /video-alt — an example alternative to YouTube-based video, built on
+// MediaOne's own player system. Real MediaOne reports, downloaded from the
+// channel as MP4 (yt-dlp) and served first-party; the poster facade lazy-mounts
+// Video.js v10 behind the MediaOne skin on click. No YouTube iframe anywhere.
+// The video set is the flat record in src/data/youtube-videos.json — swap or
+// add ids there and re-run the download script to refresh this page.
+import Layout from '../layouts/Layout.astro';
+import Logo from '../components/Logo.astro';
+import MediaPlayer from '../components/MediaPlayer.astro';
+import { shareChannels } from '../lib/share-channels';
+import { altVideos, featuredVideo, youtubeRecord } from '../lib/video-alt';
+
+const hero = featuredVideo();
+const grid = altVideos.filter((v) => v.youtubeId !== hero.youtubeId);
+
+const heroMeta = [
+  hero.category,
+  hero.durationText,
+  hero.viewsText,
+  hero.sitePublishDate ?? hero.uploadDate,
+].filter(Boolean);
+
+// The theater queue payload — the same flat record the page renders, so the
+// modal and the page can never disagree about what is watchable.
+const theaterPayload = JSON.stringify(altVideos).replace(/</g, '\\u003c');
+---
+
+<Layout
+  title="MediaOne Player — video, without YouTube"
+  description="The same MediaOne reports, self-hosted as MP4. No ads, no autoplay, no rabbit holes — the MediaOne Player plays first-party video on this server."
+  noindex
+  topAd={false}
+>
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto bg-bg-card border-x border-rule dark:border-ivory/10">
+      <div class="px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <!-- Masthead -->
+        <header class="max-w-3xl space-y-4">
+          <p class="eyebrow text-azure flex items-center gap-2">
+            <span class="inline-block size-1.5 bg-azure" aria-hidden="true"></span>
+            MediaOne Player · Video-alt
+          </p>
+          <h1 class="text-hero font-extrabold text-ink dark:text-ivory text-balance">
+            വീഡിയോ, YouTube ഇല്ലാതെ
+            <span class="block text-azure">The same news, no platform.</span>
+          </h1>
+          <p class="body-text text-ink-muted dark:text-ivory/60 max-w-2xl text-pretty">
+            These reports are the real MediaOne uploads from the MediaOne News
+            YouTube channel — downloaded as plain MP4 and served from this server.
+            No third-party iframe, no pre-roll ads, no autoplay, no recommendation
+            rabbit hole. Click a poster and the MediaOne Player mounts in place.
+          </p>
+        </header>
+
+        <!-- Why this is different — hairline rows, not cards -->
+        <section class="mt-10 max-w-3xl border-t border-rule dark:border-ivory/10" aria-label="Why this is different">
+          {
+            [
+              ['First-party playback', 'The file is a plain MP4 on this server — no YouTube embed, no third-party player.'],
+              ['No ads, no pre-rolls', 'Nothing sells your attention while you watch. The player is the whole page.'],
+              ['Nothing plays until you click', 'Posters are real markup; the player mounts only on your gesture.'],
+              ['No rabbit holes', 'One video ends where it ends. There is no autoplay queue to fall into.'],
+            ].map(([k, v]) => (
+              <div class="flex gap-4 py-4 border-b border-rule dark:border-ivory/10">
+                <i class="ti ti-circle-check text-azure text-xl mt-0.5 shrink-0" aria-hidden="true"></i>
+                <div>
+                  <h2 class="font-semibold text-ink dark:text-ivory">{k}</h2>
+                  <p class="meta-text text-ink-muted dark:text-ivory/50">{v}</p>
+                </div>
+              </div>
+            ))
+          }
+        </section>
+
+        <!-- Hero player -->
+        <section class="mt-14 space-y-4" aria-label="Featured video">
+          <div class="flex items-baseline justify-between gap-4">
+            <h2 class="section-header text-ink dark:text-ivory">Featured report</h2>
+            <span class="meta-text text-ink-muted dark:text-ivory/50 shrink-0">MediaOne Player</span>
+          </div>
+          <MediaPlayer
+            src={hero.local!.src}
+            poster={hero.local!.poster}
+            title={hero.title}
+            category={hero.category}
+            duration={hero.durationText ?? undefined}
+            ratio="16/9"
+            id={`player-${hero.youtubeId}`}
+          />
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-rule dark:border-ivory/10 pb-4">
+            <button
+              type="button"
+              data-theater-open
+              data-theater-id={hero.youtubeId}
+              data-theater-source={JSON.stringify({ src: hero.local!.src, poster: hero.local!.poster, title: hero.title }).replace(/</g, '\\u003c')}
+              class="font-semibold text-ink dark:text-ivory flex-1 min-w-0 text-left hover:text-azure transition-colors"
+              aria-haspopup="dialog"
+            >
+              {hero.title}
+            </button>
+            <span class="meta-text text-ink-muted dark:text-ivory/50 tabular-nums">
+              {heroMeta.join(' · ')}
+            </span>
+            <a
+              href={hero.watchUrl}
+              target="_blank"
+              rel="noopener"
+              class="meta-text text-azure hover:underline shrink-0"
+            >
+              Source on YouTube ↗
+            </a>
+          </div>
+        </section>
+
+        <!-- Grid -->
+        <section class="mt-12 space-y-6" aria-label="All videos">
+          <h2 class="section-header text-ink dark:text-ivory">
+            All videos <span class="meta-text text-ink-muted dark:text-ivory/50 font-normal">· {grid.length} self-hosted</span>
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+            {
+              grid.map((v) => (
+                <article class="space-y-2">
+                  <MediaPlayer
+                    src={v.local!.src}
+                    poster={v.local!.poster}
+                    title={v.title}
+                    category={v.category}
+                    duration={v.durationText ?? undefined}
+                    ratio="16/9"
+                    id={`player-${v.youtubeId}`}
+                  />
+                  <button
+                    type="button"
+                    data-theater-open
+                    data-theater-id={v.youtubeId}
+                    data-theater-source={JSON.stringify({ src: v.local!.src, poster: v.local!.poster, title: v.title }).replace(/</g, '\\u003c')}
+                    class="block w-full text-left text-body font-semibold text-ink dark:text-ivory leading-snug line-clamp-2 hover:text-azure transition-colors"
+                    aria-haspopup="dialog"
+                  >
+                    {v.title}
+                  </button>
+                  <p class="meta-text text-ink-muted dark:text-ivory/50 tabular-nums">
+                    {[v.durationText, v.viewsText, v.sitePublishDate ?? v.uploadDate].filter(Boolean).join(' · ')}
+                    <a
+                      href={v.watchUrl}
+                      target="_blank"
+                      rel="noopener"
+                      class="text-azure hover:underline ml-2"
+                    >
+                      source ↗
+                    </a>
+                  </p>
+                </article>
+              ))
+            }
+          </div>
+        </section>
+
+        <!-- Theater sample — a "Watch Live"-style stage driven by OUR player.
+             Test harness only: a self-contained copy of the theater modal's
+             player chrome (dark stage, header, close) so VideoModal.astro
+             stays untouched. Open → mount() with autoplay, exactly the call
+             the theater modal makes for its YouTube stage. -->
+        <section class="mt-14 space-y-4" aria-label="Theater sample">
+          <div class="flex items-baseline justify-between gap-4">
+            <h2 class="section-header text-ink dark:text-ivory">Theater sample</h2>
+            <span class="meta-text text-ink-muted dark:text-ivory/50 shrink-0">Watch-Live-style stage · our player</span>
+          </div>
+          <p class="meta-text text-ink-muted dark:text-ivory/50 max-w-2xl">
+            The homepage video modal, on local files: the same panel chrome,
+            single-viewer stage, Prev/Next VOD transport and Up Next queue —
+            driven by{' '}
+            <code class="font-mono">mount()</code> from <code class="font-mono">src/lib/player.ts</code>{' '}
+            instead of a YouTube iframe. Every video title on this page opens
+            this viewer.
+          </p>
+          <button
+            type="button"
+            data-theater-open
+            data-theater-id={hero.youtubeId}
+            data-theater-source={JSON.stringify({ src: hero.local!.src, poster: hero.local!.poster, title: hero.title }).replace(/</g, '\\u003c')}
+            class="inline-flex items-center gap-2 rounded-xs bg-azure text-white px-4 py-2.5 font-semibold hover:bg-azure-dark transition-colors"
+          >
+            <svg class="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8.286 5.36a1.5 1.5 0 0 1 2.288-1.287l10.143 6.64a1.5 1.5 0 0 1 0 2.574L10.574 19.93A1.5 1.5 0 0 1 8.286 18.64V5.36z" />
+            </svg>
+            Open theater sample
+          </button>
+        </section>
+
+        <!-- Source note -->
+        <footer class="mt-16 pt-6 border-t border-rule dark:border-ivory/10 space-y-1.5">
+          <p class="meta-text text-ink-muted dark:text-ivory/50">
+            Sources: MediaOne News on{' '}
+            <a
+              href="https://www.youtube.com/@MediaoneTVLive"
+              target="_blank"
+              rel="noopener"
+              class="text-azure hover:underline"
+            >
+              YouTube
+            </a>{' '}
+            · channel {youtubeRecord.channelId}
+          </p>
+          <p class="meta-text text-ink-muted dark:text-ivory/50">
+            Captured {youtubeRecord.capturedAt} with yt-dlp as MP4 (H.264/AAC, ≤720p) into{' '}
+            <code class="font-mono">public/videos/</code>; metadata in{' '}
+            <code class="font-mono">src/data/youtube-videos.json</code>. Player demo:{' '}
+            <a href="/player-lab" class="text-azure hover:underline">/player-lab</a>.
+          </p>
+        </footer>
+      </div>
+    </div>
+  </main>
+
+  <!-- Theater modal — modeled on the homepage's video modal (VideoModal.astro):
+       same panel chrome, single-viewer stage, VOD transport (Prev/Next +
+       position) and an Up Next rail. The stage runs the MediaOne Player
+       (mount from src/lib/player.ts) on local MP4s instead of a YouTube
+       iframe. Page-local copy: VideoModal.astro itself is untouched. -->
+  <div
+    id="va-theater"
+    data-theater
+    class="fixed inset-0 z-[100] opacity-0 invisible pointer-events-none transition-opacity duration-200 data-[open]:opacity-100 data-[open]:visible data-[open]:pointer-events-auto"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Video player"
+    aria-hidden="true"
+  >
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" data-close></div>
+
+    <!-- Panel -->
+    <div class="relative h-full w-full flex items-stretch sm:items-center justify-center sm:p-4 lg:p-6">
+      <div class="relative w-full max-w-[1440px] sm:max-h-full flex flex-col bg-brand-dark sm:rounded-lg border border-white/10 shadow-2xl overflow-hidden">
+
+        <!-- Header: the mark, what is playing, and the way out. -->
+        <div class="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 border-b border-white/10">
+          <a href="/" class="inline-flex items-center shrink-0 text-ivory hover:text-azure-light transition-colors" aria-label="MediaOne home">
+            <Logo class="h-9 sm:h-11 w-auto" />
+          </a>
+          <span id="va-source-head" class="hidden min-w-0 items-center gap-1.5">
+            <i class="ti ti-chevron-right shrink-0 text-lg text-ivory/35" aria-hidden="true"></i>
+            <span id="va-source-name" class="min-w-0 truncate nav-text text-ivory"></span>
+          </span>
+          <span class="ml-auto"></span>
+          <button
+            type="button"
+            data-close
+            class="size-9 rounded-full bg-black/60 text-ivory/80 hover:text-white hover:bg-black/80 border border-white/15 flex items-center justify-center backdrop-blur-sm transition-colors"
+            aria-label="Close player"
+          >
+            <i class="ti ti-x text-xl" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <!-- Body: single viewer + Up Next -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 lg:max-h-[82vh] overflow-y-auto scrollbar-none">
+          <div class="lg:col-span-7 xl:col-span-8 min-w-0">
+            <!-- Stage — the one player. mount() replaces content on switch. -->
+            <div class="relative bg-black aspect-video" data-stage></div>
+
+            <!-- Transport: VOD Prev/Next + position -->
+            <div class="flex items-center gap-2 px-4 sm:px-6 py-2.5 border-b border-white/10">
+              <button type="button" data-step="-1"
+                class="inline-flex items-center gap-1.5 rounded-xs border border-white/15 px-2.5 py-1.5 caption-text font-semibold text-ivory/70 hover:text-white hover:border-white/35 disabled:opacity-30 disabled:pointer-events-none transition-colors">
+                <i class="ti ti-player-track-prev text-sm" aria-hidden="true"></i> Prev
+              </button>
+              <button type="button" data-step="1"
+                class="inline-flex items-center gap-1.5 rounded-xs border border-white/15 px-2.5 py-1.5 caption-text font-semibold text-ivory/70 hover:text-white hover:border-white/35 disabled:opacity-30 disabled:pointer-events-none transition-colors">
+                Next <i class="ti ti-player-track-next text-sm" aria-hidden="true"></i>
+              </button>
+              <span id="va-position" class="ml-auto caption-text tabular-nums text-ivory/40"></span>
+            </div>
+
+            <!-- Info -->
+            <div class="p-4 sm:p-6">
+              <span id="va-category" class="eyebrow text-azure-light"></span>
+              <h2 id="va-title" class="mt-2 text-headline lg:text-title font-bold text-ivory text-balance leading-snug"></h2>
+              <div id="va-meta" class="mt-2 meta-text text-ivory/50 tabular-nums"></div>
+
+              <div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <span class="eyebrow text-ivory/40">Share</span>
+                {shareChannels.map((c) => (
+                  <a href="#" aria-label={`Share on ${c.name}`} title={c.name}
+                    class="grid place-items-center size-9 border border-white/15 text-ivory/70 hover:border-azure-light hover:text-azure-light transition-colors rounded-sm">
+                    <i class:list={['ti', c.icon, 'text-[17px]']} aria-hidden="true"></i>
+                  </a>
+                ))}
+                <a href="/video-alt" class="ml-auto inline-flex items-center gap-1.5 meta-text text-azure-light hover:text-white transition-colors">
+                  All videos <i class="ti ti-arrow-right text-base" aria-hidden="true"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar: Up Next — the single queue, same row shape as the modal -->
+          <aside class="lg:col-span-5 xl:col-span-4 border-t lg:border-t-0 lg:border-l border-white/10 bg-white/[0.02] min-w-0">
+            <div role="tablist" aria-label="Browse videos" class="flex items-stretch gap-1 px-3 border-b border-white/10">
+              <button type="button" role="tab" aria-selected="true"
+                class="inline-flex items-center h-10 px-2.5 border-b-2 border-azure-light caption-text font-semibold whitespace-nowrap text-ivory">
+                Up Next
+              </button>
+            </div>
+            <div class="p-3 sm:p-4 lg:max-h-[52vh] overflow-y-auto scrollbar-none">
+              <ol id="va-queue" class="space-y-1">
+                {altVideos.map((v) => (
+                  <li>
+                    <button type="button" data-item={v.youtubeId}
+                      class="vitem group w-full text-left flex gap-3 p-2 rounded-md hover:bg-white/5 transition-colors">
+                      <span class="relative w-28 shrink-0 aspect-video rounded overflow-hidden bg-black border border-white/10">
+                        <img src={v.local!.poster} alt="" loading="lazy" class="w-full h-full object-cover" />
+                        <span class="vnow absolute inset-0 hidden place-items-center bg-black/55">
+                          <i class="ti ti-player-play text-lg text-white" aria-hidden="true"></i>
+                        </span>
+                        {v.durationText && (
+                          <span class="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] px-1 py-0.5 rounded-xs tabular-nums">{v.durationText}</span>
+                        )}
+                      </span>
+                      <span class="min-w-0 flex-1">
+                        <span class="eyebrow text-azure-light text-[10px]">{v.category}</span>
+                        <span class="mt-0.5 block article-title text-sm text-ivory group-hover:text-azure-light transition-colors line-clamp-2 leading-snug">
+                          {v.title}
+                        </span>
+                        <span class="mt-1 block caption-text text-ivory/45 tabular-nums">
+                          {[v.viewsText, v.sitePublishDate ?? v.uploadDate].filter(Boolean).join(' · ')}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<!-- The modal's queue, serialized once — the client script reads this -->
+<script type="application/json" is:inline set:html={theaterPayload} id="va-payload"></script>
+
+<script>
+  import { mount } from '../lib/player';
+
+  const overlay = document.querySelector<HTMLElement>('[data-theater]');
+  const stage = overlay?.querySelector<HTMLElement>('[data-stage]');
+  const queueEl = overlay?.querySelector<HTMLOListElement>('#va-queue');
+  const payloadEl = document.getElementById('va-payload');
+  const videos: AltVideo[] = payloadEl ? JSON.parse(payloadEl.textContent || '[]') : [];
+  const byId = new Map(videos.map((v) => [v.youtubeId, v]));
+  let queue: string[] = videos.map((v) => v.youtubeId);
+  let currentId: string | null = null;
+  let handle: { dispose(): void } | null = null;
+  let lastFocused: HTMLElement | null = null;
+
+  interface AltVideo {
+    youtubeId: string;
+    title: string;
+    category: string;
+    durationText: string | null;
+    viewsText: string | null;
+    sitePublishDate: string | null;
+    uploadDate: string | null;
+    local: { src: string; poster: string };
+  }
+
+  const setText = (sel: string, t: string) => {
+    const el = overlay?.querySelector(sel);
+    if (el) el.textContent = t;
+  };
+
+  // The one player: dispose whatever was playing, then mount the next video.
+  function playVideo(v: AltVideo) {
+    if (!v?.local) return;
+    currentId = v.youtubeId;
+    handle?.dispose();
+    handle = null;
+    if (stage) {
+      mount(stage, { src: v.local.src, poster: v.local.poster, title: v.title }, { autoplay: true })
+        .then((h) => {
+          handle = h;
+          // VOD behavior: when the clip finishes, advance the queue. The media
+          // element lives inside the v10 custom element, but it is light DOM,
+          // so an 'ended' listener on it survives across the skin's lifecycle.
+          stage.querySelector('video')?.addEventListener('ended', () => step(1));
+        })
+        .catch(() => {});
+    }
+
+    setText('#va-category', v.category);
+    setText('#va-title', v.title);
+    setText('#va-meta', [v.durationText, v.viewsText, v.sitePublishDate ?? v.uploadDate].filter(Boolean).join(' · '));
+
+    // Credit the source beside the mark, like the modal's channel ident.
+    const head = document.getElementById('va-source-head');
+    const name = document.getElementById('va-source-name');
+    head?.classList.toggle('hidden', !v.category);
+    head?.classList.toggle('flex', Boolean(v.category));
+    if (name) name.textContent = v.category;
+
+    markNowPlaying();
+    const row = queueEl?.querySelector(`[data-item="${v.youtubeId}"]`);
+    row?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function markNowPlaying() {
+    queueEl?.querySelectorAll('[data-item]').forEach((n) => {
+      const on = n.getAttribute('data-item') === currentId;
+      n.classList.toggle('is-playing', on);
+      const badge = n.querySelector('.vnow');
+      if (badge) badge.classList.toggle('hidden', !on), badge.classList.toggle('grid', on);
+    });
+    const pos = document.getElementById('va-position');
+    const i = queue.indexOf(currentId!);
+    if (pos) pos.textContent = i >= 0 ? `${i + 1} of ${queue.length}` : '';
+    overlay?.querySelectorAll('[data-step]').forEach((b) => {
+      const s = Number(b.getAttribute('data-step'));
+      b.disabled = i < 0 || i + s < 0 || i + s >= queue.length;
+    });
+  }
+
+  function step(by: number) {
+    const i = queue.indexOf(currentId!);
+    const next = i + by;
+    if (i < 0 || next < 0 || next >= queue.length) return;
+    const v = byId.get(queue[next]);
+    if (v) playVideo(v);
+  }
+
+  function showModal() {
+    lastFocused = document.activeElement as HTMLElement;
+    overlay?.setAttribute('data-open', '');
+    overlay?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    const closeBtn = overlay?.querySelector('[data-close]');
+    if (closeBtn && closeBtn instanceof HTMLElement) closeBtn.focus();
+  }
+
+  function hideModal() {
+    handle?.dispose();
+    handle = null;
+    overlay?.removeAttribute('data-open');
+    overlay?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    lastFocused?.focus();
+  }
+
+  function openWithId(id: string | null) {
+    const v = byId.get(id ?? '');
+    if (!v) return;
+    showModal();
+    playVideo(v);
+  }
+
+  // One delegated listener serves every trigger (hero title, grid titles,
+  // sample button), the rail and the modal chrome.
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element;
+    const trigger = target.closest?.('[data-theater-open]') as HTMLElement | null;
+    if (trigger) {
+      openWithId(trigger.dataset.theaterId);
+      return;
+    }
+    const item = target.closest?.('[data-item]') as HTMLElement | null;
+    if (item) {
+      openWithId(item.getAttribute('data-item'));
+      return;
+    }
+    if (target.closest?.('[data-step]')) {
+      step(Number(target.closest('[data-step]')!.getAttribute('data-step')));
+      return;
+    }
+    if (target.closest?.('[data-close]')) hideModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const t = e.target as HTMLElement;
+    if (t && typeof t.closest === 'function' && t.closest('input, textarea')) return;
+    if (!overlay?.hasAttribute('data-open')) return;
+    if (e.key === 'Escape') hideModal();
+    else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+  });
+</script>
+
+<style>
+  /* The playing row keeps the azure the rest of the theater uses for state —
+     same rule VideoModal applies, scoped to this copy. */
+  #va-theater .vitem.is-playing {
+    background-color: rgb(255 255 255 / 0.06);
+    box-shadow: inset 2px 0 0 var(--color-azure-light);
+  }
+  #va-theater .vitem.is-playing .article-title { color: var(--color-azure-light); }
+</style>

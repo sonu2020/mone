@@ -1,0 +1,288 @@
+---
+// BLOCK · RouteMap — the route, pinned as a HUD.
+//
+// Leaflet, themed rather than default: Carto's unlabelled basemap desaturated
+// and pushed toward the masthead navy with a CSS filter, so the map reads as
+// part of the paper instead of as an embed. Every mark on top of it — route,
+// pins, the travelling pointer — is drawn in brand colour and is unfiltered,
+// because the filter sits on the tile pane alone.
+//
+// A photo essay reads down one column, so the map cannot take a column of its
+// own. It sits pinned in the corner instead: small, quiet, and dismissible.
+// Chapters still own it — as one scrolls into place the view flies to that
+// stop, the route line advances, and a pointer walks the new leg.
+//
+// It stays out of the way until there is something to show: hidden over the
+// hero, revealed once the essay starts, and closable for good.
+//
+// Nothing runs until Leaflet has loaded, and the page is complete without it.
+//
+// The Leaflet boot, the tile theme and the pin styling used to live here and be
+// borrowed by InlineMap, which meant an InlineMap without a RouteMap rendered
+// nothing. They belong to no single map, so they moved to MapBase; this file is
+// now only the route and its HUD.
+import MapBase from '../map/MapBase.astro';
+import type { Trek } from '../../lib/travelogue';
+
+export interface Props {
+  trek: Trek;
+  class?: string;
+}
+const { trek, class: className = '' } = Astro.props;
+
+// The HUD follows chapters, so it walks the chapters' waypoints in order —
+// not the waypoint list, which a chapter could in principle skip.
+const payload = {
+  overview: trek.overview,
+  stops: trek.chapters.map((c, i) => {
+    const w = trek.waypoints.find((x) => x.id === c.waypoint)!;
+    return {
+      id: w.id,
+      place: w.nameML,
+      placeEn: w.name,
+      coords: w.coords,
+      elevation: w.elevation,
+      km: w.km,
+      index: i + 1,
+    };
+  }),
+};
+---
+
+<MapBase />
+
+<aside
+  id="route-hud"
+  class:list={[
+    'mc',
+    'route-map fixed z-40 right-3 bottom-3 sm:right-5 sm:bottom-5',
+    'w-[17rem] sm:w-[24rem] lg:w-[27rem] rounded-sm overflow-hidden border border-white/15',
+    'bg-nav-bg shadow-2xl',
+    'opacity-0 translate-y-3 pointer-events-none transition-[opacity,transform] duration-400 ease-out',
+    'data-[shown]:opacity-100 data-[shown]:translate-y-0 data-[shown]:pointer-events-auto',
+    'data-[closed]:hidden',
+    className,
+  ]}
+  aria-label="Route map"
+>
+  <div class="flex items-center gap-2 px-2.5 h-8 border-b border-white/12">
+    <span class="eyebrow text-[0.5625rem] text-white/45">The route</span>
+    <span data-map-leg class="ml-auto caption-text tabular-nums text-white/55">1 / 5</span>
+    <button
+      type="button"
+      data-hud-close
+      class="-mr-1 inline-flex size-6 items-center justify-center rounded-xs text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+      aria-label="Hide route map"
+    ><i class="ti ti-x text-sm" aria-hidden="true"></i></button>
+  </div>
+
+  <div class="relative">
+    <div
+      id="route-map"
+      class="w-full h-[11rem] sm:h-[15rem] lg:h-[17rem] bg-brand-dark"
+      role="img"
+      aria-label={`Route map — ${trek.waypoints.map((w) => w.name).join(' to ')}`}
+    ></div>
+
+    <!-- Where the reader is, over the map's bottom edge. -->
+    <div class="pointer-events-none absolute inset-x-0 bottom-0 z-[500]">
+      <div class="px-3 pb-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+        <p data-map-place class="font-malayalam text-[1.0625rem] leading-tight text-white">
+          {trek.waypoints[0].nameML}
+        </p>
+        <p data-map-sub class="mt-0.5 caption-text tabular-nums text-white/60">
+          {trek.waypoints[0].name} · {trek.waypoints[0].km} km · {trek.waypoints[0].elevation} m
+        </p>
+      </div>
+      <div class="h-[3px] bg-white/15">
+        <span data-map-progress class="block h-full w-0 bg-accent-red transition-[width] duration-700 ease-out"></span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<script type="application/json" id="route-data" set:html={JSON.stringify(payload).replace(/</g, '\\u003c')}></script>
+
+<script is:inline>
+  (function () {
+    var el = document.getElementById('route-map');
+    var dataEl = document.getElementById('route-data');
+    if (!el || !dataEl) return;
+
+    var data = JSON.parse(dataEl.textContent || '{}');
+    var stops = data.stops || [];
+    if (!stops.length) return;
+
+    var placeEl = document.querySelector('[data-map-place]');
+    var legEl = document.querySelector('[data-map-leg]');
+    var subEl = document.querySelector('[data-map-sub]');
+    var progressEl = document.querySelector('[data-map-progress]');
+
+    window.mapReady(function (L) {
+      var reduce = window.mapReduceMotion();
+
+      var map = L.map(el, {
+        zoomControl: false,
+        scrollWheelZoom: false,   // the page owns the wheel; the map owns the story
+        dragging: true,
+        attributionControl: true,
+      }).setView(data.overview.center, data.overview.zoom);
+
+      L.control.zoom({ position: 'topright' }).addTo(map);
+
+      // Unlabelled basemap — place names come from the prose, not the tiles.
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 19,
+      }).addTo(map);
+
+      var latlngs = stops.map(function (s) { return s.coords; });
+
+      // The route, drawn twice: a faint full line for context, and a bright one
+      // that grows as the reader travels.
+      L.polyline(latlngs, {
+        color: '#0b2e5d', weight: 2, opacity: 0.22, dashArray: '3 6',
+      }).addTo(map);
+
+      var travelled = L.polyline([latlngs[0]], {
+        color: '#a72626', weight: 3.5, opacity: 0.95, lineCap: 'round',
+      }).addTo(map);
+
+      // Numbered pins, dimmed until reached.
+      var pins = stops.map(function (s, i) {
+        var marker = L.marker(s.coords, {
+          icon: L.divIcon({
+            className: 'route-pin',
+            html: '<span class="route-pin__dot">' + s.index + '</span>',
+            iconSize: [26, 26],
+            iconAnchor: [13, 13],
+          }),
+          keyboard: false,
+        }).addTo(map);
+        marker.bindTooltip(s.place, { direction: 'top', offset: [0, -14], className: 'route-tip' });
+        return marker;
+      });
+
+      // The travelling pointer — one marker that walks the leg it is on.
+      var pointer = L.marker(latlngs[0], {
+        icon: L.divIcon({ className: 'route-pointer', html: '<span></span>', iconSize: [16, 16], iconAnchor: [8, 8] }),
+        interactive: false,
+        zIndexOffset: 1000,
+      }).addTo(map);
+
+      var current = 0;
+      var anim = null;
+
+      function setActive(i) {
+        pins.forEach(function (m, n) {
+          var node = m.getElement();
+          if (node) node.classList.toggle('is-reached', n <= i);
+          if (node) node.classList.toggle('is-current', n === i);
+        });
+        if (placeEl) placeEl.textContent = stops[i].place;
+        if (subEl) {
+          subEl.textContent = stops[i].placeEn + ' · ' + stops[i].km + ' km · ' + stops[i].elevation + ' m';
+        }
+        if (legEl) legEl.textContent = (i + 1) + ' / ' + stops.length;
+        if (progressEl) progressEl.style.width = (i / (stops.length - 1)) * 100 + '%';
+      }
+
+      // Walk the pointer from one stop to the next, drawing the line behind it.
+      function travelTo(i) {
+        if (anim) cancelAnimationFrame(anim);
+        var from = latlngs[current];
+        var to = latlngs[i];
+
+        if (reduce || i === current) {
+          travelled.setLatLngs(latlngs.slice(0, i + 1));
+          pointer.setLatLng(to);
+          current = i;
+          return;
+        }
+
+        // Going back: just redraw, no theatre.
+        if (i < current) {
+          travelled.setLatLngs(latlngs.slice(0, i + 1));
+          pointer.setLatLng(to);
+          current = i;
+          return;
+        }
+
+        var start = null;
+        var DURATION = 900;
+        var head = latlngs.slice(0, current + 1);
+
+        function step(ts) {
+          if (start === null) start = ts;
+          var t = Math.min((ts - start) / DURATION, 1);
+          var e = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;   // easeInOutQuad
+          var lat = from[0] + (to[0] - from[0]) * e;
+          var lng = from[1] + (to[1] - from[1]) * e;
+          pointer.setLatLng([lat, lng]);
+          travelled.setLatLngs(head.concat([[lat, lng]]));
+          if (t < 1) anim = requestAnimationFrame(step);
+          else { current = i; anim = null; }
+        }
+        anim = requestAnimationFrame(step);
+      }
+
+      function goTo(i) {
+        if (i < 0 || i >= stops.length) return;
+        map.flyTo(stops[i].coords, 11, { duration: reduce ? 0 : 1.1 });
+        setActive(i);
+        travelTo(i);
+      }
+
+      setActive(0);
+
+      // The HUD is hidden over the hero and revealed once the essay begins, so
+      // it never covers the opening photograph. Closing it is permanent for the
+      // visit — a reader who dismisses a floating panel means it.
+      var hud = document.getElementById('route-hud');
+      var closeBtn = document.querySelector('[data-hud-close]');
+      var dismissed = false;
+
+      if (closeBtn && hud) {
+        closeBtn.addEventListener('click', function () {
+          dismissed = true;
+          hud.removeAttribute('data-shown');
+          hud.setAttribute('data-closed', '');
+        });
+      }
+
+      function showHud() {
+        if (dismissed || !hud || hud.hasAttribute('data-shown')) return;
+        hud.setAttribute('data-shown', '');
+        // Leaflet sized itself while the panel was hidden; correct it.
+        setTimeout(function () { map.invalidateSize(); }, 420);
+      }
+
+      var hero = document.querySelector('[data-immersive-hero]');
+      if (hero && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (!e.isIntersecting) showHud(); });
+        }, { threshold: 0 }).observe(hero);
+      } else {
+        showHud();
+      }
+
+      // Chapters drive the map. The band is narrow and near the middle so a
+      // chapter takes over only once it is genuinely the thing being read.
+      var chapters = Array.prototype.slice.call(document.querySelectorAll('[data-chapter]'));
+      if (!chapters.length || !('IntersectionObserver' in window)) return;
+
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var i = Number(entry.target.getAttribute('data-chapter'));
+          entry.target.classList.add('is-read');
+          if (i !== current) goTo(i);
+        });
+      }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+
+      chapters.forEach(function (c) { io.observe(c); });
+    });
+  })();
+</script>
+
+<!-- Tile theme, pins, tooltip and pointer styles now live in MapBase. -->

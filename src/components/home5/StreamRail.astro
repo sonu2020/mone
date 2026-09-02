@@ -1,0 +1,70 @@
+---
+// BLOCK · StreamRail — the column beside the feed on lg+.
+//
+// A stream this long needs one fixed point, or the page is nothing but motion.
+// The rail sticks below the masthead and holds the two things a reader might
+// want at any depth: what everyone else is reading, and a way back to the live
+// channel. Below lg it is not rendered at all — on a phone the feed is the
+// page, and a rail stacked under forty items is a footer nobody reaches.
+import AdSlot from '../AdSlot.astro';
+import type { LiveStory } from '../../lib/home4-data';
+import { LIVE_CHANNEL } from '../../lib/live-tv';
+
+export interface Props {
+  stories: LiveStory[];
+  adSlot?: string;
+  class?: string;
+}
+const { stories, adSlot, class: className = '' } = Astro.props;
+---
+
+<aside class:list={['mc', 'sticky top-20 flex flex-col gap-7', className]}>
+  <!-- Live — the one thing on the page that is happening rather than filed. -->
+  <a
+    href="/live"
+    class="group flex items-center gap-3 rounded-md border border-rule dark:border-ivory/12 px-4 py-3 hover:border-azure/50 transition-colors"
+  >
+    <span class="relative flex h-2 w-2 shrink-0">
+      <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500/70"></span>
+      <span class="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+    </span>
+    <span class="min-w-0 flex flex-col">
+      <span class="eyebrow text-red-500">Live now</span>
+      <span class="headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors truncate">
+        {LIVE_CHANNEL.titleML}
+      </span>
+    </span>
+  </a>
+
+  <!-- Most read — numbered, image-free. The rail earns its width by being the
+       one column on the page that is only text; another run of thumbs beside
+       the feed's thumbs would read as a second feed. -->
+  <section>
+    <div class="flex items-baseline gap-4 pb-1">
+      <span class="band-label text-text-navy-deep dark:text-ivory">Most read</span>
+      <span class="h-px flex-1 bg-rule dark:bg-ivory/15" aria-hidden="true"></span>
+    </div>
+
+    <ol class="divide-y divide-rule dark:divide-ivory/10">
+      {stories.map((story, i) => (
+        <li>
+          <a href={story.href} class="group flex items-start gap-3 py-3">
+            <span class="band-label w-5 shrink-0 pt-0.5 text-text-light dark:text-ivory/30 tabular-nums">
+              {i + 1}
+            </span>
+            <span class="min-w-0 flex flex-col gap-0.5">
+              <span class="headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-3">
+                {story.title}
+              </span>
+              {story.category && (
+                <span class="row-meta text-text-light dark:text-ivory/40">{story.category}</span>
+              )}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  {adSlot && <AdSlot slot={adSlot} format="rectangle" lazy />}
+</aside>

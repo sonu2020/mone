@@ -1,0 +1,103 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import SectionSubNav from '../components/nav/SectionSubNav.astro';
+import Footer from '../components/Footer.astro';
+import { allVideos } from '../lib/videos';
+import { LIVE_CHANNEL } from '../lib/live-tv';
+
+const recentVideos = allVideos.slice(0, 4);
+---
+
+<Layout title="ലൈവ് ടിവി | Live TV — MediaOne" description="മീഡിയവൺ ലൈവ് ടിവി വെബ്കാസ്റ്റ് കാണാം. തത്സമയ വാർത്തകൾ, വിശകലനങ്ങൾ, തത്സമയ ചർച്ചകൾ.">
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page py-6">
+    <div class="max-w-site mx-auto w-full px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-meta text-ink-muted dark:text-ivory/45 mb-5" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure dark:hover:text-azure-light transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-ink dark:text-ivory">Live TV</span>
+      </nav>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <!-- Live Player Column -->
+        <div class="lg:col-span-8">
+          <!-- Pulse Live Indicator Banner -->
+          <div class="bg-accent-red text-white px-4 py-3 rounded-t-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+              </span>
+              <span class="eyebrow font-bold tracking-wider">LIVE BROADCAST</span>
+            </div>
+            <span class="text-xs font-semibold tabular-nums uppercase">തത്സമയം</span>
+          </div>
+
+          <!-- Responsive Iframe Container -->
+          <div class="relative overflow-hidden bg-black aspect-video border border-rule dark:border-ivory/10 shadow-md">
+            <iframe
+              src={`${LIVE_CHANNEL.embedUrl}&autoplay=1`}
+              title={LIVE_CHANNEL.title}
+              class="absolute inset-0 w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </div>
+
+          <!-- Video Details -->
+          <div class="mt-5">
+            <h1 class="text-title text-ink dark:text-ivory flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <span>മീഡിയവൺ ലൈവ് ടിവി | MediaOne Live TV</span>
+            </h1>
+            <p class="mt-4 text-body text-ink-light dark:text-ivory/70 max-w-3xl leading-relaxed text-pretty">
+              മീഡിയവണിന്റെ തത്സമയ വാർത്താ സംപ്രേഷണം. കേരളത്തിലെയും ഇന്ത്യയിലെയും ഗൾഫിലെയും പ്രധാന വാർത്തകൾ തത്സമയം കാണാം. വിശ്വസനീയമായ തത്സമയ വാർത്തകൾ, വിശകലനങ്ങൾ, തത്സമയ ചർച്ചകൾ, മറ്റ് ജനപ്രിയ പരിപാടികൾ.
+            </p>
+          </div>
+        </div>
+
+        <!-- Sidebar (Recent Programs) -->
+        <div class="lg:col-span-4">
+          <div class="lg:border-l lg:border-rule lg:dark:border-ivory/10 lg:pl-8 space-y-8">
+            <div>
+              <div class="pb-3 border-b border-ink/15 dark:border-ivory/15">
+                <h2 class="eyebrow text-azure dark:text-azure-light">മുൻകാല പരിപാടികൾ (Recent Shows)</h2>
+              </div>
+
+              <div class="mt-2 divide-y divide-rule/50 dark:divide-ivory/5">
+                {recentVideos.map((video) => (
+                  <a href={`/videos/watch/${video.slug}`} class="group flex gap-3.5 py-4">
+                    <div class="min-w-0 flex-1">
+                      <h3 class="text-meta font-semibold text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2">{video.title}</h3>
+                      <p class="mt-1 text-caption text-ink-muted dark:text-ivory/45 tabular-nums">{video.publishDate} · {video.category}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <!-- YouTube subscribe promo -->
+            <div class="p-5 border border-rule dark:border-ivory/10 bg-bg-card rounded-sm text-center">
+              <i class="ti ti-brand-youtube text-4xl text-accent-red" aria-hidden="true"></i>
+              <h3 class="mt-3 text-headline text-ink dark:text-ivory font-bold">കൂടുതൽ വാർത്തകൾക്കായി</h3>
+              <p class="mt-2 text-caption text-ink-muted dark:text-ivory/60 font-medium">യൂട്യൂബിൽ മീഡിയവൺ ചാനൽ സബ്സ്ക്രൈബ് ചെയ്യൂ.</p>
+              <a
+                href="https://www.youtube.com/channel/UCpt10lzibN9Ux-tFGVAnrBw?sub_confirmation=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-4 inline-block w-full py-2 bg-accent-red hover:bg-red-700 text-white font-semibold text-sm rounded shadow transition-colors"
+              >
+                SUBSCRIBE ON YOUTUBE
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

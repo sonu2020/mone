@@ -1,0 +1,80 @@
+---
+// COMPONENT · ShelfFigure — a picture with its line of credit.
+//
+// One component, three scales, because the difference between a lead, a plate
+// and a portrait on this page is size and emphasis, not structure. Building
+// three near-identical components would be the kind of duplication that drifts.
+//
+// Every Shelf image is 500×300, so none of these ratios crop hard and none of
+// the scales stretch past about 600px on screen. That is a real ceiling on the
+// source material, and it is also why the page reads as spacious: the pictures
+// sit at their natural size with air around them instead of being blown up to
+// fill a container.
+import type { ShelfArticle } from '../../lib/shelf';
+
+export interface Props {
+  article: ShelfArticle;
+  /** lead — the one piece a collection opens on.
+   *  plate — a picture given room, for the visual collections.
+   *  portrait — a person, for the interviews, where the name leads. */
+  scale?: 'lead' | 'plate' | 'portrait';
+  class?: string;
+}
+
+const { article, scale = 'plate', class: className = '' } = Astro.props;
+
+// 3:2 throughout — the native ratio of every image in this set. A 4:5 portrait
+// crop would cut a third off a 500×300 source and take the subject with it.
+const headline = {
+  lead: 'article-title-lg sm:text-title',
+  plate: 'article-title-lg',
+  portrait: 'article-title',
+}[scale];
+
+const gap = { lead: 'mt-4', plate: 'mt-3', portrait: 'mt-3' }[scale];
+---
+
+<article class:list={['mc', className]}>
+  <a href={`/shelf/${article.slug}`} class="group block">
+    <div class="relative aspect-[3/2] overflow-hidden bg-placeholder">
+      <img
+        src={article.image}
+        alt=""
+        width="500"
+        height="300"
+        loading="lazy"
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+      />
+    </div>
+
+    <div class={gap}>
+      {scale === 'portrait' ? (
+        <>
+          {/* The interview subject's writer leads: in this collection the name
+              is the headline and the question is the deck. */}
+          <h3 class="article-title-lg text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+            {article.author}
+          </h3>
+          <p class="mt-1.5 body-small text-text-secondary line-clamp-3 text-balance">{article.title}</p>
+        </>
+      ) : (
+        <>
+          <div class="flex items-baseline gap-2.5">
+            <span class="eyebrow text-azure dark:text-azure-light">{article.category}</span>
+            <span class="text-text-muted" aria-hidden="true">·</span>
+            <span class="eyebrow text-text-primary">{article.author}</span>
+          </div>
+          <h3
+            class:list={[
+              'mt-2 text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance',
+              headline,
+              scale === 'lead' ? 'max-w-[24ch]' : 'max-w-[30ch]',
+            ]}
+          >{article.title}</h3>
+        </>
+      )}
+
+      <p class="mt-2 caption-text tabular-nums text-text-muted">{article.date}</p>
+    </div>
+  </a>
+</article>

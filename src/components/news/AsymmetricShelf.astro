@@ -1,0 +1,146 @@
+---
+// BLOCK · AsymmetricShelf — a premium editorial layout pattern for features.
+// Features a thick top-rule accent above the section heading, a 5:7 split hero story
+// (text left, large image right), a 4-column horizontal card grid underneath,
+// and a vertical sidebar on the right with mixed layout stories separated by rules.
+import Media from '../ui/Media.astro';
+import Kicker from '../ui/Kicker.astro';
+import Headline from '../ui/Headline.astro';
+import StoryCard from './StoryCard.astro';
+import type { Story } from '../../lib/home-data';
+
+export interface Props {
+  title: string;
+  titleEn?: string;
+  viewAllHref?: string;
+  leadStory: Story;
+  bottomStories: Story[];
+  sidebarStories: Story[];
+  class?: string;
+}
+
+const {
+  title,
+  titleEn,
+  viewAllHref,
+  leadStory,
+  bottomStories,
+  sidebarStories,
+  class: className = '',
+} = Astro.props;
+---
+
+<section class:list={['mc', 'py-7 lg:py-10', className]}>
+  <!-- Section Heading (editorial top-bordered variant matching user's layout) -->
+  <div class="border-t-2 border-ink dark:border-ivory/30 pt-3 pb-5 flex items-baseline justify-between">
+    <div class="flex items-baseline gap-2.5 min-w-0">
+      <h2 class="section-header font-bold text-ink dark:text-ivory uppercase tracking-wider">
+        {title}
+      </h2>
+      {titleEn && <span class="eyebrow text-ink-muted dark:text-ivory/40">{titleEn}</span>}
+    </div>
+    {viewAllHref && (
+      <a href={viewAllHref} class="eyebrow text-azure dark:text-azure-light hover:text-azure-dark dark:hover:text-azure transition-colors">
+        View all →
+      </a>
+    )}
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-4">
+    <!-- Left Main Column (9 columns out of 12) -->
+    <div class="lg:col-span-9 flex flex-col gap-8 lg:border-r lg:border-rule lg:dark:border-ivory/10 lg:pr-8">
+      
+      <!-- Lead / Hero Story (Split) -->
+      <a href={leadStory.href} class="group grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <!-- Lead Story Text Panel -->
+        <div class="md:col-span-5 flex flex-col justify-center">
+          {leadStory.category && (
+            <Kicker text={leadStory.category} class="mb-2 block" />
+          )}
+          <h3 class="text-title font-bold leading-tight text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors duration-200">
+            {leadStory.title}
+          </h3>
+          {leadStory.excerpt && (
+            <p class="mt-3 body-small text-text-secondary dark:text-ivory/70 line-clamp-3 md:line-clamp-4">
+              {leadStory.excerpt}
+            </p>
+          )}
+          {leadStory.date && (
+            <p class="mt-3 caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+              {leadStory.date}
+            </p>
+          )}
+        </div>
+
+        <!-- Lead Story Image Panel -->
+        <div class="md:col-span-7">
+          <Media seed={leadStory.href} ratio="3/2" class="w-full" zoom />
+        </div>
+      </a>
+
+      <!-- Horizontal line between Lead story and 4 bottom stories -->
+      <div class="border-t border-rule dark:border-ivory/10"></div>
+
+      <!-- Bottom Grid: 4 columns, 1 article each -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {bottomStories.slice(0, 4).map((story) => (
+          <StoryCard story={story} ratio="16/10" />
+        ))}
+      </div>
+    </div>
+
+    <!-- Right Sidebar Column (3 columns out of 12) -->
+    <aside class="lg:col-span-3 flex flex-col divide-y divide-rule dark:divide-ivory/10">
+      <!-- Story 1: Card layout with image -->
+      {sidebarStories[0] && (
+        <div class="pb-4">
+          <StoryCard story={sidebarStories[0]} ratio="16/10" showExcerpt />
+        </div>
+      )}
+
+      <!-- Story 2: Text-only layout -->
+      {sidebarStories[1] && (
+        <div class="py-4">
+          <a href={sidebarStories[1].href} class="group block">
+            {sidebarStories[1].category && (
+              <Kicker text={sidebarStories[1].category} class="mb-1.5 block" />
+            )}
+            <Headline as="h4" size="base" text={sidebarStories[1].title} clamp={3} />
+            {sidebarStories[1].excerpt && (
+              <p class="mt-2 body-small text-text-secondary dark:text-ivory/70 line-clamp-3">
+                {sidebarStories[1].excerpt}
+              </p>
+            )}
+            {sidebarStories[1].date && (
+              <p class="mt-2 caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+                {sidebarStories[1].date}
+              </p>
+            )}
+          </a>
+        </div>
+      )}
+
+      <!-- Story 3: Text-only layout -->
+      {sidebarStories[2] && (
+        <div class="pt-4">
+          <a href={sidebarStories[2].href} class="group block">
+            {sidebarStories[2].category && (
+              <Kicker text={sidebarStories[2].category} class="mb-1.5 block" />
+            )}
+            <Headline as="h4" size="base" text={sidebarStories[2].title} clamp={3} />
+            {sidebarStories[2].excerpt && (
+              <p class="mt-2 body-small text-text-secondary dark:text-ivory/70 line-clamp-3">
+                {sidebarStories[2].excerpt}
+              </p>
+            )}
+            {sidebarStories[2].date && (
+              <p class="mt-2 caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+                {sidebarStories[2].date}
+              </p>
+            )}
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+</section>

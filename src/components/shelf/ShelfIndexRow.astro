@@ -1,0 +1,51 @@
+---
+// COMPONENT · ShelfIndexRow — one piece as a line of type, no picture.
+//
+// The house position is that cards are the exception and most content is
+// hairline-separated rows; this is that row, at Shelf's scale. It carries the
+// byline first because in a long-form section the writer is often the reason
+// you click, and a 500px thumbnail repeated down a list adds nothing a name
+// does not already say.
+//
+// Used for the Column collection, which is nothing but rows, and for the
+// secondary picks beside a lead.
+import type { ShelfArticle } from '../../lib/shelf';
+
+export interface Props {
+  article: ShelfArticle;
+  /** 'lg' gives the headline its own line at reading size — for a whole
+   *  collection of rows. 'sm' keeps it tight, for a list beside a lead. */
+  size?: 'sm' | 'lg';
+  showCategory?: boolean;
+  class?: string;
+}
+
+const { article, size = 'sm', showCategory = false, class: className = '' } = Astro.props;
+const headline = size === 'lg' ? 'article-title-lg' : 'article-title';
+---
+
+<article class:list={['mc', 'border-b border-rule dark:border-ivory/10', className]}>
+  <a
+    href={`/shelf/${article.slug}`}
+    class:list={['group block', size === 'lg' ? 'py-4 lg:py-5' : 'py-3']}
+  >
+    <div class="flex items-baseline gap-2.5 flex-wrap">
+      <span class="eyebrow text-text-primary">{article.author}</span>
+      {showCategory && (
+        <>
+          <span class="text-text-muted" aria-hidden="true">·</span>
+          <span class="eyebrow text-azure dark:text-azure-light">{article.category}</span>
+        </>
+      )}
+      <span class="ml-auto caption-text tabular-nums text-text-muted shrink-0">{article.date}</span>
+    </div>
+
+    <h3
+      class:list={[
+        'mt-2 text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance',
+        headline,
+        size === 'lg' ? 'max-w-[38ch]' : 'line-clamp-2',
+      ]}
+    >{article.title}</h3>
+  </a>
+</article>

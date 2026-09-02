@@ -1,0 +1,154 @@
+---
+// ── /design/archive ─────────────────────────────────────────────────────────
+// Superseded gallery. These lockups still ship on the older homepage variants
+// under /home/*, so they are kept rendering here rather than deleted — but the
+// band set on /kitchen is what new work should compose from.
+import DesignShell from '../../components/design/DesignShell.astro';
+import Spec from '../../components/kitchen/Spec.astro';
+
+import StoryCard from '../../components/news/StoryCard.astro';
+import StoryList from '../../components/news/StoryList.astro';
+import OverlayStory from '../../components/news/OverlayStory.astro';
+import EditorialShelf from '../../components/news/EditorialShelf.astro';
+import AsymmetricShelf from '../../components/news/AsymmetricShelf.astro';
+import CategoryColumnsShelf from '../../components/news/CategoryColumnsShelf.astro';
+
+import {
+  hero,
+  topStories,
+  latest,
+  cluster,
+  shelfEditorialHero,
+  shelfEditorialGrid,
+  keralaEditorialHero,
+  keralaEditorialGrid,
+} from '../../lib/home-data';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+
+const groups = [
+  { id: 'lockups', n: 'A1', label: 'Page lockups', note: 'Hero + rail' },
+  { id: 'shelves', n: 'A2', label: 'Shelves', note: 'Editorial sections' },
+];
+
+// Where each archived pattern still runs, so nothing gets deleted by surprise.
+const usage = {
+  editorial: '/home/ideal, /home/magazine',
+  asymmetric: '/home/modular (Shelf band)',
+  categoryColumns: '/home/modular (Category columns)',
+  heroLockup: '/home/ideal',
+};
+---
+
+<DesignShell
+  title="Archive — MediaOne Design System"
+  description="Superseded lockups, kept rendering because the older homepage variants still ship them."
+  eyebrow="Archive"
+  heading="Superseded lockups"
+  lede="The shelf patterns the band set replaced. They are kept here — and kept working — because the older homepage variants under /home/* still render them. Compose new work from the bands in the Gallery instead."
+  active="archive"
+>
+  <div class="space-y-14">
+      <!-- ══ PAGE LOCKUPS ══ -->
+      <section id="lockups" class="scroll-mt-6">
+        <div class="flex items-baseline gap-3 mb-6">
+          <span class="eyebrow text-text-muted tabular-nums">A1</span>
+          <h2 class="text-title text-ink dark:text-ivory">Page lockups</h2>
+        </div>
+
+        <Spec
+          name="Hero lead + rail"
+          path="composed inline"
+          group="lockups"
+          status="legacy"
+          note={`Overlay hero over a three-up card row with a top-stories rail. Superseded by LeadPackage. Still on ${usage.heroLockup}.`}
+        >
+          <div class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
+            <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+              <OverlayStory story={hero} ratio="16/9" size="hero" />
+              <p class="mt-4 lead-text text-text-secondary dark:text-ivory/70 max-w-prose">{hero.excerpt}</p>
+              <div class="grid grid-cols-3 gap-6 mt-7 pt-7 border-t border-rule">
+                {[latest[1], india.lead, kerala.items[0]].map((x) => <StoryCard story={x} ratio="16/10" />)}
+              </div>
+            </div>
+            <aside class="lg:col-span-4 mt-8 lg:mt-0">
+              <h3 class="section-header text-ink dark:text-ivory pb-2.5 mb-4 border-b-2 border-ink dark:border-ivory/30">ടോപ് സ്റ്റോറീസ്</h3>
+              <StoryList items={topStories.slice(0, 4)} />
+            </aside>
+          </div>
+        </Spec>
+      </section>
+
+      <!-- ══ SHELVES ══ -->
+      <section id="shelves" class="scroll-mt-6">
+        <div class="flex items-baseline gap-3 mb-6">
+          <span class="eyebrow text-text-muted tabular-nums">A2</span>
+          <h2 class="text-title text-ink dark:text-ivory">Shelves</h2>
+        </div>
+
+        <div class="space-y-6">
+          <Spec
+            name="EditorialShelf · columns"
+            path="components/news/EditorialShelf.astro"
+            group="shelves"
+            status="legacy"
+            note={`Hero story over a three-column grid. Nearest band equivalent: ShelfBand. Still on ${usage.editorial}.`}
+          >
+            <EditorialShelf
+              title="ഷെൽഫ്"
+              titleEn="Shelf"
+              viewAllHref="/shelf"
+              heroStory={shelfEditorialHero}
+              gridStories={shelfEditorialGrid}
+              gridVariant="columns"
+            />
+          </Spec>
+
+          <Spec
+            name="EditorialShelf · lists"
+            path="components/news/EditorialShelf.astro"
+            group="shelves"
+            status="legacy"
+            note="Same shelf with the grid rendered as text lists — the Kerala treatment."
+          >
+            <EditorialShelf
+              title="കേരളം"
+              titleEn="Kerala"
+              viewAllHref="/kerala"
+              heroStory={keralaEditorialHero}
+              gridStories={keralaEditorialGrid}
+              gridVariant="lists"
+            />
+          </Spec>
+
+          <Spec
+            name="AsymmetricShelf"
+            path="components/news/AsymmetricShelf.astro"
+            group="shelves"
+            status="legacy"
+            note={`5:7 split hero, four-up card row and a mixed sidebar. Nearest band equivalent: SplitBand. Still on ${usage.asymmetric}.`}
+          >
+            <AsymmetricShelf
+              title="ടോപ് ന്യൂസ്"
+              titleEn="Top News"
+              viewAllHref="/latest-news"
+              leadStory={keralaEditorialHero}
+              bottomStories={keralaEditorialGrid.slice(0, 4)}
+              sidebarStories={[topStories[0], topStories[1], topStories[2]]}
+            />
+          </Spec>
+
+          <Spec
+            name="CategoryColumnsShelf"
+            path="components/news/CategoryColumnsShelf.astro"
+            group="shelves"
+            status="legacy"
+            note={`Four parallel category columns. Still on ${usage.categoryColumns}.`}
+          >
+            <CategoryColumnsShelf clusters={[kerala, cluster('india'), cluster('gulf'), cluster('sports')]} />
+          </Spec>
+        </div>
+      </section>
+    </div>
+</DesignShell>

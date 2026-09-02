@@ -1,0 +1,74 @@
+---
+// /design/inspector · internal LeadPackage inspection workspace.
+// The route is intentionally build-gated: normal builds redirect to the
+// design index, while PUBLIC_MC_OUTLINE=true exposes the design-engineer tool.
+import DesignShell from '../../components/design/DesignShell.astro';
+import LeadPackage from '../../components/home4/LeadPackage.astro';
+import { leadStories, latest, feed } from '../../lib/home4-data';
+
+const outlineEnabled = import.meta.env.PUBLIC_MC_OUTLINE === 'true';
+if (!outlineEnabled) return Astro.redirect('/design');
+
+const [hero, ...heroRest] = leadStories;
+---
+
+<DesignShell
+  title="LeadPackage Inspector | MediaOne Design"
+  description="Internal design-engineering inspection workspace for the canonical MediaOne LeadPackage component."
+  eyebrow="Inspector · LeadPackage"
+  heading="LeadPackage inspection"
+  lede="A canonical homepage fixture for reviewing component ownership, token provenance, custom utilities, and reversible preview fixes. This workspace is available only in outline mode."
+  active="components"
+  contained={false}
+  noindex
+>
+  <main class="min-h-dvh bg-bg-page" data-inspection-app data-inspection-component="LeadPackage">
+    <div class="mx-auto grid max-w-site gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:px-8 lg:py-12">
+      <section
+        class="min-w-0 bg-bg-card dark:bg-brand-dark"
+        data-inspection-fixture="lead-package"
+        aria-labelledby="fixture-heading"
+      >
+        <div class="border-b border-rule px-4 py-4 dark:border-ivory/10 sm:px-6">
+          <p class="eyebrow text-azure dark:text-azure-light">CANONICAL FIXTURE · HOMEPAGE</p>
+          <h2 id="fixture-heading" class="mt-1 text-title font-bold text-ink dark:text-ivory">LeadPackage</h2>
+          <p class="mt-1 text-body-small text-ink-muted dark:text-ivory/60">
+            Select the component tree or focus text in the fixture to inspect its token provenance.
+          </p>
+        </div>
+        <div class="px-4 sm:px-6">
+          <LeadPackage
+            lead={hero}
+            rows={[...heroRest, ...latest].slice(0, 4)}
+            feed={feed}
+            topics={[]}
+            onAir={false}
+            flushTop
+            class="border-b border-rule dark:border-ivory/10"
+          />
+        </div>
+      </section>
+
+      <aside
+        class="h-fit border border-rule bg-bg-card dark:border-ivory/10 dark:bg-brand-dark"
+        data-inspection-panel
+        aria-label="LeadPackage inspection panel"
+      >
+        <div class="p-4 sm:p-5">
+          <p class="eyebrow text-azure dark:text-azure-light">INSPECTION</p>
+          <h2 class="mt-1 text-section font-bold text-ink dark:text-ivory">Loading inspector…</h2>
+          <p class="mt-2 text-body-small text-ink-muted dark:text-ivory/60">
+            The fixture remains readable while inspection controls initialize.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </main>
+</DesignShell>
+
+<script>
+  import { initLeadPackageInspection } from '../../lib/inspection/inspection-page';
+
+  initLeadPackageInspection();
+  document.addEventListener('astro:page-load', initLeadPackageInspection);
+</script>

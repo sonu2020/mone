@@ -1,0 +1,81 @@
+---
+// ── /latest-news · the site-wide river ───────────────────────────────────────
+// Every desk's file as one desk, newest first, on the same shell /<section>
+// uses. See getLatestDesk in src/lib/desk.ts for how the pool is built and for
+// the one honest limitation in its ordering.
+//
+// This is deliberately not a distinct instrument — no time spine, no day
+// dividers, no lockup of its own. A reader arriving from the header's "Latest"
+// should land on something they already know how to read, and the eleven desk
+// pages are where that reading habit comes from.
+//
+// The page this replaced is archived at /old-latest-news.
+import Layout from "../layouts/Layout.astro";
+import HeaderBar from "../components/nav/HeaderBar.astro";
+import SectionSubNav from "../components/nav/SectionSubNav.astro";
+import Footer from "../components/Footer.astro";
+import VideoModal from "../components/VideoModal.astro";
+import ScheduleList from "../components/live/ScheduleList.astro";
+import DeskPage from "../components/desk/DeskPage.astro";
+
+import { getLatestDesk, getDeskPage, LATEST_DESK_ID } from "../lib/desk";
+import { latest } from "../lib/home4-data";
+import { allVideos, todaysVideos } from "../lib/videos";
+import { toModalVideos, modalShows, type ModalVideo } from "../lib/video-modal";
+import { LIVE_CHANNEL } from "../lib/live-tv";
+
+const desk = getLatestDesk();
+const page = getDeskPage(desk, 1);
+
+// The modal doubles as a video browser, so it needs more than a queue.
+const modalToday = todaysVideos().map((v) => ({
+  id: v.slug,
+  title: v.title,
+  time: v.publishTime,
+  poster: v.thumbnailUrl || "",
+}));
+const shows = await modalShows();
+
+const liveModalVideo: ModalVideo = {
+  id: LIVE_CHANNEL.id,
+  title: `${LIVE_CHANNEL.titleML} | ${LIVE_CHANNEL.title}`,
+  category: "Live TV",
+  meta: "Streaming now · 24×7",
+  poster: LIVE_CHANNEL.poster,
+  src: "",
+  embedUrl: LIVE_CHANNEL.embedUrl,
+  isLive: true,
+};
+---
+
+<Layout
+  title={`${desk.labelML} | ${desk.label} — MediaOne`}
+  description={desk.description}
+  adTone="gray"
+>
+  <HeaderBar isBreaking={false} showTopics={false} liveUnit />
+  <!-- The News item in the IA is already href /latest-news, so this resolves to
+       its Kerala / National / International / Fact Check column for free. -->
+  <SectionSubNav pathname={`/${LATEST_DESK_ID}`} />
+
+  <main class="flex-1 bg-bg-page">
+    <DeskPage
+      desk={desk}
+      page={page}
+      videos={allVideos.slice(0, 5)}
+      trending={latest.slice(0, 5)}
+      latest={latest.slice(5, 11)}
+      latestViewAllHref={null}
+    />
+  </main>
+
+  <Footer />
+
+  <VideoModal
+    videos={[liveModalVideo, ...toModalVideos(allVideos)]}
+    today={modalToday}
+    programs={shows}
+  >
+    <ScheduleList slot="live-panel" tone="dark" />
+  </VideoModal>
+</Layout>

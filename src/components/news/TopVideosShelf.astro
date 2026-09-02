@@ -1,0 +1,87 @@
+---
+// BLOCK · TopVideosShelf — a full-bleed premium horizontal video carousel with a deep-blue background.
+// Features category tabs, active underlines, visual slide chev controls, and cards with inline duration badges.
+import Media from '../ui/Media.astro';
+import type { VideoItem } from '../../lib/video-data';
+
+// `modalId` marks the card as a VideoModal trigger (data-video-open) — the
+// href stays as a no-JS fallback. `imageUrl` overrides the seeded dummy still.
+type ShelfVideo = VideoItem & { modalId?: string; imageUrl?: string };
+
+export interface Props {
+  title?: string;
+  titleEn?: string;
+  viewAllHref?: string;
+  videos: ShelfVideo[];
+  class?: string;
+}
+
+const {
+  title = 'വീഡിയോ',
+  titleEn = 'TOP VIDEOS',
+  viewAllHref = '/videos',
+  videos,
+  class: className = '',
+} = Astro.props;
+---
+
+<section class:list={['mc', 'w-full bg-[#0a2e5c] text-white py-8 lg:py-10 my-6 lg:my-8 border-t border-b border-white/5', className]}>
+  <div class="w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8 relative">
+    
+    <!-- Title and Tabs Header Row -->
+    <div class="flex flex-col gap-4 mb-6">
+      <a href={viewAllHref} class="group inline-flex items-center gap-1.5 text-white hover:text-azure-light transition-colors font-bold tracking-wider uppercase text-section">
+        <span>{titleEn || title}</span>
+        <svg viewBox="0 0 24 24" class="size-4 fill-none stroke-current stroke-2.5 ml-0.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </a>
+      
+      <!-- Sub-category Tabs -->
+      <div class="flex items-center gap-6 text-sm font-semibold tracking-wide border-b border-white/10 pb-2">
+        <span class="text-white border-b-2 border-white pb-2 relative font-bold select-none cursor-pointer">Latest</span>
+        <span class="text-white/60 hover:text-white transition-colors cursor-pointer pb-2 select-none">Live</span>
+        <span class="text-white/60 hover:text-white transition-colors cursor-pointer pb-2 select-none">Explainers</span>
+        <span class="text-white/60 hover:text-white transition-colors cursor-pointer pb-2 select-none">Programs</span>
+      </div>
+    </div>
+
+    <!-- Carousel grid wrapper with visual controls -->
+    <div class="relative group/carousel">
+      <!-- Grid displaying 4 columns -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {videos.slice(0, 4).map((video) => (
+          <a href={video.href} data-video-open={video.modalId} class="group block">
+            <!-- Thumbnail Frame -->
+            <div class="relative aspect-[16/9] overflow-hidden rounded-none mb-3">
+              <Media seed={video.seed || video.href} src={video.imageUrl} ratio="16/9" class="w-full h-full object-cover" zoom />
+              
+              {/* Surgical Duration Capsule Overlay (bottom-left) */}
+              {video.duration && (
+                <span class="absolute bottom-2.5 left-2.5 bg-black/80 text-[10px] font-bold px-2 py-0.5 rounded-none flex items-center gap-1.5 border border-white/10 select-none">
+                  <svg class="size-2 fill-white" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z" />
+                  </svg>
+                  <span class="tabular-nums">{video.duration}</span>
+                </span>
+              )}
+            </div>
+
+            <!-- Video Text Headline -->
+            <h3 class="text-headline font-bold text-white group-hover:text-azure-light transition-colors duration-200 leading-snug line-clamp-2">
+              {video.title}
+            </h3>
+          </a>
+        ))}
+      </div>
+
+      <!-- Floating Chevron Button on Right -->
+      <button class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white hover:bg-ivory text-ink size-10 flex items-center justify-center border border-rule shadow-md transition-all cursor-pointer z-10 rounded-none hidden lg:flex" aria-label="Next items">
+        <svg viewBox="0 0 24 24" class="size-5 fill-none stroke-current stroke-2.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</section>

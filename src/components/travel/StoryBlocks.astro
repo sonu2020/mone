@@ -1,0 +1,144 @@
+---
+// BLOCK · StoryBlocks — renders one chapter's blocks in order.
+//
+// Long-form doesn't come in one rhythm, so a chapter is a list rather than a
+// shape. Prose sits on the reading measure; photographs and maps break out past
+// it; food and sights are cards that interrupt on purpose.
+//
+// Malayalam leads. The English under it is a gloss, set smaller and quieter —
+// this is a Malayalam paper, and a bilingual page that gives both scripts equal
+// weight ends up being read in neither.
+import InlineMap from './InlineMap.astro';
+import type { Block, Waypoint } from '../../lib/travelogue';
+
+export interface Props {
+  blocks: Block[];
+  /** The chapter's waypoint — inline maps centre on it. */
+  waypoint: Waypoint;
+  slug: string;
+}
+const { blocks, waypoint, slug } = Astro.props;
+
+const MEASURE = 'mx-auto max-w-[42rem] px-5';
+const WIDE = 'mx-auto max-w-[68rem] px-5';
+---
+
+{blocks.map((block, i) => (
+  <>
+    {block.kind === 'text' && (
+      <div class:list={['mc', MEASURE, 'mt-7 first:mt-0']}>
+        <p class="font-malayalam text-[1.0625rem] leading-[1.85] [font-variation-settings:'wdth'_100,'wght'_400] text-text-primary dark:text-ivory/90 text-pretty">
+          {block.ml}
+        </p>
+        {block.en && (
+          <p class="mt-2.5 body-small text-text-muted dark:text-ivory/45 text-pretty">{block.en}</p>
+        )}
+      </div>
+    )}
+
+    {block.kind === 'photo' && (
+      <figure class:list={['mc', block.wide ? WIDE : WIDE, 'mt-10']} data-zoom>
+        {block.src2 ? (
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+            <img src={block.src} alt="" loading="lazy" class="w-full aspect-[4/3] object-cover bg-bg-page" />
+            <img src={block.src2} alt="" loading="lazy" class="w-full aspect-[4/3] object-cover bg-bg-page" />
+          </div>
+        ) : (
+          <img
+            src={block.src}
+            alt=""
+            loading="lazy"
+            class:list={['w-full object-cover bg-bg-page', block.wide ? 'aspect-[21/9]' : 'aspect-[16/9]']}
+          />
+        )}
+        {(block.caption || block.credit) && (
+          <figcaption class="mt-2.5">
+            {block.caption && (
+              <span class="block caption-text text-text-muted dark:text-ivory/45">{block.caption}</span>
+            )}
+            {(block.credit || block.credit2) && (
+              <span class="mt-0.5 block caption-text text-text-light dark:text-ivory/25">
+                {[block.credit, block.credit2].filter(Boolean).join(' · ')}
+              </span>
+            )}
+          </figcaption>
+        )}
+      </figure>
+    )}
+
+    {block.kind === 'map' && (
+      <figure class:list={['mc', WIDE, 'mt-10']}>
+        <InlineMap
+          id={`${slug}-${waypoint.id}-${i}`}
+          center={waypoint.coords}
+          zoom={block.zoom}
+          label={waypoint.nameML}
+        />
+        <figcaption class="mt-2.5">
+          <span class="block font-malayalam text-[0.9375rem] text-text-secondary dark:text-ivory/60">
+            {block.captionML}
+          </span>
+          {block.caption && (
+            <span class="mt-0.5 block caption-text text-text-muted dark:text-ivory/45">{block.caption}</span>
+          )}
+        </figcaption>
+      </figure>
+    )}
+
+    {block.kind === 'food' && (
+      <aside class:list={['mc', MEASURE, 'mt-10']}>
+        <div class="border border-rule dark:border-ivory/15 bg-ivory dark:bg-brand-elevated">
+          <div class="flex items-baseline gap-2 px-4 py-2.5 border-b border-rule dark:border-ivory/10">
+            <i class="ti ti-tools-kitchen-2 text-base text-accent-red" aria-hidden="true"></i>
+            <h3 class="font-malayalam text-[1rem] [font-variation-settings:'wght'_600] text-text-primary dark:text-ivory">
+              {block.titleML}
+            </h3>
+            <span class="ml-auto eyebrow text-text-muted dark:text-ivory/40">{block.title}</span>
+          </div>
+          <ul class="divide-y divide-rule/70 dark:divide-ivory/[0.07]">
+            {block.items.map((item) => (
+              <li class="flex flex-wrap items-baseline gap-x-3 px-4 py-2.5">
+                <span class="font-malayalam text-[0.9375rem] text-text-primary dark:text-ivory">{item.ml}</span>
+                <span class="caption-text text-text-muted dark:text-ivory/45">{item.en}</span>
+                {item.note && (
+                  <span class="w-full sm:w-auto sm:ml-auto caption-text text-text-light dark:text-ivory/30">{item.note}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    )}
+
+    {block.kind === 'sight' && (
+      <aside class:list={['mc', WIDE, 'mt-10']}>
+        <div class="grid grid-cols-1 sm:grid-cols-[1fr_1.1fr] gap-0 border border-rule dark:border-ivory/15 overflow-hidden">
+          {block.src && (
+            <img src={block.src} alt="" loading="lazy" class="w-full h-full min-h-[12rem] object-cover bg-bg-page" />
+          )}
+          <div class="p-5 sm:p-6 bg-ivory dark:bg-brand-elevated">
+            <p class="eyebrow text-accent-red">{block.title}</p>
+            <h3 class="mt-1.5 font-malayalam text-[1.1875rem] [font-variation-settings:'wght'_600] text-text-primary dark:text-ivory">
+              {block.titleML}
+            </h3>
+            <p class="mt-2.5 font-malayalam text-[0.9375rem] leading-[1.8] text-text-secondary dark:text-ivory/70">
+              {block.ml}
+            </p>
+            {block.credit && (
+              <p class="mt-3 caption-text text-text-light dark:text-ivory/25">{block.credit}</p>
+            )}
+          </div>
+        </div>
+      </aside>
+    )}
+
+    {block.kind === 'note' && (
+      <div class:list={['mc', MEASURE, 'mt-8']}>
+        <p class="inline-flex items-baseline gap-2.5 border-l-2 border-accent-red pl-3.5">
+          <span class="eyebrow text-text-muted dark:text-ivory/40">{block.label}</span>
+          <span class="article-title-lg tabular-nums text-text-primary dark:text-ivory">{block.value}</span>
+        </p>
+      </div>
+    )}
+  </>
+))}

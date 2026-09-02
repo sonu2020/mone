@@ -1,0 +1,72 @@
+{
+  "color": {
+    "$type": "color",
+    "ink": { "$value": "oklch(0.376 0.065 262)" },
+    "ink-light": { "$value": "oklch(0.52 0.018 256)" },
+    "ink-muted": { "$value": "oklch(0.555 0.013 256)" },
+
+    "ivory": { "$value": "oklch(0.988 0.002 250)" },
+    "ivory-dark": { "$value": "oklch(0.965 0.004 250)" },
+
+    "off-white": { "$value": "#fffeff" },
+    "light-gray": { "$value": "#f1f4f6" },
+    "placeholder": { "$value": "#d9d9d9" },
+
+    "rule": { "$value": "oklch(0.905 0.006 250)" },
+    "rule-light": { "$value": "oklch(0.94 0.004 250)" },
+    "rule-blue": { "$value": "#173661" },
+    "rule-slate": { "$value": "#637fa5" },
+
+    "brand-dark": { "$value": "oklch(0.145 0.018 262)" },
+    "brand-elevated": { "$value": "oklch(0.195 0.022 262)" },
+    "brand-overlay": { "$value": "oklch(0.245 0.026 262)" },
+
+    "azure": { "$value": "oklch(0.527 0.153 253)" },
+    "azure-dark": { "$value": "oklch(0.43 0.123 254)" },
+    "azure-light": { "$value": "oklch(0.68 0.125 245)" },
+
+    "header-bg": { "$value": "#000813" },
+    "header-bg-deep": { "$value": "#0a1729" },
+
+    "nav-bg": { "$value": "#0b2e5d" },
+    "nav-rule": { "$value": "#177aa5" },
+    "nav-bg-dark": { "$value": "#071d3b" },
+
+    "accent-red": { "$value": "#a72626" },
+    "accent-mint": { "$value": "#aef3d5" },
+    "accent-cyan": { "$value": "#28a3c4" },
+    "accent-green-light": { "$value": "#e2f5cd" },
+    "accent-green-dark": { "$value": "#143719" },
+    "accent-green-ink": { "$value": "#002a1e" },
+    "accent-green-title": { "$value": "#021e12" },
+    "saffron": { "$value": "oklch(0.72 0.13 66)" },
+
+    "text-primary": { "$value": "#021e12" },
+    "text-secondary": { "$value": "#394741" },
+    "text-tertiary": { "$value": "#445265" },
+    "text-muted": { "$value": "#626a73" },
+    "text-light": { "$value": "#8a9199" },
+    "text-inverse": { "$value": "#ffffff" },
+    "text-inverse-soft": { "$value": "#eaf1fa" },
+    "text-navy": { "$value": "#000813" },
+    "text-blue": { "$value": "#1d457c" },
+    "text-navy-deep": { "$value": "#0b2e5d" },
+    "text-blue-light": { "$value": "#5990d9" },
+    "text-warm-gray": { "$value": "#b9b9ae" },
+
+    "bg-page": { "$value": "oklch(0.85 0.01 0 / 0.24)" },
+    "bg-card": { "$value": "#fffeff" },
+    "bg-pure": { "$value": "oklch(0.85 0.008 256)" },
+
+    "ad-surface": { "$value": "oklch(0.902 0.017 148)" },
+    "ad-surface-dark": { "$value": "oklch(0.238 0.014 148)" },
+
+    "brand-primary": { "$value": "oklch(0.527 0.153 253)" },
+    "brand-secondary": { "$value": "oklch(0.376 0.065 262)" },
+    "brand-accent": { "$value": "oklch(0.527 0.153 253)" },
+    "brand-gray": { "$value": "oklch(0.988 0.002 250)" },
+    "brand-text": { "$value": "oklch(0.376 0.065 262)" },
+    "brand-lightText": { "$value": "oklch(0.52 0.018 256)" },
+    "brand-border": { "$value": "oklch(0.905 0.006 250)" }
+  }
+}

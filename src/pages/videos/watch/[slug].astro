@@ -1,0 +1,122 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/nav/HeaderBar.astro';
+import Footer from '../../../components/Footer.astro';
+import SectionSubNav from '../../../components/nav/SectionSubNav.astro';
+import DeskMasthead from '../../../components/desk/DeskMasthead.astro';
+import VideoEmbed from '../../../components/VideoEmbed.astro';
+import { shareChannels } from '../../../lib/share-channels';
+import { allVideos, getShow, getVideoYoutubeId } from '../../../lib/videos';
+
+export function getStaticPaths() {
+  return allVideos.map((video) => ({
+    params: { slug: video.slug },
+    props: { video },
+  }));
+}
+
+const { video } = Astro.props;
+
+const relatedVideos = allVideos
+  .filter((v) => v.slug !== video.slug && v.category === video.category)
+  .slice(0, 6);
+
+const parentShow = video.showSlug ? getShow(video.showSlug) : undefined;
+
+
+---
+
+<Layout title={`${video.title} — MediaOne Videos`} description={video.description}>
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 max-w-site mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-meta text-ink-muted dark:text-ivory/45 mb-5" aria-label="Breadcrumb">
+      <a href="/videos" class="hover:text-azure dark:hover:text-azure-light transition-colors">Videos</a>
+      <span aria-hidden="true">/</span>
+      {/* The parent show still names where a video came from, but /videos/shows
+          is unlisted now, so the crumb reads as plain text rather than a link. */}
+      {video.showSlug && parentShow ? (
+        <span>{parentShow.title}</span>
+      ) : (
+        <span>{video.category}</span>
+      )}
+      <span aria-hidden="true">/</span>
+      <span class="text-ink dark:text-ivory truncate max-w-[200px]">{video.title}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
+      <!-- Player + info -->
+      <div class="lg:col-span-8">
+        <VideoEmbed
+          youtubeId={getVideoYoutubeId(video)}
+          title={video.title}
+          seed={video.slug}
+          poster={video.thumbnailUrl}
+          category={video.category}
+          duration={video.duration}
+        />
+
+        <div class="mt-5">
+          <h1 class="text-title text-ink dark:text-ivory">{video.title}</h1>
+          <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-meta text-ink-muted dark:text-ivory/45 tabular-nums">
+            <span>{video.publishDate}</span>
+            <span aria-hidden="true">·</span>
+            <span>{video.views} views</span>
+            {video.duration && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>{video.duration}</span>
+              </>
+            )}
+          </div>
+
+          <p class="mt-4 pt-4 border-t border-rule dark:border-ivory/10 text-body text-ink-light dark:text-ivory/70 max-w-2xl">
+            {video.description}
+          </p>
+
+          <div class="flex items-center gap-3 mt-5 pt-4 border-t border-rule dark:border-ivory/10">
+            <span class="eyebrow text-ink-muted dark:text-ivory/40">Share</span>
+            {shareChannels.map((c) => (
+              <a href="#" class="grid place-items-center size-9 border border-rule dark:border-ivory/20 text-ink-light dark:text-ivory/70 hover:border-azure hover:text-azure dark:hover:text-azure-light transition-colors" aria-label={`Share on ${c.name}`} title={c.name}>
+                <i class:list={['ti', c.icon, 'text-[17px]']} aria-hidden="true"></i>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Related -->
+      <div class="lg:col-span-4">
+        <div class="lg:border-l lg:border-rule lg:dark:border-ivory/10 lg:pl-8">
+          <div class="flex items-baseline justify-between pb-3 border-b border-ink/15 dark:border-ivory/15">
+            <h2 class="eyebrow text-azure dark:text-azure-light">Related Videos</h2>
+            <span class="text-caption text-ink-muted dark:text-ivory/45">{video.category}</span>
+          </div>
+
+          {relatedVideos.length > 0 ? (
+            <div class="mt-2">
+              {relatedVideos.map((rel) => (
+                <a href={`/videos/watch/${rel.slug}`} class="group flex gap-3.5 py-4 border-b border-rule dark:border-ivory/10 last:border-0">
+                  <div class="relative w-28 shrink-0 overflow-hidden aspect-video border border-rule dark:border-ivory/10">
+                    <img src={rel.thumbnailUrl} alt={rel.title} loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                    {rel.duration && <span class="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.2 rounded-xs font-semibold backdrop-blur-xs tabular-nums">{rel.duration}</span>}
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-meta font-bold text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2 leading-snug">{rel.title}</h3>
+                    <p class="mt-1 text-caption text-text-muted tabular-nums font-medium">{rel.publishDate} · {rel.views} views</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p class="mt-6 text-meta text-ink-muted dark:text-ivory/45">No related videos found.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

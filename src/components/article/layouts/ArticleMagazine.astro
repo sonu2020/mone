@@ -1,0 +1,89 @@
+---
+// LAYOUT · Magazine — the long-read case.
+//
+// The opener is asymmetric: the headline holds a narrow left column while the
+// art takes the wide right one, the way a feature spread opens. The body then
+// runs at a generous measure with a dropped cap, and the furniture is demoted
+// to a margin column of small notes — sponsor and next-reads — that never
+// interrupts the prose.
+import ArticleBreadcrumb from '../ArticleBreadcrumb.astro';
+import ArticleHeadline from '../ArticleHeadline.astro';
+import ArticleByline from '../ArticleByline.astro';
+import ArticleBody from '../ArticleBody.astro';
+import ShareBar from '../ShareBar.astro';
+import TopicChips from '../TopicChips.astro';
+import SponsoredCard from '../SponsoredCard.astro';
+import ReadMoreList from '../ReadMoreList.astro';
+import VideoBlock from '../VideoBlock.astro';
+import AdDisclaimer from '../AdDisclaimer.astro';
+import AdSlot from '../../AdSlot.astro';
+import Media from '../../ui/Media.astro';
+import { readingTime, type ArticleDoc } from '../../../lib/article-data';
+
+export interface Props { doc: ArticleDoc }
+const { doc } = Astro.props;
+const minutes = readingTime(doc);
+---
+<div class="mc bg-bg-card">
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Asymmetric opener: type left, art right -->
+    <ArticleBreadcrumb section={doc.section} sectionHref={doc.sectionHref} class="pt-8 lg:pt-12" />
+
+    <header class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-end">
+      <div class="lg:col-span-5">
+        <ArticleHeadline
+          kicker={doc.section}
+          badge={doc.badge}
+          title={doc.title}
+        />
+      </div>
+      <figure class="lg:col-span-7">
+        <Media src={doc.image} ratio="16/9" class="w-full" loading="eager" fetchpriority="high" />
+        <figcaption class="pt-2 caption-text text-text-muted">{doc.caption}</figcaption>
+      </figure>
+    </header>
+
+    <!-- The dek runs the full width beneath both, tying the two columns back
+         together before the reader drops into the body. -->
+    <p class="mt-8 pt-6 border-t-2 border-ink dark:border-ivory/30 lead-text text-text-secondary max-w-4xl">
+      {doc.dek}
+    </p>
+
+    <!-- Body at a generous measure, furniture in the margin -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-12 pt-8">
+      <div class="lg:col-span-8 min-w-0">
+        <ArticleByline
+          author={doc.author}
+          published={doc.published}
+          updated={doc.updated}
+          readingTime={minutes}
+          class="mb-8"
+        />
+        <ArticleBody blocks={doc.blocks} dropCap={true} adDensity="light" />
+
+        <div class="mt-10 pt-6 border-t border-rule dark:border-ivory/10 flex flex-wrap items-center justify-between gap-4">
+          <TopicChips topics={doc.tags} />
+          <ShareBar />
+        </div>
+      </div>
+
+      <aside class="lg:col-span-4 min-w-0 mt-12 lg:mt-0" aria-label="Alongside this story">
+        <div class="lg:sticky lg:top-24 flex flex-col gap-10 lg:pl-8 lg:border-l border-rule dark:border-ivory/10">
+          <SponsoredCard item={doc.sponsored} orientation="vertical" />
+          <VideoBlock title={doc.video.title} src={doc.video.image} duration={doc.video.duration} />
+          <ReadMoreList items={doc.readMore} title="Read More" variant="thumbs" limit={3} />
+          <AdSlot slot="story-rail" format="rectangle" tone="gray" lazy={true} />
+        </div>
+      </aside>
+    </div>
+
+    <ReadMoreList
+      items={doc.readMore.slice(2)}
+      title="More from Kerala"
+      variant="grid"
+      limit={3}
+      class="mt-14 pt-10 border-t border-rule dark:border-ivory/10"
+    />
+    <AdDisclaimer text={doc.disclaimer} class="mt-14 pb-14" />
+  </div>
+</div>

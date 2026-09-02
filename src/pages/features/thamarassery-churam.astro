@@ -1,0 +1,282 @@
+---
+// ── /features/thamarassery-churam · the climb ───────────────────────────────
+// NH 766 from Adivaram to Lakkidi. Scroll drives distance up the road; the
+// overview watches the switchbacks from outside, the driver's seat rides them.
+//
+// PROTOTYPE. The road, the elevations, the place names and the bends are all
+// derived from open data — see the header of src/lib/journeys/churam.ts,
+// including why there are nine bends and not some other number. There is no
+// narration in this cut; the page says only what the data says.
+//
+// Everything 3D here comes from the `terrain-journey` package. This file is
+// the article around it: hero, locator, bend table, attribution.
+//
+// Stacking: JourneyStage's stage is `position: fixed` at z-index 0, so every
+// other block here carries `relative z-10` and its own background.
+import Layout from '../../layouts/Layout.astro';
+import ImmersiveBar from '../../components/travel/ImmersiveBar.astro';
+import Footer from '../../components/Footer.astro';
+import PinMap from '../../components/map/PinMap.astro';
+import JourneyStage from '../../components/journey/JourneyStage.astro';
+
+import { churam, bends, places, routeLength, lowest, highest } from '../../lib/journeys/churam';
+import { TERRAIN_ATTRIBUTION } from 'terrain-journey';
+
+const VERTICAL_SCALE = churam.verticalScale;
+
+// PinMap is Leaflet and speaks [lat, lng]; the churam data is MapLibre's
+// [lng, lat]. One flip, here, rather than two coordinate orders in the data.
+const locatorPins = [
+  ...places.map((p) => ({
+    id: p.id,
+    label: `${p.name} · ${p.elevation} m`,
+    labelML: p.nameLocal,
+    coords: [p.coords[1], p.coords[0]] as [number, number],
+    icon: 'ti-mountain',
+  })),
+  ...bends.map((b) => ({
+    id: `bend-${b.n}`,
+    label: `Hairpin ${b.n} · ${b.elevation} m`,
+    labelML: `വളവ് ${b.n}`,
+    coords: [b.coords[1], b.coords[0]] as [number, number],
+    icon: 'ti-rotate-2',
+  })),
+];
+
+/**
+ * Cover photograph — one of the images on the Malayalam Wikipedia article
+ * താമരശ്ശേരി ചുരം, via Wikimedia Commons.
+ *
+ * A hairpin seen from the road above it, buses and lorries working round the
+ * retaining wall. Its own Commons description reads "National Highway 766 as
+ * seen from the upper section of the same road" — so it is this road, not a
+ * lookalike, which is the whole reason it was chosen over the alternatives.
+ *
+ * CC0, so no attribution is legally required. Credited anyway: someone climbed
+ * up there and took it.
+ *
+ * Two rejected candidates worth recording. The "Nedumpoil ghat road" series on
+ * Commons is a different pass altogether — the Kannur route — and would have
+ * put the wrong mountain under the headline. And `File:Thamarassery.jpg`, which
+ * a title search surfaces first, is a portrait captioned "love of mother".
+ */
+const cover = {
+  src: '/images/features/thamarassery-churam-hairpin.jpg',
+  alt:
+    'A hairpin bend of the Thamarassery ghat seen from the road above it. ' +
+    'National Highway 766 doubles back around a tall curved retaining wall ' +
+    'cut into forested hillside, with buses, cars and a lorry on both arms ' +
+    'of the bend.',
+  author: 'Challiyan',
+  sourceHref: 'https://commons.wikimedia.org/wiki/File:Mountain_Pass_Wayanad.jpg',
+  licence: 'CC0',
+  licenceHref: 'https://creativecommons.org/publicdomain/zero/1.0/',
+  articleHref: 'https://ml.wikipedia.org/wiki/താമരശ്ശേരി_ചുരം',
+};
+
+const facts: [string, string, string][] = [
+  ['അടിവാരം', 'Adivaram', `${lowest} m`],
+  ['ലക്കിടി', 'Lakkidi', `${highest} m`],
+  ['കയറ്റം', 'The climb', `${highest - lowest} m`],
+  ['വളവുകൾ', 'Hairpins', String(bends.length)],
+  ['ദൂരം', 'Road', `${(routeLength / 1000).toFixed(1)} km`],
+];
+---
+
+<Layout
+  title="താമരശ്ശേരി ചുരം — ഒൻപത് വളവുകൾ | Thamarassery Churam | MediaOne"
+  description="A scroll-driven 3D wireframe drive up the nine hairpins of the Thamarassery ghat. Design prototype."
+  topAd={false}
+  noindex
+>
+  <ImmersiveBar
+    title="താമരശ്ശേരി ചുരം — ഒൻപത് വളവുകൾ"
+    backHref="/latest-news"
+    backLabel="Latest"
+  />
+
+  <main class="flex-1">
+    <!-- ══ HERO ═════════════════════════════════════════════════════════ -->
+    <section
+      data-immersive-hero
+      class="relative z-10 flex min-h-[100svh] flex-col justify-end overflow-hidden bg-nav-bg"
+    >
+      <img
+        src={cover.src}
+        alt={cover.alt}
+        width="1600"
+        height="1033"
+        fetchpriority="high"
+        decoding="async"
+        class="absolute inset-0 h-full w-full object-cover"
+      />
+      <!-- Weighted to the bottom third, where the type sits. An evenly-spread
+           scrim reads as "tinted navy photo" and loses the bend entirely,
+           which is the one thing this picture is here to show. -->
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-nav-bg from-22% via-nav-bg/70 via-52% to-nav-bg/0"
+        aria-hidden="true"
+      ></div>
+
+      <div class="relative mx-auto w-full max-w-[68rem] px-5 pb-16 sm:pb-20">
+        <p class="eyebrow text-white/55">ഭൂപ്രകൃതി · Thamarassery Churam</p>
+        <h1 class="mt-3 font-malayalam text-display font-bold text-white text-balance">
+          ഒൻപത് വളവുകൾ
+        </h1>
+        <p class="mt-1 text-title font-bold text-white/65">Nine hairpins</p>
+        <p class="mt-5 max-w-2xl body-small text-white/70 text-pretty">
+          The road spends its first two kilometres at {lowest} m. It has to reach
+          {highest} m. The only way up the wall is to double back on itself
+          {bends.length} times — and that is a thing a flat map cannot show you.
+        </p>
+
+        <p class="mt-8 inline-block border border-white/25 px-3 py-1.5 caption-text text-white/60">
+          Design prototype — real road, real elevation, no narration.
+        </p>
+
+        <p class="mt-5 caption-text text-white/40">
+          Photograph: <a href={cover.sourceHref} class="underline hover:text-white/70"
+            >a hairpin on NH&nbsp;766</a
+          > by {cover.author},
+          <a href={cover.licenceHref} class="underline hover:text-white/70">{cover.licence}</a>,
+          via Wikimedia Commons — one of the images on the Malayalam Wikipedia article
+          <a href={cover.articleHref} class="underline hover:text-white/70" lang="ml"
+            >താമരശ്ശേരി ചുരം</a
+          >. Resized.
+        </p>
+      </div>
+
+      <span
+        class="absolute inset-x-0 bottom-5 flex justify-center text-white/45 motion-safe:animate-bounce"
+        aria-hidden="true"
+      ><i class="ti ti-chevron-down text-2xl"></i></span>
+    </section>
+
+    <!-- ══ THE FACTS + LOCATOR ══════════════════════════════════════════ -->
+    <section class="relative z-10 bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto max-w-[68rem] px-5 py-14 sm:py-20">
+        <div class="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-start lg:gap-14">
+          <div>
+            <p class="eyebrow text-azure dark:text-azure-light">Where this is</p>
+            <p class="mt-3 font-malayalam text-[1.1875rem] leading-[1.85] text-text-primary dark:text-ivory text-pretty">
+              കോഴിക്കോട് നിന്ന് വയനാട്ടിലേക്കുള്ള വഴി. അടിവാരത്ത് നിന്ന് ലക്കിടി വരെ
+              ദേശീയപാത 766 പശ്ചിമഘട്ടം കയറുന്നു.
+            </p>
+            <p class="mt-3 body-small text-text-muted dark:text-ivory/50 text-pretty">
+              The Kozhikode–Wayanad road. Between Adivaram and Lakkidi, NH 766
+              climbs the Western Ghats.
+            </p>
+
+            <dl class="mt-8 flex flex-wrap gap-x-8 gap-y-3 border-t border-rule pt-6 dark:border-ivory/10">
+              {facts.map(([ml, en, v]) => (
+                <div>
+                  <dt class="font-malayalam caption-text text-text-muted dark:text-ivory/45">
+                    {ml} <span class="text-text-light dark:text-ivory/25">{en}</span>
+                  </dt>
+                  <dd class="mt-0.5 article-title tabular-nums text-text-primary dark:text-ivory">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <PinMap
+            id="churam-locator"
+            pins={locatorPins}
+            center={[11.5, 76.018]}
+            zoom={12}
+            label="Locator map — the hairpins and the places along the ghat"
+            class="h-[20rem] sm:h-[24rem]"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ THE DRIVE ════════════════════════════════════════════════════ -->
+    <JourneyStage
+      journey={churam}
+      kicker="The drive · അടിവാരം → ലക്കിടി"
+      title={`${bends.length} hairpins, ${(routeLength / 1000).toFixed(1)} km, ${highest - lowest} m of climb`}
+      standfirst="Scroll to drive. The camera hangs back and wide through each bend, so the switchback reads as a shape rather than a wall."
+      overviewLabel="Chase"
+      firstPersonLabel="Driver"
+      overviewIcon="ti-drone"
+      firstPersonIcon="ti-steering-wheel"
+      playLabel="Drive"
+      markerNoun="Bend"
+    />
+
+    <!-- ══ THE BENDS ════════════════════════════════════════════════════ -->
+    <section class="relative z-10 bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto max-w-[68rem] px-5 py-16 sm:py-20">
+        <p class="eyebrow text-azure dark:text-azure-light">Every bend</p>
+        <h2 class="mt-2 article-title text-text-primary dark:text-ivory">
+          The {bends.length} hairpins, bottom to top
+        </h2>
+
+        <div class="mt-8 overflow-x-auto">
+          <table class="w-full min-w-[36rem] border-collapse text-left">
+            <thead>
+              <tr class="border-b border-rule dark:border-ivory/12">
+                <th class="py-2 pr-4 caption-text font-normal text-text-muted dark:text-ivory/45">Bend</th>
+                <th class="py-2 pr-4 caption-text font-normal text-text-muted dark:text-ivory/45">Elevation</th>
+                <th class="py-2 pr-4 caption-text font-normal text-text-muted dark:text-ivory/45">From Adivaram</th>
+                <th class="py-2 pr-4 caption-text font-normal text-text-muted dark:text-ivory/45">Turn</th>
+                <th class="py-2 caption-text font-normal text-text-muted dark:text-ivory/45">Coordinates</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bends.map((b) => (
+                <tr class="border-b border-rule/60 dark:border-ivory/8">
+                  <td class="py-2.5 pr-4 tabular-nums font-bold text-text-primary dark:text-ivory">{b.n}</td>
+                  <td class="py-2.5 pr-4 tabular-nums text-text-primary dark:text-ivory/85">{b.elevation} m</td>
+                  <td class="py-2.5 pr-4 tabular-nums text-text-muted dark:text-ivory/55">{b.km.toFixed(2)} km</td>
+                  <td class="py-2.5 pr-4 tabular-nums text-text-muted dark:text-ivory/55">
+                    {/* `detail` also carries height and distance for the reveal
+                        card; this column already has its own columns for those. */}
+                    {b.detail?.split('·')[0].trim()}
+                  </td>
+                  <td class="py-2.5 tabular-nums caption-text text-text-light dark:text-ivory/35">
+                    {b.coords[1].toFixed(5)}, {b.coords[0].toFixed(5)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ══ HOW THE NUMBER WAS ARRIVED AT ═══════════════════════════ -->
+        <div class="mt-12 border-t border-rule pt-6 dark:border-ivory/10">
+          <p class="eyebrow text-text-muted dark:text-ivory/45">On the count</p>
+          <p class="mt-3 max-w-3xl body-small text-text-muted dark:text-ivory/55 text-pretty">
+            “Nine hairpin bends” is the figure everyone cites, but OpenStreetMap
+            names only two of them — nodes tagged <em>7Th Hair pin bend</em> and
+            <em>8Yh Hair pin bend</em>. Those two are the only hard evidence
+            there is, so they were used as the test rather than the answer: a
+            turn-angle detector was swept across its parameters, and every
+            setting that placed those two bends at positions 7 and 8, counting
+            from Adivaram, was kept. Ten settings did. Eight of them found nine
+            bends; two found ten. Nine is what the geometry returns, not what it
+            was told to return.
+          </p>
+        </div>
+
+        <p class="mt-10 border-t border-rule pt-4 caption-text text-text-light dark:border-ivory/10 dark:text-ivory/35">
+          Road geometry, place names and the two named bends: © OpenStreetMap
+          contributors, via Overpass — every way tagged <code>ref=NH766</code> in
+          the bounding box, stitched end to end. Elevation data:
+          <Fragment set:html={TERRAIN_ATTRIBUTION} />, sampled at zoom 13 (≈19 m
+          per pixel). The overview exaggerates height by ×{VERTICAL_SCALE.overview},
+          because {highest - lowest} m spread over {(routeLength / 1000).toFixed(1)} km
+          reads as a gentle ramp at true scale; the driver's seat uses true scale,
+          where the gradient is something you feel rather than look at. Which one
+          is in use is stated on screen. Terrain colouring and the trees are
+          impressions, not survey — the landform, the road and every elevation
+          are measured, the vegetation is not. Basemap © OpenStreetMap
+          contributors, © CARTO.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="relative z-10"><Footer /></div>
+</Layout>

@@ -1,0 +1,114 @@
+---
+import Placeholder from './Placeholder.astro';
+import { getArticleImage } from '../lib/images';
+
+export interface Props {
+  title: string;
+  excerpt?: string;
+  category?: string;
+  href: string;
+  date?: string;
+  image?: string;
+  variant?: 'lead' | 'standard' | 'compact' | 'overlay';
+  class?: string;
+}
+
+const {
+  title,
+  excerpt,
+  category,
+  href,
+  date,
+  image,
+  variant = 'standard',
+  class: className = '',
+} = Astro.props;
+
+const imageUrl = getArticleImage(image);
+---
+
+{variant === 'lead' && (
+  <article class:list={['mc', className]}>
+    <a href={href} class="group block">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <Placeholder class="w-full h-full" src={imageUrl} alt={title} />
+      </div>
+      <div class="mt-4">
+        {category && (
+          <div class="flex items-center gap-2 meta-text text-text-muted">
+            <span class="eyebrow text-azure">{category}</span>
+            {date && <><span>·</span><span class="tabular-nums">{date}</span></>}
+          </div>
+        )}
+        <h2 class="mt-2 article-title-lg text-text-primary group-hover:text-azure transition-colors">
+          {title}
+        </h2>
+        {excerpt && <p class="mt-3 body-small text-text-secondary max-w-prose">{excerpt}</p>}
+      </div>
+    </a>
+  </article>
+)}
+
+{variant === 'standard' && (
+  <article class:list={['mc', className]}>
+    <a href={href} class="group block">
+      <div class="relative aspect-[4/3] overflow-hidden">
+        <Placeholder class="w-full h-full" src={imageUrl} alt={title} />
+      </div>
+      <div class="mt-3">
+        {category && (
+          <div class="flex items-center gap-2 meta-text text-text-muted">
+            <span class="eyebrow text-azure">{category}</span>
+          </div>
+        )}
+        <h3 class="mt-1.5 article-title text-text-primary group-hover:text-azure transition-colors line-clamp-3">
+          {title}
+        </h3>
+        {date && <p class="mt-1.5 caption-text text-text-muted tabular-nums">{date}</p>}
+      </div>
+    </a>
+  </article>
+)}
+
+{variant === 'compact' && (
+  <article class:list={['mc', `border-b border-rule last:border-0 ${className}`]}>
+    <a href={href} class="group flex gap-3 py-3 sm:gap-4">
+      <div class="shrink-0">
+        <Placeholder class="w-20 h-16 sm:w-24 sm:h-20 md:w-28 md:h-20" src={imageUrl} alt={title} />
+      </div>
+      <div class="flex-1 min-w-0 flex flex-col justify-center">
+        <h3 class="article-title text-text-primary group-hover:text-azure transition-colors line-clamp-2">
+          {title}
+        </h3>
+        <div class="hidden sm:flex items-center gap-2 mt-1.5 meta-text text-text-muted">
+          {category && <span class="text-azure">{category}</span>}
+          {category && date && <span>·</span>}
+          {date && <span class="tabular-nums">{date}</span>}
+        </div>
+      </div>
+    </a>
+  </article>
+)}
+
+{variant === 'overlay' && (
+  <article class:list={['mc', `relative overflow-hidden ${className}`]}>
+    <a href={href} class="group block">
+      <div class="relative aspect-[16/10] lg:aspect-[3/4]">
+        <Placeholder class="w-full h-full" src={imageUrl} alt={title} />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+      </div>
+      <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+        {category && (
+          <div class="flex items-center gap-2 caption-text text-white/70 mb-2">
+            <span class="eyebrow text-azure-light">{category}</span>
+            {date && <><span>·</span><span class="tabular-nums">{date}</span></>}
+          </div>
+        )}
+        <h3 class="text-headline font-semibold text-white leading-snug group-hover:text-azure-light transition-colors">
+          {title}
+        </h3>
+        {excerpt && <p class="hidden sm:block mt-2 body-small text-white/70 line-clamp-2">{excerpt}</p>}
+      </div>
+    </a>
+  </article>
+)}

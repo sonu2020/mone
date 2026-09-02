@@ -1,0 +1,104 @@
+---
+// The one-second read: today's rate, today's move, and the two toggles.
+// A hairline-separated band, not a card.
+//
+// Direction is carried by a glyph and a word, never by a second hue — AGENTS.md
+// reserves azure as the only accent and rules out red anywhere, including on a
+// falling price. Colour is therefore never the sole carrier of meaning here,
+// which is also what the accessibility rule wants.
+import { formatINR, stats, toUnit, windowSeries } from '../../lib/price-series';
+import type { PriceSeries } from '../../lib/price-series';
+
+interface Props { series: PriceSeries; label: string; labelML: string }
+const { series, label, labelML } = Astro.props;
+
+const unit = series.units[0];
+const points = series.points;
+const latest = points[points.length - 1];
+const week = windowSeries(series, '1W');
+
+const readings = series.variants.map((variant) => {
+  const value = latest.values[variant.id];
+  // The previous day that actually quoted this variant — not simply the row
+  // before, which may be a gap.
+  const prev = [...points].slice(0, -1).reverse()
+    .find((p) => typeof p.values[variant.id] === 'number')?.values[variant.id];
+  const change = typeof value === 'number' && typeof prev === 'number' ? value - prev : 0;
+  const w = stats(week, variant.id);
+  return {
+    variant,
+    base: typeof value === 'number' ? value : null,
+    display: typeof value === 'number' ? toUnit(value, unit, series.precision) : null,
+    change: toUnit(change, unit, series.precision),
+    changeBase: change,
+    weekChange: w ? toUnit(w.change, unit, series.precision) : 0,
+  };
+});
+
+const lead = readings[0];
+const dir = lead.change > 0 ? { glyph: '▲', word: 'up' }
+  : lead.change < 0 ? { glyph: '▼', word: 'down' }
+  : { glyph: '—', word: 'unchanged' };
+
+const asOf = new Date(`${latest.date}T00:00:00Z`).toLocaleDateString('en-IN', {
+  day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+});
+---
+
+<section data-price-desk class:list={['mc', 'border-b border-rule py-8']} aria-labelledby="desk-heading">
+  <p class="eyebrow text-eyebrow text-azure">{label}</p>
+  <h1 id="desk-heading" class="font-malayalam text-hero text-ink">{labelML}</h1>
+
+  <div class="mt-5 flex flex-wrap items-baseline gap-x-5 gap-y-2">
+    <p class="text-display tabular-nums text-ink" data-desk-value>
+      ₹{lead.display === null ? '—' : formatINR(lead.display, series.precision)}
+    </p>
+    <p class="text-body tabular-nums text-ink-muted">
+      <span aria-hidden="true" data-desk-glyph>{dir.glyph}</span>
+      <span class="sr-only" data-desk-word>{dir.word}</span>
+      <span data-desk-change>₹{formatINR(Math.abs(lead.change), series.precision)}</span>
+      <span> since the previous rate</span>
+    </p>
+  </div>
+
+  <p class="mt-1 text-meta text-ink-muted">
+    per <span data-unit-label>{unit.label}</span> · {asOf}
+  </p>
+
+  <div class="mt-5 flex flex-wrap gap-x-8 gap-y-3">
+    <div role="group" aria-label="Purity" class="flex gap-2">
+      {series.variants.map((v, i) => (
+        <button type="button" data-variant-pill={v.id} aria-pressed={i === 0}
+          class="eyebrow border border-rule px-3 py-1 text-eyebrow text-ink-muted
+                 transition-colors duration-150 hover:text-ink
+                 aria-pressed:border-azure aria-pressed:text-azure
+                 focus-visible:outline-2 focus-visible:outline-azure">{v.label}</button>
+      ))}
+    </div>
+    <div role="group" aria-label="Unit" class="flex gap-2">
+      {series.units.map((u, i) => (
+        <button type="button" data-unit-pill={u.id} data-unit-factor={u.factor}
+          data-unit-label={u.label} aria-pressed={i === 0}
+          class="eyebrow border border-rule px-3 py-1 text-eyebrow text-ink-muted
+                 transition-colors duration-150 hover:text-ink
+                 aria-pressed:border-azure aria-pressed:text-azure
+                 focus-visible:outline-2 focus-visible:outline-azure">{u.label}</button>
+      ))}
+    </div>
+  </div>
+
+  <script type="application/json" data-desk-data set:html={JSON.stringify({
+    precision: series.precision,
+    readings: readings.map((r) => ({
+      variantId: r.variant.id,
+      base: r.base,
+      change: r.changeBase,
+    })),
+  })} />
+</section>
+
+<script>
+  import { initPriceDesks } from '../../lib/price-chart';
+  initPriceDesks();
+  document.addEventListener('astro:page-load', initPriceDesks);
+</script>

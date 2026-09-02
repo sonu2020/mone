@@ -1,0 +1,173 @@
+---
+// ── /old-latest-news · the previous Latest News page ─────────────────────────
+// Archived when /latest-news moved onto the standard desk shell (see
+// src/pages/latest-news.astro and src/lib/desk.ts's getLatestDesk).
+//
+// It was the last page in the repo still on the pre-port design: OldHeader, a
+// gradient SectionHeader that AGENTS.md bans outright, and the ArticleCard /
+// CardGrid / SectionBlock set every other listing has moved off. It also sorted
+// its stories alphabetically by title, which is not "latest" under any reading.
+//
+// Kept whole and routable so the two can be compared side by side; nothing is
+// deleted to make room for the replacement, and the components it imports stay
+// exported for it. Same pattern as /old-home and /old-section/<id>.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/OldHeader.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import SectionBlock from '../components/SectionBlock.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import ArticleList from '../components/ArticleList.astro';
+import CardGrid from '../components/CardGrid.astro';
+import { sections } from '../lib/sections';
+
+// Aggregate all articles from all sections
+const allArticles = sections.flatMap((s) =>
+  s.articles.map((a) => ({ ...a, sectionName: s.name, sectionId: s.id }))
+);
+
+// Shuffle deterministically by title length for variety
+const articles = [...allArticles].sort((a, b) => a.title.localeCompare(b.title));
+
+const hero = articles.slice(0, 1)[0];
+const grid = articles.slice(1, 7);
+const rest = articles.slice(7);
+const sidebarArticles = articles.slice(0, 5);
+
+const gridItems = grid.map((a) => ({
+  title: a.title,
+  category: a.sectionName,
+  href: a.href,
+  date: a.date,
+  excerpt: a.excerpt,
+  image: a.image,
+}));
+
+const restItems = rest.map((a) => ({
+  title: a.title,
+  category: a.sectionName,
+  href: a.href,
+  date: a.date,
+  image: a.image,
+}));
+
+const trendingItems = sidebarArticles.map((a) => ({
+  title: a.title,
+  href: a.href,
+  date: a.date,
+}));
+
+const moreStoriesItems = articles.slice(3, 6).map((a) => ({
+  title: a.title,
+  category: a.sectionName,
+  href: a.href,
+  date: a.date,
+  image: a.image,
+}));
+---
+
+<Layout
+  title="പുതിയ വാർത്തകൾ | Latest News — MediaOne (previous design)"
+  description="മീഡിയവണിന്റെ ഏറ്റവും പുതിയ വാർത്തകൾ. അടിയന്തര വിവരങ്ങൾ, പ്രധാന സംഭവവികാസങ്ങൾ, വിശദമായ റിപ്പോർട്ടുകൾ."
+  noindex
+>
+  <Header />
+
+  <main class="flex-1 bg-bg-page">
+    <!-- Section Header Banner -->
+    <SectionHeader
+      variant="gradient"
+      title="പുതിയ വാർത്തകൾ"
+      titleEn="Latest News"
+      href="/latest-news"
+      viewAllHref="/latest-news"
+      sticky={false}
+    />
+
+    <div class="w-full lg:max-w-site lg:mx-auto">
+      <!-- Section description -->
+      <div class="px-4 pt-5 pb-6 sm:px-6 md:px-8 bg-bg-card">
+        <p class="lead-text text-text-secondary max-w-prose text-pretty">മീഡിയവണിന്റെ ഏറ്റവും പുതിയ വാർത്തകൾ. അടിയന്തര വിവരങ്ങൾ, പ്രധാന സംഭവവികാസങ്ങൾ, വിശദമായ റിപ്പോർട്ടുകൾ.</p>
+        <p class="mt-4 eyebrow text-azure tabular-nums">{articles.length} Articles</p>
+      </div>
+
+      <!-- 12-col grid: 8 + 4 -->
+      <div class="lg:grid lg:grid-cols-12">
+
+        <!-- MAIN COLUMN -->
+        <div class="lg:col-span-8 lg:pr-6">
+
+          <!-- Hero article using ArticleCard lead variant -->
+          {hero && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <ArticleCard
+                variant="lead"
+                title={hero.title}
+                excerpt={hero.excerpt}
+                category={hero.sectionName}
+                href={hero.href}
+                date={hero.date}
+                image={hero.image}
+              />
+            </div>
+          )}
+
+          <!-- Grid section using CardGrid -->
+          {grid.length > 0 && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <SectionBlock title="കൂടുതൽ" titleEn="More Stories" href="/latest-news" viewAllHref="/latest-news">
+                <CardGrid items={gridItems} cols={2} />
+              </SectionBlock>
+            </div>
+          )}
+
+          <!-- Rest as ArticleList -->
+          {rest.length > 0 && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <SectionBlock title="പഴയ വാർത്തകൾ" titleEn="Earlier" href="/latest-news">
+                <ArticleList items={restItems} />
+              </SectionBlock>
+            </div>
+          )}
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="hidden lg:block lg:col-span-4 lg:border-l lg:border-rule lg:bg-bg-card">
+          <div class="p-6 xl:p-8 space-y-10">
+
+            <SectionBlock title="ജനപ്രിയം" titleEn="Trending" href="/latest-news">
+              <ol class="space-y-4">
+                {trendingItems.slice(0, 5).map((a, i) => (
+                  <li class="flex gap-3">
+                    <span class="text-2xl font-bold text-azure/30 tabular-nums leading-none pt-0.5">{String(i + 1).padStart(2, '0')}</span>
+                    <a href={a.href} class="group">
+                      <p class="article-title text-text-primary group-hover:text-azure transition-colors">{a.title}</p>
+                      <p class="mt-1 caption-text text-text-muted">{a.date}</p>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </SectionBlock>
+
+            <SectionBlock title="കൂടുതൽ" titleEn="More Stories">
+              <div class="space-y-4">
+                {moreStoriesItems.map((a) => (
+                  <ArticleCard
+                    variant="standard"
+                    title={a.title}
+                    category={a.category}
+                    href={a.href}
+                    date={a.date}
+                    image={a.image}
+                  />
+                ))}
+              </div>
+            </SectionBlock>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

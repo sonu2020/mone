@@ -1,0 +1,41 @@
+---
+// BLOCK · StreamStrip — the same sideways treatment as StreamVideos, for
+// stories rather than stills. It carries the shelf reads the band at the top
+// of the page did not use, so the strip is a continuation of that desk rather
+// than a second copy of it.
+//
+// Tinted, because unlike the video strip it holds the same kind of object as
+// the rows around it: without a surface behind it the reader has no cue that
+// the axis just changed.
+import Art from '../home4/Art.astro';
+import type { LiveStory } from '../../lib/home4-data';
+
+export interface Props {
+  label: string;
+  href: string;
+  stories: LiveStory[];
+  class?: string;
+}
+const { label, href, stories, class: className = '' } = Astro.props;
+---
+
+<section class:list={['mc', 'my-6 sm:my-7 -mx-4 sm:mx-0 sm:rounded-lg bg-light-gray dark:bg-brand-elevated px-4 sm:px-6 py-6', className]}>
+  <div class="flex items-baseline gap-4 pb-3.5">
+    <span class="band-label text-text-navy-deep dark:text-ivory">{label}</span>
+    <span class="h-px flex-1 bg-rule dark:bg-ivory/15" aria-hidden="true"></span>
+    <a href={href} class="eyebrow text-azure dark:text-azure-light hover:text-azure-dark dark:hover:text-azure transition-colors">View all →</a>
+  </div>
+
+  <div class="-mx-4 sm:mx-0 overflow-x-auto scrollbar-none overscroll-x-contain">
+    <div class="flex gap-5 px-4 sm:px-0 snap-x snap-mandatory">
+      {stories.map((story) => (
+        <a href={story.href} class="group block w-52 sm:w-60 shrink-0 snap-start">
+          <Art story={story} ratio="4/3" w={480} class="rounded-md" zoom loading="lazy" />
+          <h3 class="pt-2 headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-3">
+            {story.title}
+          </h3>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

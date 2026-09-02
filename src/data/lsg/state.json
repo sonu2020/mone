@@ -1,0 +1,217 @@
+{
+  "builtAt": "2026-08-12T12:56:18.840Z",
+  "counts": {
+    "Grama Panchayat": 941,
+    "Block Panchayat": 152,
+    "District Panchayat": 14,
+    "Municipality": 87,
+    "Corporation": 6,
+    "wards": 23611,
+    "declared": 23573,
+    "voters": 28662726
+  },
+  "seats": {
+    "LDF": 8889,
+    "UDF": 11103,
+    "NDA": 1919,
+    "OTHERS": 1662
+  },
+  "districts": [
+    {
+      "name": "Thiruvananthapuram",
+      "slug": "thiruvananthapuram",
+      "wards": 1838,
+      "declared": 1837,
+      "voters": 2926080,
+      "seats": {
+        "LDF": 799,
+        "UDF": 654,
+        "NDA": 320,
+        "OTHERS": 64
+      },
+      "leading": "LDF"
+    },
+    {
+      "name": "Kollam",
+      "slug": "kollam",
+      "wards": 1698,
+      "declared": 1698,
+      "voters": 2271343,
+      "seats": {
+        "LDF": 759,
+        "UDF": 676,
+        "NDA": 206,
+        "OTHERS": 57
+      },
+      "leading": "LDF"
+    },
+    {
+      "name": "Pathanamthitta",
+      "slug": "pathanamthitta",
+      "wards": 1099,
+      "declared": 1099,
+      "voters": 1062756,
+      "seats": {
+        "LDF": 327,
+        "UDF": 532,
+        "NDA": 169,
+        "OTHERS": 71
+      },
+      "leading": "UDF"
+    },
+    {
+      "name": "Alappuzha",
+      "slug": "alappuzha",
+      "wards": 1666,
+      "declared": 1666,
+      "voters": 1802555,
+      "seats": {
+        "LDF": 747,
+        "UDF": 597,
+        "NDA": 238,
+        "OTHERS": 84
+      },
+      "leading": "LDF"
+    },
+    {
+      "name": "Kottayam",
+      "slug": "kottayam",
+      "wards": 1611,
+      "declared": 1611,
+      "voters": 1641176,
+      "seats": {
+        "LDF": 521,
+        "UDF": 783,
+        "NDA": 143,
+        "OTHERS": 164
+      },
+      "leading": "UDF"
+    },
+    {
+      "name": "Idukki",
+      "slug": "idukki",
+      "wards": 1036,
+      "declared": 1036,
+      "voters": 912133,
+      "seats": {
+        "LDF": 309,
+        "UDF": 617,
+        "NDA": 36,
+        "OTHERS": 74
+      },
+      "leading": "UDF"
+    },
+    {
+      "name": "Ernakulam",
+      "slug": "ernakulam",
+      "wards": 2220,
+      "declared": 2219,
+      "voters": 2667746,
+      "seats": {
+        "LDF": 508,
+        "UDF": 1290,
+        "NDA": 104,
+        "OTHERS": 317
+      },
+      "leading": "UDF"
+    },
+    {
+      "name": "Thrissur",
+      "slug": "thrissur",
+      "wards": 2204,
+      "declared": 2204,
+      "voters": 2754275,
+      "seats": {
+        "LDF": 1018,
+        "UDF": 870,
+        "NDA": 220,
+        "OTHERS": 96
+      },
+      "leading": "LDF"
+    },
+    {
+      "name": "Palakkad",
+      "slug": "palakkad",
+      "wards": 2116,
+      "declared": 2116,
+      "voters": 2433390,
+      "seats": {
+        "LDF": 1009,
+        "UDF": 776,
+        "NDA": 202,
+        "OTHERS": 129
+      },
+      "leading": "LDF"
+    },
+    {
+      "name": "Malappuram",
+      "slug": "malappuram",
+      "wards": 2789,
+      "declared": 2788,
+      "voters": 3618851,
+      "seats": {
+        "LDF": 468,
+        "UDF": 1934,
+        "NDA": 33,
+        "OTHERS": 353
+      },
+      "leading": "UDF"
+    },
+    {
+      "name": "Kozhikode",
+      "slug": "kozhikode",
+      "wards": 1903,
+      "declared": 1903,
+      "voters": 2682682,
+      "seats": {
+        "LDF": 794,
+        "UDF": 938,
+        "NDA": 46,
+        "OTHERS": 125
+      },
+      "leading": "UDF"
+    },
+    {
+      "name": "Wayanad",
+      "slug": "wayanad",
+      "wards": 629,
+      "declared": 629,
+      "voters": 647378,
+      "seats": {
+        "LDF": 213,
+        "UDF": 357,
+        "NDA": 21,
+        "OTHERS": 38
+      },
+      "leading": "UDF"
+    },
+    {
+      "name": "Kannur",
+      "slug": "kannur",
+      "wards": 1812,
+      "declared": 1812,
+      "voters": 2092003,
+      "seats": {
+        "LDF": 1080,
+        "UDF": 641,
+        "NDA": 48,
+        "OTHERS": 43
+      },
+      "leading": "LDF"
+    },
+    {
+      "name": "Kasaragod",
+      "slug": "kasaragod",
+      "wards": 955,
+      "declared": 955,
+      "voters": 1112190,
+      "seats": {
+        "LDF": 337,
+        "UDF": 438,
+        "NDA": 133,
+        "OTHERS": 47
+      },
+      "leading": "UDF"
+    }
+  ]
+}

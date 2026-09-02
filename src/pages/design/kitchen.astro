@@ -1,0 +1,586 @@
+---
+import DesignShell from '../../components/design/DesignShell.astro';
+import Spec from '../../components/kitchen/Spec.astro';
+
+// Atoms
+import Kicker from '../../components/ui/Kicker.astro';
+import MetaRow from '../../components/ui/MetaRow.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Pulse from '../../components/ui/Pulse.astro';
+import Headline from '../../components/ui/Headline.astro';
+import Media from '../../components/ui/Media.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+
+// Blocks
+import StoryCard from '../../components/news/StoryCard.astro';
+import StoryList from '../../components/news/StoryList.astro';
+import StoryLink from '../../components/news/StoryLink.astro';
+import OverlayStory from '../../components/news/OverlayStory.astro';
+import NumberedList from '../../components/news/NumberedList.astro';
+import Timeline from '../../components/news/Timeline.astro';
+import PromoGrid from '../../components/news/PromoGrid.astro';
+import VideoPlayer from '../../components/news/VideoPlayer.astro';
+import VideoThumb from '../../components/news/VideoThumb.astro';
+import VideoCard from '../../components/news/VideoCard.astro';
+import VideoGrid from '../../components/news/VideoGrid.astro';
+import ShortsRail from '../../components/news/ShortsRail.astro';
+import VideoHero from '../../components/news/VideoHero.astro';
+import VideoFeature from '../../components/news/VideoFeature.astro';
+import EditorialShelf from '../../components/news/EditorialShelf.astro';
+import AsymmetricShelf from '../../components/news/AsymmetricShelf.astro';
+import CategoryColumnsShelf from '../../components/news/CategoryColumnsShelf.astro';
+import TopVideosShelf from '../../components/news/TopVideosShelf.astro';
+
+// Bands — the /home4 production set
+import Art from '../../components/home4/Art.astro';
+import BandHeading from '../../components/home4/BandHeading.astro';
+import ThumbRow from '../../components/home4/ThumbRow.astro';
+import LeadPackage from '../../components/home4/LeadPackage.astro';
+import ListBand from '../../components/home4/ListBand.astro';
+import ShelfBand from '../../components/home4/ShelfBand.astro';
+import FeatureBand from '../../components/home4/FeatureBand.astro';
+import SplitBand from '../../components/home4/SplitBand.astro';
+import OpinionBand from '../../components/home4/OpinionBand.astro';
+import ProgramBand from '../../components/home4/ProgramBand.astro';
+
+import { videoItems, shorts, featuredVideo } from '../../lib/video-data';
+import {
+  hero,
+  topStories,
+  latest,
+  mostRead,
+  cluster,
+  shelfEditorialHero,
+  shelfEditorialGrid,
+  keralaEditorialHero,
+  keralaEditorialGrid,
+} from '../../lib/home-data';
+import {
+  leadStories,
+  latest as liveLatest,
+  shelf as liveShelf,
+  magazine as liveMagazine,
+  feed as liveFeed,
+  section as liveSection,
+  SOURCE,
+} from '../../lib/home4-data';
+import { allVideos } from '../../lib/videos';
+import { getProgramBySlug, getProgramEpisodes } from '../../lib/programs';
+import { trendingTopics } from '../../lib/mega-nav';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+const s = hero;
+const feed = topStories.slice(0, 4).map((t, i) => ({ time: ['21:14', '20:40', '20:12', '19:47'][i], ...t }));
+
+// Live-snapshot material, so the band demos render the same content as /home4.
+const [liveHero, ...liveHeroRest] = leadStories;
+const liveKerala = liveSection('kerala');
+const liveSports = liveSection('sports');
+const liveWorld = liveSection('world');
+const featuredLive = allVideos.find((v) => v.isFeatured) ?? allVideos[0];
+const demoProgram = getProgramBySlug('special-edition')!;
+const demoEpisodes = getProgramEpisodes(demoProgram, 5);
+
+const groups = [
+  { id: 'foundations', n: '01', label: 'Foundations', note: 'Type scales' },
+  { id: 'atoms', n: '02', label: 'Atoms', note: 'Indivisible parts' },
+  { id: 'blocks', n: '03', label: 'Blocks', note: 'Story units' },
+  { id: 'bands', n: '04', label: 'Bands', note: 'Homepage sections' },
+  { id: 'video', n: '05', label: 'Video', note: 'Player sub-system' },
+];
+---
+
+<DesignShell
+  title="Gallery — MediaOne Design System"
+  description="Every atom, block and band in the MediaOne design system, rendered live."
+  eyebrow="Gallery"
+  heading="Atoms, Blocks & Bands"
+  lede="Every reusable part, rendered live from the components the site ships. Atoms compose into blocks; blocks compose into bands; bands compose the homepage. The band set is what the homepage is built from — it renders the live-site snapshot, so these demos show real material."
+  active="gallery"
+>
+      <div class="grid grid-cols-1 lg:grid-cols-[13rem_minmax(0,1fr)] gap-8 lg:gap-10">
+        <!-- ══ BROWSER RAIL ══ -->
+        <aside class="lg:sticky lg:top-6 lg:self-start" aria-label="Component browser">
+          <div class="border border-rule dark:border-ivory/10 bg-bg-card">
+            <!-- Filter — revealed by the browser script, inert without JS -->
+            <div id="kitchen-filter" class="hidden border-b border-rule dark:border-ivory/10 p-3">
+              <label for="kitchen-search" class="sr-only">Filter components</label>
+              <input
+                id="kitchen-search"
+                type="search"
+                autocomplete="off"
+                placeholder="Filter components…"
+                class="w-full bg-bg-page dark:bg-brand-dark border border-rule dark:border-ivory/15 px-2.5 py-1.5 body-small text-text-primary dark:text-ivory placeholder:text-text-light focus:outline-none focus:border-azure transition-colors"
+              />
+              <p id="kitchen-count" class="mt-2 caption-text text-text-muted tabular-nums" role="status" aria-live="polite"></p>
+            </div>
+
+            <nav class="p-2" aria-label="Sections">
+              <ul class="space-y-0.5">
+                {groups.map((g) => (
+                  <li>
+                    <a
+                      href={`#${g.id}`}
+                      data-nav={g.id}
+                      class="group flex items-baseline gap-2.5 px-2.5 py-2 hover:bg-bg-page dark:hover:bg-brand-elevated transition-colors"
+                    >
+                      <span class="eyebrow text-azure tabular-nums shrink-0">{g.n}</span>
+                      <span class="min-w-0">
+                        <span class="block article-title text-text-primary dark:text-ivory group-hover:text-azure transition-colors">{g.label}</span>
+                        <span class="block caption-text text-text-muted dark:text-ivory/40">{g.note}</span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div class="border-t border-rule dark:border-ivory/10 p-3 flex flex-wrap gap-x-3 gap-y-1.5">
+              <span class="eyebrow text-azure">■ Production</span>
+              <span class="eyebrow text-accent-cyan">■ Atom</span>
+            </div>
+
+            <a
+              href="/design/archive"
+              class="group flex items-baseline gap-2.5 border-t border-rule dark:border-ivory/10 px-4 py-3 hover:bg-bg-page dark:hover:bg-brand-elevated transition-colors"
+            >
+              <span class="eyebrow text-text-muted tabular-nums shrink-0">↩</span>
+              <span class="min-w-0">
+                <span class="block article-title text-text-primary dark:text-ivory group-hover:text-azure transition-colors">Archive</span>
+                <span class="block caption-text text-text-muted dark:text-ivory/40">Superseded lockups</span>
+              </span>
+            </a>
+          </div>
+
+          <p class="mt-3 caption-text text-text-muted dark:text-ivory/40">
+            Band demos render the {SOURCE.url.replace('https://www.', '')} snapshot captured {SOURCE.capturedAt}.
+          </p>
+        </aside>
+
+        <!-- ══ GALLERY ══ -->
+        <div class="min-w-0 space-y-14">
+          <section id="foundations" class="scroll-mt-6">
+            <div class="flex items-baseline gap-3 mb-6">
+              <span class="eyebrow text-azure tabular-nums">01</span>
+              <h2 class="text-title text-ink dark:text-ivory">Foundations</h2>
+            </div>
+            <p class="body-small text-text-secondary dark:text-ivory/60 max-w-prose mb-6">
+              Two parallel type scales. The promo scale sets airy, image-led layouts; the dense
+              editorial scale sets the packed newsroom grid — same families, tighter rhythm.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Spec
+                name="Dense editorial scale"
+                path="styles/app.css"
+                group="foundations"
+                note="headline-lead · -feature · -deck, band-label, row-meta. Drives every band."
+              >
+                <div class="space-y-4">
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">band-label · 18→22px</p>
+                    <p class="band-label text-text-navy-deep dark:text-ivory">Entertainment</p>
+                  </div>
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">headline-lead · 21→25px</p>
+                    <p class="headline-lead text-text-primary dark:text-ivory">{liveHero.title}</p>
+                  </div>
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">headline-feature · 19→22px</p>
+                    <p class="headline-feature text-text-navy-deep dark:text-ivory">{liveShelf[0].title}</p>
+                  </div>
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">headline-deck · 15→16.5px</p>
+                    <p class="headline-deck text-text-primary dark:text-ivory">{liveLatest[0].title}</p>
+                  </div>
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">row-meta · 12px</p>
+                    <p class="row-meta text-text-primary dark:text-ivory">Kerala <span class="text-text-light">5 mnt ago</span></p>
+                  </div>
+                </div>
+              </Spec>
+
+              <Spec
+                name="Promo scale"
+                path="styles/app.css"
+                group="foundations"
+                status="legacy"
+                note="hero / article-title-lg / article-title / body-small — the airier scale the older layouts use."
+              >
+                <div class="space-y-4">
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">text-hero · 24→44px</p>
+                    <p class="text-hero font-bold text-ink dark:text-ivory leading-tight">{s.title}</p>
+                  </div>
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">article-title-lg · 21→30px</p>
+                    <p class="article-title-lg text-ink dark:text-ivory">{s.title}</p>
+                  </div>
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">article-title · 14→18px</p>
+                    <p class="article-title text-text-primary dark:text-ivory">{s.title}</p>
+                  </div>
+                  <div>
+                    <p class="caption-text text-text-muted mb-1">eyebrow / caption-text</p>
+                    <p class="eyebrow text-azure">Kerala</p>
+                    <p class="caption-text text-text-muted tabular-nums mt-1">8:48 PM IST</p>
+                  </div>
+                </div>
+              </Spec>
+            </div>
+          </section>
+          <section id="atoms" class="scroll-mt-6">
+            <div class="flex items-baseline gap-3 mb-6">
+              <span class="eyebrow text-azure tabular-nums">02</span>
+              <h2 class="text-title text-ink dark:text-ivory">Atoms</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Spec name="BandHeading" path="components/home4/BandHeading.astro" group="atoms" status="atom"
+                note="Section marker: label, hairline rule to the far edge, optional View all. Opens every band." wide>
+                <BandHeading label="Entertainment" href="#" viewAllHref="#" />
+                <BandHeading label="Kerala" class="mt-6" />
+              </Spec>
+
+              <Spec name="ThumbRow" path="components/home4/ThumbRow.astro" group="atoms" status="atom"
+                note="The rail workhorse. Fixed 72/88px thumb slot keeps every row in one vertical lane; metaBelow moves the meta under the headline.">
+                <div class="flex flex-col gap-5">
+                  {liveLatest.slice(0, 2).map((story) => <ThumbRow story={story} />)}
+                  <ThumbRow story={liveLatest[2]} metaBelow />
+                </div>
+              </Spec>
+
+              <Spec name="Art" path="components/home4/Art.astro" group="atoms" status="atom"
+                note="Story artwork that never lies: renders the story's own image, or holds the frame with a neutral tint when none exists.">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <Art story={liveLatest[0]} ratio="16/9" w={560} zoom />
+                    <p class="caption-text text-text-muted mt-1.5">with image</p>
+                  </div>
+                  <div>
+                    <Art story={{ title: '', href: '#' }} ratio="16/9" />
+                    <p class="caption-text text-text-muted mt-1.5">no image published</p>
+                  </div>
+                </div>
+              </Spec>
+
+              <Spec name="Kicker" path="components/ui/Kicker.astro" group="atoms" status="atom"
+                note="Category eyebrow — the one place letter-spacing is allowed. Latin uppercase only.">
+                <div class="flex flex-wrap items-center gap-5">
+                  <Kicker text="Kerala" />
+                  <span class="bg-ink px-2 py-1 inline-flex"><Kicker text="Kerala" tone="onDark" /></span>
+                  <Kicker text="Analysis" tone="muted" />
+                </div>
+              </Spec>
+
+              <Spec name="Badge · Pulse" path="components/ui/Badge.astro" group="atoms" status="atom"
+                note="Status flags for breaking, live and exclusive lockups.">
+                <div class="flex flex-wrap items-center gap-3">
+                  <Badge label="Breaking" variant="breaking" />
+                  <Badge label="Live" variant="live" />
+                  <Badge label="Exclusive" variant="solid" />
+                  <Badge label="Opinion" variant="outline" />
+                  <span class="inline-flex items-center gap-2 eyebrow text-text-muted"><Pulse /> Pulse</span>
+                </div>
+              </Spec>
+
+              <Spec name="MetaRow" path="components/ui/MetaRow.astro" group="atoms" status="atom"
+                note="Category + timestamp pair for card footers.">
+                <MetaRow category="India" date="2 hr" />
+                <span class="block mt-3 bg-ink px-2 py-2 inline-block"><MetaRow category="India" date="2 hr" tone="onDark" /></span>
+              </Spec>
+
+              <Spec name="SectionHeading" path="components/ui/SectionHeading.astro" group="atoms" status="atom"
+                note="Malayalam block label with azure accent rule — the older sections' identity.">
+                <SectionHeading title={kerala.name} titleEn={kerala.nameEn} href="#" viewAllHref="#" class="mb-0" />
+              </Spec>
+
+              <Spec name="Headline" path="components/ui/Headline.astro" group="atoms" status="atom"
+                note="The one heading primitive. size maps to exactly one type token — never set headline type ad hoc." wide>
+                <div class="group space-y-3">
+                  <Headline as="h3" size="hero" text={s.title} />
+                  <Headline as="h3" size="lg" text={s.title} />
+                  <Headline as="h3" size="base" text={s.title} />
+                  <Headline as="h3" size="section" text="കേരളം" />
+                </div>
+              </Spec>
+
+              <Spec name="Media" path="components/ui/Media.astro" group="atoms" status="atom"
+                note="Aspect-ratio frame. Derives intrinsic width/height from the ratio; takes loading + fetchpriority for LCP art." wide>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Media seed="k1" ratio="16/9" />
+                  <Media seed="k2" ratio="4/3" />
+                  <Media seed="k3" ratio="1/1" />
+                  <div class="group"><Media seed="k4" ratio="16/9" overlay="strong" zoom /></div>
+                </div>
+              </Spec>
+            </div>
+          </section>
+          <section id="blocks" class="scroll-mt-6">
+            <div class="flex items-baseline gap-3 mb-6">
+              <span class="eyebrow text-azure tabular-nums">03</span>
+              <h2 class="text-title text-ink dark:text-ivory">Blocks</h2>
+            </div>
+            <p class="body-small text-text-secondary dark:text-ivory/60 max-w-prose mb-6">
+              Story units built from atoms. Bands arrange these; section and story pages use them directly.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Spec name="StoryCard" path="components/news/StoryCard.astro" group="blocks"
+                note="Image-top promo unit — the workhorse of grids.">
+                <div class="grid grid-cols-2 gap-6">
+                  <StoryCard story={india.lead} />
+                  <StoryCard story={kerala.lead} showExcerpt />
+                </div>
+              </Spec>
+
+              <Spec name="StoryList" path="components/news/StoryList.astro" group="blocks"
+                note="Rule-divided text rail of StoryRow units.">
+                <StoryList items={topStories.slice(0, 3)} />
+              </Spec>
+
+              <Spec name="OverlayStory" path="components/news/OverlayStory.astro" group="blocks"
+                note="Text-over-image lockup with scrim and optional badge.">
+                <OverlayStory story={hero} ratio="16/9" size="lg" badge="Live" badgeVariant="live" />
+              </Spec>
+
+              <Spec name="StoryLink" path="components/news/StoryLink.astro" group="blocks"
+                note="Bare headline link, optionally bulleted — the densest unit available.">
+                <ul>
+                  {kerala.items.slice(0, 4).map((it) => <li><StoryLink story={it} bullet showMeta={false} /></li>)}
+                </ul>
+              </Spec>
+
+              <Spec name="NumberedList" path="components/news/NumberedList.astro" group="blocks"
+                note="Ranked rail for most-read.">
+                <NumberedList items={mostRead.slice(0, 5)} />
+              </Spec>
+
+              <Spec name="Timeline" path="components/news/Timeline.astro" group="blocks"
+                note="Timestamped spine for live feeds. LeadPackage renders its own variant of this pattern.">
+                <Timeline items={feed} />
+              </Spec>
+
+              <Spec name="PromoGrid" path="components/news/PromoGrid.astro" group="blocks"
+                note="StoryCard grid at 2–4 columns." wide>
+                <PromoGrid items={[india.lead, kerala.lead, ...latest.slice(0, 2)]} cols={4} />
+              </Spec>
+            </div>
+          </section>
+          <section id="bands" class="scroll-mt-6">
+            <div class="flex items-baseline gap-3 mb-6">
+              <span class="eyebrow text-azure tabular-nums">04</span>
+              <h2 class="text-title text-ink dark:text-ivory">Bands</h2>
+            </div>
+            <p class="body-small text-text-secondary dark:text-ivory/60 max-w-prose mb-6">
+              Full-width homepage sections, each one a band heading over a lead, a card run and a rail.
+              All sit on the site's 12-column grid, so they stack predictably against each other.
+              <a href="/" class="text-azure hover:text-azure-dark">The homepage</a> is these six in the
+              live site's order.
+            </p>
+
+            <div class="space-y-6">
+              <Spec name="LeadPackage" path="components/home4/LeadPackage.astro" group="bands"
+                note="The hero band: a 5-column lead spanning two rows, with a trending-topics strip across columns 2+3 over the thumbed headline stack (4) and the live rail (3) — OnAirNow plus the timestamped feed.">
+                <LeadPackage
+                  lead={liveHero}
+                  rows={[...liveHeroRest, ...liveLatest].slice(0, 4)}
+                  feed={liveFeed}
+                  topics={trendingTopics}
+                />
+              </Spec>
+
+              <Spec name="ListBand" path="components/home4/ListBand.astro" group="bands"
+                note="Latest-news feed: a two- or three-column run of rule-separated ThumbRows.">
+                <ListBand label="Latest News" href="#" viewAllHref="#" stories={liveLatest.slice(0, 6)} class="border-b-0 py-0" />
+              </Spec>
+
+              <Spec name="ShelfBand" path="components/home4/ShelfBand.astro" group="bands"
+                note="Editorial lead (image and text side by side on a tinted panel), a rule, three promo cards, and a rail closed by a rectangle ad.">
+                <ShelfBand
+                  label="Shelf"
+                  href="#"
+                  viewAllHref="#"
+                  lead={liveShelf[0]}
+                  cards={liveShelf.slice(1, 4)}
+                  rail={liveShelf.slice(4, 7)}
+                  class="border-b-0 py-0"
+                />
+              </Spec>
+
+              <Spec name="FeatureBand" path="components/home4/FeatureBand.astro" group="bands"
+                note="Built around one tall feature: large image over a tinted caption panel, a narrow stack of two cards, and a deep rail.">
+                <FeatureBand
+                  label="Sports"
+                  href="#"
+                  viewAllHref="#"
+                  feature={liveSports.stories[0]}
+                  stack={liveSports.stories.slice(1, 3)}
+                  rail={liveSports.stories.slice(3, 5)}
+                  class="border-b-0 py-0"
+                />
+              </Spec>
+
+              <Spec name="SplitBand" path="components/home4/SplitBand.astro" group="bands"
+                note="Mirrored split lead (text panel left, image right), a four-up row of bordered cards, and an optional rail of thumb and author rows.">
+                <SplitBand
+                  label="Kerala"
+                  href="#"
+                  viewAllHref="#"
+                  lead={liveKerala.stories[0]}
+                  cards={liveKerala.stories.slice(1, 5)}
+                  rail={liveKerala.stories.slice(5, 7)}
+                  authors={liveKerala.stories.slice(7, 8)}
+                  class="py-0"
+                />
+              </Spec>
+
+              <Spec name="SplitBand · no rail" path="components/home4/SplitBand.astro" group="bands"
+                note="Omit rail and authors and the main column takes all 12 columns — how the World band runs.">
+                <SplitBand
+                  label="World"
+                  href="#"
+                  viewAllHref="#"
+                  lead={liveWorld.stories[0]}
+                  cards={liveWorld.stories.slice(1, 5)}
+                  class="py-0"
+                />
+              </Spec>
+
+              <Spec name="ProgramBand" path="components/home4/ProgramBand.astro" group="bands"
+                note="One programme's shelf: latest episode as a large still, the rest of the run as a numbered playlist. For flagship shows, where the draw is the programme rather than a single story.">
+                <ProgramBand program={demoProgram} episodes={demoEpisodes} popular class="border-b-0 py-0" />
+              </Spec>
+
+              <Spec name="OpinionBand" path="components/home4/OpinionBand.astro" group="bands"
+                note="Text-forward strip for desks that publish without art — rule-led columns carrying only kicker and headline.">
+                <OpinionBand label="Magazine" href="#" viewAllHref="#" stories={liveMagazine} class="border-b-0 py-0" />
+              </Spec>
+            </div>
+          </section>
+          <section id="video" class="scroll-mt-6">
+            <div class="flex items-baseline gap-3 mb-6">
+              <span class="eyebrow text-azure tabular-nums">05</span>
+              <h2 class="text-title text-ink dark:text-ivory">Video</h2>
+            </div>
+            <p class="body-small text-text-secondary dark:text-ivory/60 max-w-prose mb-6">
+              A video sub-system built from the same atoms. <span class="font-mono text-meta">VideoThumb</span>
+              is the core still (play + duration); everything else composes it — landscape grids, the vertical
+              reels rail, a cinematic hero, and an inline player.
+            </p>
+
+            <div class="space-y-6">
+              <Spec name="TopVideosShelf" path="components/news/TopVideosShelf.astro" group="video"
+                note="Full-bleed blue band of video cards. The Videos band on the homepage; cards open the shared modal.">
+                <TopVideosShelf title="വീഡിയോ" titleEn="Top Videos" videos={videoItems} />
+              </Spec>
+
+              <Spec name="VideoHero" path="components/news/VideoHero.astro" group="video"
+                note="Full-bleed cinematic still for video landing pages.">
+                <VideoHero item={featuredVideo} height="hero" excerpt="ഇടുക്കിയിലെ റെയ്ഡിൽ ലഹരി വില്പന ശൃംഖല പൊലീസ് തകർത്തു — അന്വേഷണ റിപ്പോർട്ട്." />
+              </Spec>
+
+              <Spec name="VideoCard" path="components/news/VideoCard.astro" group="video" note="Landscape still + title + duration.">
+                <div class="grid grid-cols-2 gap-6">
+                  <VideoCard item={videoItems[0]} />
+                  <VideoCard item={videoItems[1]} />
+                </div>
+              </Spec>
+
+              <Spec name="VideoThumb" path="components/news/VideoThumb.astro" group="video" note="The core still, at 16/9, 1/1 and 9/16.">
+                <div class="grid grid-cols-3 gap-4 items-start">
+                  <VideoThumb item={videoItems[2]} href={videoItems[2].href} ratio="16/9" playSize="sm" />
+                  <VideoThumb item={videoItems[3]} href={videoItems[3].href} ratio="1/1" playSize="sm" />
+                  <VideoThumb item={shorts[0]} href={shorts[0].href} ratio="9/16" playSize="sm" live />
+                </div>
+              </Spec>
+
+              <Spec name="ShortsRail" path="components/news/ShortsRail.astro" group="video" note="Horizontal rail of vertical reels.">
+                <ShortsRail items={shorts} />
+              </Spec>
+
+              <Spec name="VideoGrid" path="components/news/VideoGrid.astro" group="video" note="VideoCard grid at 2–4 columns.">
+                <VideoGrid items={videoItems.slice(0, 4)} cols={4} />
+              </Spec>
+
+              <Spec name="VideoFeature" path="components/news/VideoFeature.astro" group="video" note="Watch module: player with an up-next rail.">
+                <VideoFeature feature={featuredVideo} items={videoItems.slice(1, 5)} />
+              </Spec>
+
+              <Spec name="VideoPlayer" path="components/news/VideoPlayer.astro" group="video" note="Inline HTML5 player.">
+                <div class="max-w-2xl">
+                  <VideoPlayer title="നൂറ്റാണ്ടുകള്‍ പഴക്കമുള്ള പള്ളി; ബുള്‍ഡോസര്‍ രാജ്" seed="vid-demo" />
+                </div>
+              </Spec>
+            </div>
+          </section>
+
+          <p id="kitchen-empty" class="hidden border border-rule dark:border-ivory/10 bg-bg-card p-8 text-center body-small text-text-muted">
+            Nothing matches that filter.
+          </p>
+        </div>
+      </div>
+
+  <!-- Component browser: live filter + current-section tracking. Progressive —
+       the filter reveals itself only once this runs. -->
+  <script is:inline>
+    (function () {
+      var specs = Array.prototype.slice.call(document.querySelectorAll('[data-spec]'));
+      var sections = Array.prototype.slice.call(document.querySelectorAll('main section[id]'));
+      var navLinks = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+      var empty = document.getElementById('kitchen-empty');
+      var wrap = document.getElementById('kitchen-filter');
+      var input = document.getElementById('kitchen-search');
+      var count = document.getElementById('kitchen-count');
+      if (!specs.length || !wrap || !input || !count) return;
+
+      wrap.classList.remove('hidden');
+
+      function apply(q) {
+        var term = q.trim().toLowerCase();
+        var shown = 0;
+        specs.forEach(function (el) {
+          var hit = !term
+            || el.getAttribute('data-name').indexOf(term) !== -1
+            || el.getAttribute('data-path').indexOf(term) !== -1
+            || el.getAttribute('data-group').indexOf(term) !== -1;
+          el.hidden = !hit;
+          if (hit) shown++;
+        });
+        // Hide a section heading when the filter empties it.
+        sections.forEach(function (sec) {
+          var any = sec.querySelector('[data-spec]:not([hidden])');
+          sec.hidden = !any;
+        });
+        if (empty) empty.classList.toggle('hidden', shown !== 0);
+        count.textContent = term
+          ? shown + ' of ' + specs.length + ' components'
+          : specs.length + ' components';
+      }
+
+      apply('');
+      input.addEventListener('input', function () { apply(input.value); });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { input.value = ''; apply(''); }
+      });
+
+      // Mark the section currently in view.
+      if ('IntersectionObserver' in window) {
+        var mark = function (id) {
+          navLinks.forEach(function (a) {
+            var on = a.getAttribute('data-nav') === id;
+            a.classList.toggle('bg-bg-page', on);
+            a.classList.toggle('dark:bg-brand-elevated', on);
+          });
+        };
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) mark(entry.target.id);
+          });
+        }, { rootMargin: '-10% 0px -75% 0px' });
+        sections.forEach(function (sec) { io.observe(sec); });
+      }
+    })();
+  </script>
+</DesignShell>

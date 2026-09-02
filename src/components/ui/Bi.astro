@@ -1,0 +1,26 @@
+---
+// ATOM · Bi — one string in two scripts, of which the reader sees one.
+//
+// Both ship in the HTML and a class on <html> chooses (see app.css). Writing
+// the pair by hand everywhere invites one half drifting from the other, so it
+// lives here: Malayalam always carries `font-malayalam` and `lang="ml"`, and
+// neither can be forgotten at a call site.
+//
+// `display: none` takes the hidden side out of the accessibility tree, so a
+// screen reader gets one language rather than both in sequence.
+export interface Props {
+  ml: string;
+  en: string;
+  /** Rendered element. Use a heading tag where the text is a heading. */
+  as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'div';
+  class?: string;
+  /** Extra classes for the Malayalam half only — it often wants a size bump. */
+  mlClass?: string;
+}
+
+const { ml, en, as: Tag = 'span', class: className = '', mlClass = '' } = Astro.props;
+---
+
+<Tag class:list={['mc', className]}>
+  <span data-ml lang="ml" class:list={['font-malayalam', mlClass]}>{ml}</span><span data-en lang="en">{en}</span>
+</Tag>

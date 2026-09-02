@@ -1,0 +1,39 @@
+---
+import ArticleCard from './ArticleCard.astro';
+
+export interface ArticleGridItem {
+  title: string;
+  category?: string;
+  href: string;
+  date?: string;
+  excerpt?: string;
+  image?: string;
+}
+
+export interface Props {
+  items: ArticleGridItem[];
+  cols?: 2 | 3 | 4;
+  class?: string;
+}
+
+const { items, cols = 3, class: className = '' } = Astro.props;
+
+const colMap = {
+  2: 'sm:grid-cols-2',
+  3: 'sm:grid-cols-2 md:grid-cols-3',
+  4: 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
+};
+---
+
+<div class:list={['mc', `grid grid-cols-2 ${colMap[cols]} gap-3 sm:gap-4 md:gap-5 ${className}`]}>
+  {items.map((item) => (
+    <ArticleCard
+      variant="standard"
+      title={item.title}
+      category={item.category}
+      href={item.href}
+      date={item.date}
+      image={item.image}
+    />
+  ))}
+</div>

@@ -1,0 +1,62 @@
+---
+// BLOCK · ReadMoreList — the "Read More" rows: square thumb, headline, optional
+// timestamp, hairline between. `variant="text"` drops the thumbs for the dense
+// rail; `variant="grid"` lays the same rows out across the full measure.
+import Placeholder from '../Placeholder.astro';
+import type { RailStory } from '../../lib/article-data';
+
+export interface Props {
+  items: RailStory[];
+  title?: string;
+  variant?: 'thumbs' | 'text' | 'grid';
+  limit?: number;
+  class?: string;
+}
+const {
+  items,
+  title = 'Read More',
+  variant = 'thumbs',
+  limit = 5,
+  class: className = '',
+} = Astro.props;
+
+const rows = items.slice(0, limit);
+---
+<section class:list={['mc', className]}>
+  {title && (
+    <h2 class="eyebrow text-text-primary pb-2 mb-1 border-b-2 border-ink dark:border-ivory/30">{title}</h2>
+  )}
+
+  {variant === 'grid' ? (
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 mt-5">
+      {rows.map((a) => (
+        <a href={a.href} class="group block">
+          <Placeholder class="aspect-[16/9] w-full" src={a.image} alt="" />
+          {a.category && <span class="mt-3 block eyebrow text-azure dark:text-azure-light">{a.category}</span>}
+          <h3 class="mt-1.5 article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+            {a.title}
+          </h3>
+          {a.date && <p class="mt-1.5 caption-text tabular-nums text-text-muted">{a.date}</p>}
+        </a>
+      ))}
+    </div>
+  ) : (
+    <ul class="divide-y divide-rule/70 dark:divide-ivory/[0.07]">
+      {rows.map((a) => (
+        <li>
+          <a href={a.href} class="group flex items-start gap-3 py-3.5">
+            {variant === 'thumbs' && (
+              <Placeholder class="w-20 shrink-0 aspect-[4/3]" src={a.image} alt="" />
+            )}
+            <span class="min-w-0 flex-1">
+              <span class="block article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light line-clamp-3 transition-colors">
+                {a.title}
+              </span>
+              {a.date && <span class="mt-1 block caption-text tabular-nums text-text-muted">{a.date}</span>}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</section>

@@ -1,0 +1,130 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/nav/HeaderBar.astro';
+import Footer from '../../components/Footer.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import DeskMasthead from '../../components/desk/DeskMasthead.astro';
+import VideoModal from '../../components/VideoModal.astro';
+import ShortsShelf from '../../components/ShortsShelf.astro';
+import ProgramFeed from '../../components/videos/ProgramFeed.astro';
+import ProgramBrowser from '../../components/programs/ProgramBrowser.astro';
+import BandHeading from '../../components/home4/BandHeading.astro';
+import { allVideos, todaysVideos } from '../../lib/videos';
+import { toModalVideos, modalShows, featuredFromPrograms } from '../../lib/video-modal';
+
+// Programme episodes are not in `allVideos`; VideoModal folds them into its own
+// payload from the `programs` prop, which is what makes the ProgramBrowser's
+// cards playable here.
+const modalVideos = toModalVideos(allVideos);
+
+// The rail and the modal browse the same material, so they are built from one
+// source — a show listed beside the grid must be playable in the player the
+// grid opens.
+const today = todaysVideos().map((v) => ({
+  id: v.slug,
+  title: v.title,
+  time: v.publishTime,
+  poster: v.thumbnailUrl || '',
+}));
+const programs = await modalShows();
+const picks = await featuredFromPrograms(3, 9);
+
+// ?category= still filters the grid for deep links, even though the filter
+// bar that used to set it is gone.
+const category = Astro.url.searchParams.get('category') || 'All';
+const filteredVideos = category === 'All' 
+  ? allVideos 
+  : allVideos.filter(v => v.category.toLowerCase() === category.toLowerCase());
+
+// Nine, for a 3×3 grid in the seven-column half. A tenth would open a fourth
+// row against a switcher that has already ended.
+const recentVideos = filteredVideos.slice(0, 9);
+---
+
+<Layout title="Videos — MediaOne | News Videos, Shows & Programs" description="Watch the latest Malayalam news videos, TV shows, programs, and exclusive interviews from MediaOne.">
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 max-w-site mx-auto w-full px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 bg-bg-page/40">
+    <DeskMasthead
+      title="Videos"
+      description="News videos, shows and programmes from MediaOne."
+      class="mb-6"
+    />
+
+    <!-- The featured hero and the category filter bar stood here. Both are
+         out: the hero repeated the first card of the grid below it at four
+         times the height, and the filter row reloaded the page per category
+         while the programme filter further down does the same job in place. -->
+
+    <!-- ══ LATEST + SWITCHER ═══════════════════════════════════════════════
+         Seven columns of grid beside five of switcher. The grid is what the
+         reader came for, so it keeps the larger half and a full 3×3 of it is
+         visible before the fold; the switcher is how they choose what is next,
+         so it sits alongside rather than below, where it would only be found
+         by someone who had already run out of grid. ══ -->
+    <section class="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-x-8">
+      <!-- ── Seven · the 3×3 grid ───────────────────────────────────────── -->
+      <div class="lg:col-span-7 min-w-0">
+      <BandHeading label="Latest Videos" badge={`${filteredVideos.length} videos`} class="mb-8" />
+
+      {recentVideos.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-8">
+          {recentVideos.map((video) => (
+            <a href={`/videos/watch/${video.slug}`} data-video-open={video.slug} class="group block">
+              <div class="relative overflow-hidden bg-black aspect-video border border-rule dark:border-ivory/10 shadow-xs">
+                <img src={video.thumbnailUrl} alt={video.title} loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
+                
+                <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <span class="size-11 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center border border-white/40 shadow-sm">
+                    <i class="ti ti-player-play text-lg ml-0.5" aria-hidden="true"></i>
+                  </span>
+                </span>
+                
+                {video.duration && <span class="absolute bottom-2 right-2 bg-black/75 text-white text-caption px-1.5 py-0.5 rounded-sm font-semibold backdrop-blur-xs tabular-nums">{video.duration}</span>}
+              </div>
+              <div class="mt-3">
+                <span class="eyebrow text-azure dark:text-azure-light text-[10px] font-bold">{video.category}</span>
+                <h3 class="mt-1 text-headline text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2 leading-snug">{video.title}</h3>
+                <div class="mt-2.5 flex items-center justify-between text-caption text-text-muted tabular-nums font-medium">
+                  <span>{video.publishDate}</span>
+                  {video.views && <span>{video.views} views</span>}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="mt-12 text-center py-10 bg-bg-card border border-rule dark:border-ivory/10 rounded-sm">
+          <p class="text-body text-text-muted">ഈ കാറ്റഗറിയിൽ വീഡിയോകൾ ഒന്നും കണ്ടെത്തിയില്ല.</p>
+        </div>
+      )}
+      </div>
+
+      <!-- ── Five · the switcher ────────────────────────────────────────── -->
+      <aside class="lg:col-span-5 min-w-0">
+        <!-- Fed by `picks`, which comes from the programmes, so the heading
+             points where the rail's material actually lives. -->
+        <BandHeading label="From the Programmes" href="/programs" viewAllHref="/programs" class="mb-8" />
+
+        <ProgramFeed items={picks} />
+      </aside>
+    </section>
+
+    <!-- Shorts Video Shelf -->
+    <div class="mt-14 -mx-4 sm:-mx-6 lg:-mx-8">
+      <ShortsShelf />
+    </div>
+
+    <!-- ── Browse by programme ─────────────────────────────────────────────
+         Where the "Shows & Programs" grid used to stand. That band linked into
+         /videos/shows, which is now unlisted; this replaces it with the real
+         slate — every programme, filtering real episodes in place. -->
+    <ProgramBrowser class="mt-14" playable />
+
+  </main>
+
+  <Footer />
+
+  <VideoModal videos={modalVideos} today={today} programs={programs} />
+</Layout>

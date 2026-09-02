@@ -1,0 +1,36 @@
+---
+// SECTION · HeroSection — the lead package. A broadcast-frame overlay hero (with a
+// live badge + excerpt + 3 secondary cards) alongside a rule-divided Top Stories
+// rail. The first 30 seconds of a visit. Composed only from system blocks.
+import OverlayStory from '../news/OverlayStory.astro';
+import StoryCard from '../news/StoryCard.astro';
+import StoryList from '../news/StoryList.astro';
+import type { Story } from '../../lib/home-data';
+
+export interface Props {
+  hero: Story;
+  secondaries: Story[];
+  topStories: Story[];
+  class?: string;
+}
+const { hero, secondaries, topStories, class: className = '' } = Astro.props;
+---
+<section class:list={['mc', 'grid grid-cols-1 lg:grid-cols-12 lg:gap-8 py-6 lg:py-9', className]}>
+  <!-- Lead: broadcast-frame hero + excerpt + secondary cards -->
+  <div class="lg:col-span-8 lg:border-r border-rule lg:pr-8">
+    <OverlayStory story={hero} ratio="16/9" size="hero" badge="Live" badgeVariant="live" />
+    <p class="mt-4 lead-text text-text-secondary max-w-prose">{hero.excerpt}</p>
+    <p class="mt-2 caption-text text-text-muted tabular-nums">{hero.date}</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-7 pt-7 border-t border-rule">
+      {secondaries.map((s) => <StoryCard story={s} ratio="16/10" />)}
+    </div>
+  </div>
+
+  <!-- Top Stories rail -->
+  <aside class="lg:col-span-4 mt-9 lg:mt-0">
+    <h2 class="section-header text-ink pb-2.5 mb-4 border-b-2 border-ink">ടോപ് സ്റ്റോറീസ്</h2>
+    <StoryCard story={topStories[0]} ratio="16/9" size="lg" class="mb-4 pb-4 border-b border-rule" />
+    <StoryList items={topStories.slice(1)} />
+  </aside>
+</section>

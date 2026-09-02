@@ -1,0 +1,21 @@
+---
+// DESIGN · Rule — a numbered section heading for the handbook, with the same
+// hairline the newsroom bands use so the documentation reads in the system it
+// documents.
+export interface Props {
+  n: string;          // '01'
+  title: string;
+  lede?: string;
+}
+const { n, title, lede } = Astro.props;
+---
+
+<div class:list={['mc', 'pb-3 mb-6 border-b-2 border-ink dark:border-ivory/30']}>
+  <div class="flex items-baseline gap-3">
+    <span class="band-label text-azure dark:text-azure-light tabular-nums">{n}</span>
+    <h2 class="text-section font-bold text-ink dark:text-ivory">{title}</h2>
+  </div>
+  {lede && (
+    <p class="mt-2 body-small text-text-secondary dark:text-ivory/60 max-w-prose">{lede}</p>
+  )}
+</div>

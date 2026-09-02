@@ -1,0 +1,237 @@
+---
+// COMPONENT · ShowViewer — the shared "show viewer" used by every show/program
+// page (/programs/[slug] and /videos/shows/[slug]). One big YouTube viewer +
+// a clickable episode playlist that swaps the player in place, plus an
+// "About this show" panel. Both pages pass the same normalized shape so they
+// look and behave identically.
+import VideoEmbed from './VideoEmbed.astro';
+import DummyImage from './DummyImage.astro';
+import { shareChannels } from '../lib/share-channels';
+
+export interface ShowEpisode {
+  title: string;
+  youtubeId: string;
+  duration: string;
+  publishDate: string;
+  views: string;
+  seed: string;          // DummyImage poster seed — the fallback
+  thumbnailUrl?: string; // real poster frame, when the episode is real
+  posterUrl?: string;    // same frame at player size
+}
+
+export interface Props {
+  title: string;
+  titleML?: string;
+  kicker: string;        // e.g. 'TV Show', 'Digital Show', or the show category
+  description: string;
+  descriptionML?: string;
+  schedule?: string;
+  host: { name: string; title: string };
+  episodes: ShowEpisode[];
+  episodesLabel?: string;
+  /** Extra facts for the About panel — e.g. when the programme last published. */
+  facts?: { label: string; value: string; caption?: string }[];
+}
+
+const {
+  title,
+  titleML,
+  kicker,
+  description,
+  descriptionML,
+  schedule,
+  host,
+  episodes,
+  episodesLabel = 'Episodes',
+  facts = [],
+} = Astro.props;
+
+const active = episodes[0];
+---
+
+<!-- Show identity -->
+<div class:list={['mc', 'flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-5']}>
+  <span class="eyebrow text-azure">{kicker}</span>
+  <h1 class="text-title font-bold text-text-primary">{title}</h1>
+</div>
+
+<!-- Viewer + Playlist -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+  <!-- Main: player + active episode info -->
+  <div class="lg:col-span-8">
+    <VideoEmbed
+      id="show-player"
+      youtubeId={active.youtubeId}
+      title={active.title}
+      seed={active.seed}
+      poster={active.posterUrl ?? active.thumbnailUrl}
+      category={title}
+      duration={active.duration}
+    />
+
+    <div class="mt-4">
+      <h2 id="active-title" class="text-headline lg:text-title font-bold text-text-primary text-balance leading-snug">{active.title}</h2>
+      <div id="active-meta" class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 meta-text text-text-muted tabular-nums">
+        <span>{active.publishDate}</span>
+        <span aria-hidden="true">·</span>
+        <span>{active.views} views</span>
+        <span aria-hidden="true">·</span>
+        <span>{active.duration}</span>
+      </div>
+
+      <p class="mt-4 pt-4 border-t border-rule dark:border-ivory/10 text-body text-text-secondary max-w-prose">
+        {description}
+      </p>
+
+      <!-- Share + schedule row -->
+      <div class="mt-4 pt-4 border-t border-rule dark:border-ivory/10 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span class="eyebrow text-text-muted">Share</span>
+        {shareChannels.map((c) => (
+          <a href="#" aria-label={`Share on ${c.name}`} title={c.name}
+            class="grid place-items-center size-9 border border-rule dark:border-ivory/20 text-text-light hover:border-azure hover:text-azure transition-colors">
+            <i class:list={['ti', c.icon, 'text-[17px]']} aria-hidden="true"></i>
+          </a>
+        ))}
+        {schedule && (
+          <span class="ml-auto flex items-center gap-1.5 meta-text text-text-muted">
+            <i class="ti ti-calendar-event text-base text-azure" aria-hidden="true"></i>
+            {schedule}
+          </span>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar: episode playlist -->
+  <aside class="lg:col-span-4">
+    <div class="lg:border-l lg:border-rule lg:dark:border-ivory/10 lg:pl-8">
+      <div class="flex items-baseline justify-between pb-3 border-b-2 border-ink dark:border-ivory/30">
+        <h2 class="section-header text-ink dark:text-ivory">{episodesLabel}</h2>
+        <span class="meta-text text-text-muted tabular-nums">{episodes.length} episodes</span>
+      </div>
+
+      <ol id="playlist" class="mt-1 max-h-[560px] overflow-y-auto scrollbar-none divide-y divide-rule dark:divide-ivory/10">
+        {episodes.map((ep, idx) => (
+          <li>
+            <button
+              type="button"
+              class="episode-item group w-full text-left flex gap-3 py-3.5 aria-[current=true]:bg-azure/5"
+              aria-current={idx === 0 ? 'true' : 'false'}
+              data-yt-id={ep.youtubeId}
+              data-title={ep.title}
+              data-date={ep.publishDate}
+              data-views={ep.views}
+              data-duration={ep.duration}
+              data-seed={ep.seed}
+            >
+              <div class="relative w-28 shrink-0 overflow-hidden aspect-video border border-rule dark:border-ivory/10">
+                {ep.thumbnailUrl
+                  ? <img src={ep.thumbnailUrl} alt="" class="w-full h-full object-cover" loading="lazy" width="320" height="180" />
+                  : <DummyImage class="w-full h-full object-cover" w={320} h={180} seed={ep.seed} />}
+                <span class="absolute bottom-0 right-0 bg-ink/85 text-ivory eyebrow px-1.5 py-0.5 tabular-nums">{ep.duration}</span>
+                <span class="ep-playing hidden absolute inset-0 items-center justify-center bg-ink/50">
+                  <span class="eyebrow text-ivory flex items-center gap-1"><i class="ti ti-player-play text-sm" aria-hidden="true"></i>Now playing</span>
+                </span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 caption-text text-text-muted tabular-nums">
+                  <span class="font-bold text-azure dark:text-azure-light">#{episodes.length - idx}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{ep.publishDate}</span>
+                </div>
+                <h3 class="mt-1 article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2 leading-snug">{ep.title}</h3>
+                <p class="mt-1 caption-text text-text-muted tabular-nums">{ep.views} views</p>
+              </div>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </aside>
+</div>
+
+<!-- About this show -->
+<section class="mt-10 p-5 sm:p-6 border border-rule dark:border-ivory/10">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-8">
+      <h2 class="eyebrow text-text-muted">About this show</h2>
+      <p class="mt-2 text-body text-text-secondary max-w-prose">{descriptionML || description}</p>
+    </div>
+    <dl class="lg:col-span-4 grid grid-cols-3 lg:grid-cols-1 gap-4 lg:gap-3 lg:border-l lg:border-rule lg:dark:border-ivory/10 lg:pl-6">
+      <div>
+        <dt class="eyebrow text-text-muted">Presenter</dt>
+        <dd class="mt-1 article-title text-text-primary">{host.name}</dd>
+        <dd class="caption-text text-text-muted">{host.title}</dd>
+      </div>
+      <div>
+        <dt class="eyebrow text-text-muted">Type</dt>
+        <dd class="mt-1 text-meta text-text-primary">{kicker}</dd>
+      </div>
+      {schedule && (
+        <div>
+          <dt class="eyebrow text-text-muted">Schedule</dt>
+          <dd class="mt-1 text-meta text-text-primary tabular-nums">{schedule}</dd>
+        </div>
+      )}
+      {facts.map((f) => (
+        <div>
+          <dt class="eyebrow text-text-muted">{f.label}</dt>
+          <dd class="mt-1 text-meta text-text-primary tabular-nums">{f.value}</dd>
+          {f.caption && <dd class="caption-text text-text-muted">{f.caption}</dd>}
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var player = document.getElementById('show-player');
+    var titleEl = document.getElementById('active-title');
+    var metaEl = document.getElementById('active-meta');
+    var items = Array.prototype.slice.call(document.querySelectorAll('.episode-item'));
+    if (!player || !items.length) return;
+
+    function playEpisode(btn) {
+      var id = btn.getAttribute('data-yt-id');
+      if (!id) return;
+
+      if (typeof window.activateYouTube === 'function') {
+        window.activateYouTube(player, id);
+      } else {
+        var iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        iframe.title = 'Video player';
+        iframe.className = 'absolute inset-0 w-full h-full border-0';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        player.innerHTML = '';
+        player.appendChild(iframe);
+      }
+
+      if (titleEl) titleEl.textContent = btn.getAttribute('data-title') || '';
+      if (metaEl) {
+        metaEl.innerHTML =
+          '<span>' + (btn.getAttribute('data-date') || '') + '</span>' +
+          '<span aria-hidden="true">·</span>' +
+          '<span>' + (btn.getAttribute('data-views') || '') + ' views</span>' +
+          '<span aria-hidden="true">·</span>' +
+          '<span>' + (btn.getAttribute('data-duration') || '') + '</span>';
+      }
+
+      items.forEach(function (el) {
+        var on = el === btn;
+        el.setAttribute('aria-current', on ? 'true' : 'false');
+        var badge = el.querySelector('.ep-playing');
+        if (badge) {
+          badge.classList.toggle('hidden', !on);
+          badge.classList.toggle('flex', on);
+        }
+      });
+    }
+
+    items.forEach(function (btn) {
+      btn.addEventListener('click', function () { playEpisode(btn); });
+    });
+  })();
+</script>

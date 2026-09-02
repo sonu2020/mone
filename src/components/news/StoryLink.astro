@@ -1,0 +1,22 @@
+---
+// BLOCK · StoryLink — a headline-only link, optionally bulleted. For dense
+// title lists where thumbnails would be noise.
+import Headline from '../ui/Headline.astro';
+import MetaRow from '../ui/MetaRow.astro';
+import type { Story } from '../../lib/home-data';
+export interface Props {
+  story: Story;
+  bullet?: boolean;
+  size?: 'base' | 'lg';
+  showMeta?: boolean;
+  class?: string;
+}
+const { story, bullet = false, size = 'base', showMeta = true, class: className = '' } = Astro.props;
+---
+<a href={story.href} class:list={['mc', 'group block py-3.5 first:pt-0', bullet && 'flex items-start gap-2.5', className]}>
+  {bullet && <span class="mt-2 shrink-0 size-1.5 rounded-full bg-azure"></span>}
+  <span class="min-w-0 block">
+    <Headline as="h3" size={size} text={story.title} clamp={2} />
+    {showMeta && (story.category || story.date) && <MetaRow category={story.category} date={story.date} class="mt-1.5" />}
+  </span>
+</a>

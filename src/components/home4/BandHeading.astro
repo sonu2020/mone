@@ -1,0 +1,45 @@
+---
+// ATOM · BandHeading — the /home4 section marker: an uppercase Latin label, a
+// hairline rule running to the far edge, and an optional "View all". The rule
+// is a flex child rather than a border so it always ends where the link begins.
+export interface Props {
+  label: string;
+  href?: string;
+  viewAllHref?: string;
+  badge?: string; // small flag beside the label, e.g. "Popular"
+  class?: string;
+}
+const { label, href, viewAllHref, badge, class: className = "" } = Astro.props;
+const LabelTag = href ? "a" : "span";
+---
+
+<div class:list={["flex items-center gap-4 sm:gap-6", className]}>
+  <LabelTag
+    href={href}
+    class:list={[
+      "band-label shrink-0 text-text-navy-deep dark:text-ivory transition-colors",
+      href && "hover:text-azure dark:hover:text-azure-light",
+    ]}>{label}</LabelTag
+  >
+
+  {
+    badge && (
+      <span class="shrink-0 eyebrow border border-azure/40 bg-azure/5 px-1.5 py-0.5 text-azure">
+        {badge}
+      </span>
+    )
+  }
+
+  <span class="h-px flex-1 bg-rule dark:bg-ivory/15" aria-hidden="true"></span>
+
+  {
+    viewAllHref && (
+      <a
+        href={viewAllHref}
+        class="shrink-0 eyebrow text-azure dark:text-azure-light hover:text-azure-dark dark:hover:text-azure transition-colors"
+      >
+        View all →
+      </a>
+    )
+  }
+</div>

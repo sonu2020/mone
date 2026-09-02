@@ -1,0 +1,16 @@
+---
+// ATOM · Kicker — the category eyebrow. The one place tracking is allowed;
+// Latin uppercase only. Tone switches for light vs. over-image contexts.
+export interface Props {
+  text: string;
+  tone?: 'azure' | 'onDark' | 'muted';
+  class?: string;
+}
+const { text, tone = 'azure', class: className = '' } = Astro.props;
+const toneCls = {
+  azure: 'text-azure',
+  onDark: 'text-azure-light',
+  muted: 'text-text-muted',
+}[tone];
+---
+<span class:list={['mc', 'eyebrow', toneCls, className]}>{text}</span>

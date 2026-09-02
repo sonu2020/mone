@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Terms of Use — MediaOne" description="Terms and conditions for using MediaOne Online">
+  <Header />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto px-4 sm:px-6 md:px-8 py-10">
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">Terms of Use</span>
+      </nav>
+
+      <h1 class="text-hero font-bold text-text-primary text-balance">Terms of Use</h1>
+
+      <div class="mt-8 max-w-prose space-y-5 text-body text-text-primary">
+        <p>
+          By accessing and using MediaOne Online, you agree to comply with these terms and conditions. All content on this website is for informational purposes only.
+        </p>
+        <p>
+          You may not reproduce, distribute, or commercially exploit our content without prior written permission. We reserve the right to modify or discontinue any part of the website at any time.
+        </p>
+        <p>
+          Opinions expressed in articles, columns, and user comments are those of the respective authors and do not necessarily reflect the views of MediaOne.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

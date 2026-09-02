@@ -1,0 +1,53 @@
+---
+// ATOM · ShareBar — the share affordance as an icon row. `orientation="vertical"`
+// is the sticky desktop rail from the wireframe's left gutter; horizontal is the
+// fallback that rides under the byline when there is no rail.
+export interface Props {
+  orientation?: 'horizontal' | 'vertical';
+  tone?: 'default' | 'onDark';
+  showLabel?: boolean;
+  class?: string;
+}
+const {
+  orientation = 'horizontal',
+  tone = 'default',
+  showLabel = true,
+  class: className = '',
+} = Astro.props;
+
+import { shareChannels } from '../../lib/share-channels';
+
+const channels = [
+  ...shareChannels,
+  { name: 'Copy link', icon: 'ti-link' },
+];
+
+const onDark = tone === 'onDark';
+const vertical = orientation === 'vertical';
+const btn = onDark
+  ? 'border-white/25 text-white/80 hover:border-white hover:text-white'
+  : 'border-rule dark:border-ivory/20 text-text-muted hover:border-azure hover:text-azure';
+---
+<div
+  class:list={[
+    'mc flex items-center gap-2',
+    vertical && 'flex-col items-start gap-2.5',
+    className,
+  ]}
+>
+  {showLabel && (
+    <span class:list={['eyebrow shrink-0', onDark ? 'text-white/55' : 'text-text-muted']}>Share</span>
+  )}
+  <div class:list={['flex gap-2', vertical && 'flex-col']}>
+    {channels.map((c) => (
+      <a
+        href="#"
+        aria-label={`Share on ${c.name}`}
+        title={c.name}
+        class:list={['grid place-items-center size-9 border transition-colors', btn]}
+      >
+        <i class:list={['ti', c.icon, 'text-icon']} aria-hidden="true"></i>
+      </a>
+    ))}
+  </div>
+</div>

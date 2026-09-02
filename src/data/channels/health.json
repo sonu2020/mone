@@ -1,0 +1,419 @@
+{
+  "desk": "health",
+  "label": "MediaOne Health",
+  "blurb": "Medicine, public health and living well, explained by the people who practise it.",
+  "handle": "@MediaOneHealth",
+  "channelUrl": "https://www.youtube.com/@MediaOneHealth",
+  "social": [],
+  "avatarSource": "https://yt3.googleusercontent.com/6Ov5dSoBtY9SfmjGs6-n2Lw2XgTgW3VJTuki2qxiA3EJUM6To5HlscHJGGlo3O6c6FrEaTdzpw=s900-c-k-c0x00ffffff-no-rj",
+  "avatar": "/images/channels/health.jpg",
+  "subscribersText": "10K subscribers",
+  "videoCountText": "486 videos",
+  "shows": [
+    {
+      "playlistId": "PLQFztdOZo8V4m48zQy1V2PbuX-NqvmvRT",
+      "title": "OP TICKET - PODCAST",
+      "videoCountText": "7 videos",
+      "href": "https://www.youtube.com/playlist?list=PLQFztdOZo8V4m48zQy1V2PbuX-NqvmvRT",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLQFztdOZo8V4m48zQy1V2PbuX-NqvmvRT",
+      "thumbnail": "https://i.ytimg.com/vi/tUKH-uD7P-4/mqdefault.jpg"
+    },
+    {
+      "playlistId": "PLQFztdOZo8V5odKeAIqnU7XAqI0cXdX_A",
+      "title": "Stethoscope",
+      "videoCountText": "1 video",
+      "href": "https://www.youtube.com/playlist?list=PLQFztdOZo8V5odKeAIqnU7XAqI0cXdX_A",
+      "embedUrl": "https://www.youtube.com/embed/videoseries?list=PLQFztdOZo8V5odKeAIqnU7XAqI0cXdX_A",
+      "thumbnail": "https://i.ytimg.com/vi/Ds-FH1N6Rvg/mqdefault.jpg"
+    }
+  ],
+  "capturedAt": "2026-08-07",
+  "featured": [
+    {
+      "youtubeId": "sd_Fa2K5T_A",
+      "title": "PCOD and PCOS Are Not the Same! Don't Ignore These Symptoms | Are PCOD and PCOS the Same? Symptoms",
+      "durationText": "3:24",
+      "viewsText": "436 views",
+      "publishedText": "1 day ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/sd_Fa2K5T_A/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/sd_Fa2K5T_A/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=sd_Fa2K5T_A",
+      "durationSeconds": 203,
+      "viewCount": 436,
+      "publishedAt": "2026-08-06T13:45:22Z"
+    },
+    {
+      "youtubeId": "0oGfZEkUDoE",
+      "title": "What Happens If You Give Sugar to Kids Under 2! Must-Know for Parents | Sugar for Kids",
+      "durationText": "2:53",
+      "viewsText": "9.7K views",
+      "publishedText": "1 day ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/0oGfZEkUDoE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/0oGfZEkUDoE/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=0oGfZEkUDoE",
+      "durationSeconds": 172,
+      "viewCount": 9788,
+      "publishedAt": "2026-08-05T14:00:17Z"
+    },
+    {
+      "youtubeId": "0_kI9U6tjpg",
+      "title": "No Gym, No Dietician! Here Is the Secret of the Housewife Who Lost 32 Kilos by Cutting Out 5 Foods",
+      "durationText": "3:58",
+      "viewsText": "109K views",
+      "publishedText": "2 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/0_kI9U6tjpg/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/0_kI9U6tjpg/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=0_kI9U6tjpg",
+      "durationSeconds": 238,
+      "viewCount": 109741,
+      "publishedAt": "2026-08-04T14:00:22Z"
+    },
+    {
+      "youtubeId": "-_PyQ6py7R8",
+      "title": "Thinking of losing weight by eating only fruit? Watch this! | Fruitarian Diet",
+      "durationText": "4:11",
+      "viewsText": "1.2K views",
+      "publishedText": "4 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/-_PyQ6py7R8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/-_PyQ6py7R8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=-_PyQ6py7R8",
+      "durationSeconds": 250,
+      "viewCount": 1223,
+      "publishedAt": "2026-08-03T13:45:08Z"
+    },
+    {
+      "youtubeId": "Tu-0vxcilK4",
+      "title": "Want to Quit Smoking? Follow These 5 Steps | How to Quit Smoking",
+      "durationText": "3:13",
+      "viewsText": "5.2K views",
+      "publishedText": "4 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Tu-0vxcilK4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Tu-0vxcilK4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Tu-0vxcilK4",
+      "durationSeconds": 193,
+      "viewCount": 5270,
+      "publishedAt": "2026-08-02T14:12:27Z"
+    },
+    {
+      "youtubeId": "MOKd17CpZGI",
+      "title": "Lose Weight Without Exercise! Just Follow These Tips | MediaOne Health",
+      "durationText": "4:53",
+      "viewsText": "1.7K views",
+      "publishedText": "6 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/MOKd17CpZGI/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/MOKd17CpZGI/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=MOKd17CpZGI",
+      "durationSeconds": 292,
+      "viewCount": 1732,
+      "publishedAt": "2026-08-01T13:15:24Z"
+    },
+    {
+      "youtubeId": "ZhvZ6FEQ_2g",
+      "title": "Should Malayalis Eat Oats? Doctors Weigh In | MediaOne Health",
+      "durationText": "14:59",
+      "viewsText": "41K views",
+      "publishedText": "6 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/ZhvZ6FEQ_2g/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/ZhvZ6FEQ_2g/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=ZhvZ6FEQ_2g",
+      "durationSeconds": 898,
+      "viewCount": 41077,
+      "publishedAt": "2026-08-01T07:15:03Z"
+    },
+    {
+      "youtubeId": "vP5eP8N-8oo",
+      "title": "No More Excuses About Not Having Time to Exercise; The 10-10-10 Workout Is Trending | 10-10-10 Wo...",
+      "durationText": "4:49",
+      "viewsText": "5.7K views",
+      "publishedText": "7 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/vP5eP8N-8oo/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/vP5eP8N-8oo/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=vP5eP8N-8oo",
+      "durationSeconds": 289,
+      "viewCount": 5743,
+      "publishedAt": "2026-07-31T13:15:06Z"
+    }
+  ],
+  "more": [
+    {
+      "youtubeId": "u-9zdoGucaM",
+      "title": "Sneezing and Runny Nose When You Wake Up? This Could Be Why! MediaOne Health",
+      "durationText": "4:05",
+      "viewsText": "8.6K views",
+      "publishedText": "8 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/u-9zdoGucaM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/u-9zdoGucaM/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=u-9zdoGucaM"
+    },
+    {
+      "youtubeId": "8b7_LX-CSO4",
+      "title": "Vegetables to Eat and Avoid During the Monsoon | #MonsoonHealthTips",
+      "durationText": "4:20",
+      "viewsText": "1.5K views",
+      "publishedText": "10 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/8b7_LX-CSO4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/8b7_LX-CSO4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=8b7_LX-CSO4"
+    },
+    {
+      "youtubeId": "LvOB1inHC8w",
+      "title": "Can Obesity, Smoking, and Alcohol Cause Infertility? Things to Keep in Mind | Doctor Explains",
+      "durationText": "4:11",
+      "viewsText": "722 views",
+      "publishedText": "11 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/LvOB1inHC8w/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/LvOB1inHC8w/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=LvOB1inHC8w"
+    },
+    {
+      "youtubeId": "0jyjlGohgj8",
+      "title": "Does Everyone Need IVF? When Is IVF Treatment Necessary? Everything You Need to Know | Fertility ...",
+      "durationText": "5:43",
+      "viewsText": "869 views",
+      "publishedText": "11 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/0jyjlGohgj8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/0jyjlGohgj8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=0jyjlGohgj8"
+    },
+    {
+      "youtubeId": "Wamb2ihCwCE",
+      "title": "Men Can Be Infertile Too! Is the Woman Always to Blame for Infertility? | Male Infertility Explained",
+      "durationText": "3:31",
+      "viewsText": "564 views",
+      "publishedText": "12 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Wamb2ihCwCE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Wamb2ihCwCE/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=Wamb2ihCwCE"
+    },
+    {
+      "youtubeId": "vWKNHrVtYWM",
+      "title": "Does IVF Cause Disabilities in Children? Is Infertility Only Caused by Women? | Doctor Podcast",
+      "durationText": "20:02",
+      "viewsText": "1.8K views",
+      "publishedText": "13 days ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/vWKNHrVtYWM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/vWKNHrVtYWM/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=vWKNHrVtYWM"
+    },
+    {
+      "youtubeId": "jt1zLpRUtf8",
+      "title": "ചോറ് ഇങ്ങനെ കഴിച്ചാൽ രോഗിയാവില്ല, ആശുപത്രികൾ പൂട്ടും ജിൽസിക്ക് ഹെൽത്തി ലഞ്ച് വിളമ്പി  ഡോക്ടർമാർ",
+      "durationText": "3:13",
+      "viewsText": "92K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/jt1zLpRUtf8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/jt1zLpRUtf8/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=jt1zLpRUtf8"
+    },
+    {
+      "youtubeId": "R_1x_DDAmqw",
+      "title": "Still Not Losing Belly Fat Despite Going to the Gym? Change These 5 Eating Habits | WeightLoss | ...",
+      "durationText": "4:29",
+      "viewsText": "12K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/R_1x_DDAmqw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/R_1x_DDAmqw/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=R_1x_DDAmqw"
+    },
+    {
+      "youtubeId": "o4xw7w--fsY",
+      "title": "Do you eat dates every day? Then you must know this | MediaOne Health",
+      "durationText": "5:00",
+      "viewsText": "62K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/o4xw7w--fsY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/o4xw7w--fsY/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=o4xw7w--fsY"
+    },
+    {
+      "youtubeId": "nB9jsvOTtLk",
+      "title": "Can Diabetes Be Fully Cured? What Doctors Say | Nephrologists Explain | Diabetes Guide",
+      "durationText": "6:21",
+      "viewsText": "1.3K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/nB9jsvOTtLk/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/nB9jsvOTtLk/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=nB9jsvOTtLk"
+    },
+    {
+      "youtubeId": "D2YHTd2a0yE",
+      "title": "പ്രമേഹ രോഗികൾക്ക് ചായയിൽ മധുരം ചേർക്കാം, പക്ഷേ ഈ തെറ്റ് വരുത്തരുത്!",
+      "durationText": "7:57",
+      "viewsText": "25K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/D2YHTd2a0yE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/D2YHTd2a0yE/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=D2YHTd2a0yE"
+    },
+    {
+      "youtubeId": "lUbMYX1nzK4",
+      "title": "Persistent Nasal Congestion and Headaches? Don't Ignore Them | Chronic Sinusitis",
+      "durationText": "3:35",
+      "viewsText": "679 views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/lUbMYX1nzK4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/lUbMYX1nzK4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=lUbMYX1nzK4"
+    },
+    {
+      "youtubeId": "bnMwIqyOLNY",
+      "title": "Never Put These 7 Fruits in the Fridge by Mistake; You'll Regret It! | Fruits You Should Never Re...",
+      "durationText": "3:34",
+      "viewsText": "57K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/bnMwIqyOLNY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/bnMwIqyOLNY/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=bnMwIqyOLNY"
+    },
+    {
+      "youtubeId": "oBzx8GBtRsY",
+      "title": "Diabetics can eat rice twice a day if they follow these tips | Nephrologists Explain",
+      "durationText": "6:38",
+      "viewsText": "1.1K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/oBzx8GBtRsY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/oBzx8GBtRsY/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=oBzx8GBtRsY"
+    },
+    {
+      "youtubeId": "tUKH-uD7P-4",
+      "title": "Do You Have Diabetes? Watch Out for These Early Warning Signs | Nephrologists Explain",
+      "durationText": "5:31",
+      "viewsText": "1.6K views",
+      "publishedText": "2 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/tUKH-uD7P-4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/tUKH-uD7P-4/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=tUKH-uD7P-4"
+    },
+    {
+      "youtubeId": "mmB7Sv_cG7g",
+      "title": "Can Diabetes Be Completely Cured? Important for Those on Medication | Nephrologists Explain | Dia...",
+      "durationText": "5:41",
+      "viewsText": "599 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/mmB7Sv_cG7g/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/mmB7Sv_cG7g/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=mmB7Sv_cG7g"
+    },
+    {
+      "youtubeId": "TX3IweUetNs",
+      "title": "Can't Sleep at Night? Here Are 4 Tricks to Fall Asleep Instantly! | Insomnia Remedies | Sleepless...",
+      "durationText": "4:15",
+      "viewsText": "6.5K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/TX3IweUetNs/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/TX3IweUetNs/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=TX3IweUetNs"
+    },
+    {
+      "youtubeId": "O3DQW5G84fw",
+      "title": "Can Diabetes Be Cured Without Medication? Should You Avoid Rice? | Nephrologists Explain | Diabet...",
+      "durationText": "42:36",
+      "viewsText": "183K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/O3DQW5G84fw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/O3DQW5G84fw/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=O3DQW5G84fw"
+    },
+    {
+      "youtubeId": "OqsIlWMjycQ",
+      "title": "You May Not Have Chest Pain; These Symptoms Could Be a Silent Heart Attack, Do Not Ignore Them | ...",
+      "durationText": "3:35",
+      "viewsText": "58K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/OqsIlWMjycQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/OqsIlWMjycQ/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=OqsIlWMjycQ"
+    },
+    {
+      "youtubeId": "xSd9CX7xfDg",
+      "title": "Could Changes in Your Eyes Be a Sign of Kidney Disease? | #KidneyDisease | #EyeHealth | #Periorbi...",
+      "durationText": "4:11",
+      "viewsText": "552 views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/xSd9CX7xfDg/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/xSd9CX7xfDg/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=xSd9CX7xfDg"
+    },
+    {
+      "youtubeId": "g0opJu5TJk0",
+      "title": "4 Foods You Should Never Eat With Tea",
+      "durationText": "4:31",
+      "viewsText": "44K views",
+      "publishedText": "3 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/g0opJu5TJk0/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/g0opJu5TJk0/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=g0opJu5TJk0"
+    },
+    {
+      "youtubeId": "BzwZf-T9ruU",
+      "title": "Do you experience sudden anger and sadness? It's not arrogance, it's mood swings!",
+      "durationText": "5:38",
+      "viewsText": "585 views",
+      "publishedText": "4 weeks ago",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/BzwZf-T9ruU/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/BzwZf-T9ruU/maxresdefault.jpg"
+      },
+      "href": "https://www.youtube.com/watch?v=BzwZf-T9ruU"
+    }
+  ]
+}

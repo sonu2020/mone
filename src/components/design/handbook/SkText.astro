@@ -1,0 +1,27 @@
+---
+// BLUEPRINT · SkText — headline and body as bars. Widths taper down the stack so
+// a block reads as text at a glance without anyone having to write copy for a
+// diagram.
+export interface Props {
+  lines?: number;
+  /** 'head' draws heavier, darker bars — a headline rather than body copy. */
+  tone?: 'head' | 'body' | 'meta';
+  class?: string;
+}
+const { lines = 2, tone = 'head', class: className = '' } = Astro.props;
+
+const bar = {
+  head: 'h-2 bg-ink/25 dark:bg-ivory/25',
+  body: 'h-1.5 bg-ink/12 dark:bg-ivory/12',
+  meta: 'h-1.5 bg-azure/30',
+}[tone];
+
+// Taper: full, then progressively shorter, so the last line ends ragged.
+const widths = ['w-full', 'w-[92%]', 'w-[78%]', 'w-[85%]', 'w-[64%]'];
+---
+
+<div class:list={['mc', 'flex flex-col gap-1.5', className]} aria-hidden="true">
+  {Array.from({ length: lines }, (_, i) => (
+    <span class:list={['block rounded-full', bar, tone === 'meta' ? 'w-16' : widths[i % widths.length]]}></span>
+  ))}
+</div>

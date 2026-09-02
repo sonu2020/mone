@@ -1,0 +1,88 @@
+---
+// LAYOUT · Classic — the "Artical Page v6" wireframe as drawn.
+//
+// The opener runs nine columns wide with a rectangle parked beside it; a
+// leaderboard separates the opener from the story; then three columns — tools,
+// prose, sponsor rail — carry the body. Paid space is interleaved with the
+// prose exactly where the wireframe puts it, which is the whole point of this
+// variant: it is the commercial baseline the other three are measured against.
+import AdSlot from '../../AdSlot.astro';
+import Media from '../../ui/Media.astro';
+import ArticleBreadcrumb from '../ArticleBreadcrumb.astro';
+import ArticleHeadline from '../ArticleHeadline.astro';
+import ArticleByline from '../ArticleByline.astro';
+import ArticleBody from '../ArticleBody.astro';
+import ArticleToolRail from '../ArticleToolRail.astro';
+import ArticleRail from '../ArticleRail.astro';
+import TopicChips from '../TopicChips.astro';
+import SponsoredCard from '../SponsoredCard.astro';
+import ReadMoreList from '../ReadMoreList.astro';
+import AdDisclaimer from '../AdDisclaimer.astro';
+import { readingTime, type ArticleDoc } from '../../../lib/article-data';
+
+export interface Props { doc: ArticleDoc }
+const { doc } = Astro.props;
+const minutes = readingTime(doc);
+---
+<div class="mc bg-bg-card">
+  <AdSlot slot="story-masthead" format="leaderboard-lg" tone="gray" />
+
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Opener: the lockup beside its rectangle -->
+    <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-x-8">
+      <div class="lg:col-span-9">
+        <ArticleBreadcrumb section={doc.section} sectionHref={doc.sectionHref} />
+        <ArticleHeadline
+          kicker={doc.section}
+          badge={doc.badge}
+          title={doc.title}
+          dek={doc.dek}
+          class="mt-4"
+        />
+        <ArticleByline
+          author={doc.author}
+          published={doc.published}
+          updated={doc.updated}
+          readingTime={minutes}
+          class="mt-6"
+        />
+      </div>
+      <div class="hidden lg:block lg:col-span-3 lg:pt-10">
+        <AdSlot slot="story-opener" format="rectangle" tone="gray" />
+      </div>
+    </div>
+
+    <!-- Hero, full editorial width -->
+    <figure class="mt-6">
+      <Media src={doc.image} ratio="16/9" class="w-full" loading="eager" fetchpriority="high" />
+      <figcaption class="pt-2 caption-text text-text-muted">{doc.caption}</figcaption>
+    </figure>
+  </div>
+
+  <AdSlot slot="story-below-hero" format="leaderboard-lg" tone="gray" lazy={true} class="mt-8" />
+
+  <!-- Body: tools · prose · rail -->
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 xl:gap-x-10 pt-8">
+      <ArticleToolRail class="hidden lg:block lg:col-span-2" />
+
+      <div class="lg:col-span-7 min-w-0">
+        <ArticleBody blocks={doc.blocks} />
+        <TopicChips topics={doc.tags} class="mt-8 pt-6 border-t border-rule dark:border-ivory/10" />
+        <SponsoredCard item={doc.sponsored} class="mt-8" />
+      </div>
+
+      <ArticleRail doc={doc} class="lg:col-span-3 min-w-0 mt-10 lg:mt-0" />
+    </div>
+
+    <ReadMoreList
+      items={doc.readMore}
+      title="Read More"
+      variant="grid"
+      limit={4}
+      class="mt-14 pt-10 border-t border-rule dark:border-ivory/10"
+    />
+
+    <AdDisclaimer text={doc.disclaimer} class="mt-14 pb-14" />
+  </div>
+</div>

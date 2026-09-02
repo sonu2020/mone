@@ -1,0 +1,311 @@
+---
+// ── /features/rivers-of-kerala · one river at a time ────────────────────────
+//
+// A shelf that will hold Kerala's rivers. One is built: the Chaliyar. The rest
+// are listed with what is known about them and nothing more, because a card
+// that pretends to a journey it does not have is worse than an empty shelf.
+//
+// The 3D comes entirely from the `terrain-journey` package, the same one behind
+// /features/thamarassery-churam. Nothing here is river-specific except the data
+// file and the words.
+//
+// Stacking: JourneyStage's stage is `position: fixed` at z-index 0, so every
+// other block here carries `relative z-10` and its own background.
+import Layout from '../../layouts/Layout.astro';
+import ImmersiveBar from '../../components/travel/ImmersiveBar.astro';
+import Footer from '../../components/Footer.astro';
+import PinMap from '../../components/map/PinMap.astro';
+import JourneyStage from '../../components/journey/JourneyStage.astro';
+
+import { chaliyar, towns, places, source } from '../../lib/journeys/chaliyar';
+import { TERRAIN_ATTRIBUTION } from 'terrain-journey';
+
+const km = (m: number) => (m / 1000).toFixed(0);
+
+// PinMap is Leaflet and speaks [lat, lng]; journey data is [lng, lat].
+const locatorPins = places.map((p) => ({
+  id: p.id,
+  label: `${p.name} · ${p.elevation} m`,
+  labelML: p.nameLocal,
+  coords: [p.coords[1], p.coords[0]] as [number, number],
+  icon: 'ti-building-community',
+}));
+
+const facts: [string, string, string][] = [
+  ['നീളം', 'This stretch', `${km(chaliyar.length)} km`],
+  ['ഉയരം', 'Falls from', `${chaliyar.highest} m`],
+  ['പട്ടണങ്ങൾ', 'Towns on it', String(places.length)],
+  ['ഒഴുക്ക്', 'Gradient', `${((chaliyar.highest - chaliyar.lowest) / (chaliyar.length / 1000)).toFixed(1)} m/km`],
+];
+
+/**
+ * Context from the English Wikipedia article "Chaliyar" (CC BY-SA).
+ *
+ * Facts only, restated — none of the article's wording is reproduced. Kept in
+ * one place so its provenance is unambiguous and so a desk replacing it knows
+ * exactly what came from where.
+ */
+const river = {
+  length: 169,
+  rank: 'fourth longest in Kerala',
+  rises: 'the Elambaleri Hills, in the Nilgiris of the Western Ghats',
+  risesIn: 'Wayanad district, near the Malappuram border',
+  basin: 2933,
+  mouth: 'the Lakshadweep Sea at Beypore, opposite Chaliyam',
+  aliases: ['Chulika', 'Nilambur river', 'Beypore river'],
+  tributaries: [
+    'Cherupuzha',
+    'Iruvanjippuzha',
+    'Kuthirappuzha',
+    'Karimpuzha',
+    'Kanjirappuzha',
+  ],
+  href: 'https://en.wikipedia.org/wiki/Chaliyar',
+};
+
+const context: [string, string][] = [
+  ['Length', `${river.length} km — the ${river.rank}`],
+  ['Rises in', `${river.rises}, in ${river.risesIn}`],
+  ['Reaches', river.mouth],
+  ['Basin', `${river.basin.toLocaleString('en-IN')} km²`],
+  ['Also called', river.aliases.join(' · ')],
+  ['Main tributaries', river.tributaries.join(' · ')],
+];
+
+/**
+ * The rest of the shelf.
+ *
+ * Deliberately not linked and deliberately thin. These are the other rivers in
+ * the source dataset; none has a journey built yet, and saying so is more
+ * useful than a card that looks clickable and is not.
+ */
+const shelf = [
+  ['Periyar', 'പെരിയാർ', 244],
+  ['Bharathappuzha', 'ഭാരതപ്പുഴ', 209],
+  ['Pamba', 'പമ്പ', 176],
+  ['Kabini', 'കബിനി', 184],
+  ['Chandragiri', 'ചന്ദ്രഗിരി', 105],
+  ['Valapattanam', 'വളപട്ടണം', 110],
+  ['Achankovil', 'അച്ചൻകോവിൽ', 128],
+  ['Kallada', 'കല്ലട', 121],
+] as const;
+---
+
+<Layout
+  title="കേരളത്തിലെ പുഴകൾ — ചാലിയാർ | Rivers of Kerala — the Chaliyar | MediaOne"
+  description="A scroll-driven 3D journey down the Chaliyar, from the Nilgiri foothills to the sea at Beypore. Design prototype."
+  topAd={false}
+  noindex
+>
+  <ImmersiveBar
+    title="കേരളത്തിലെ പുഴകൾ — ചാലിയാർ"
+    backHref="/latest-news"
+    backLabel="Latest"
+  />
+
+  <main class="flex-1">
+    <!-- ══ HERO ═════════════════════════════════════════════════════════ -->
+    <section
+      data-immersive-hero
+      class="relative z-10 flex min-h-[100svh] flex-col justify-end bg-nav-bg"
+    >
+      <div class="mx-auto w-full max-w-[68rem] px-5 pb-16 sm:pb-20">
+        <p class="eyebrow text-white/55">Rivers of Kerala · 01</p>
+        <h1 class="mt-3 font-malayalam text-display font-bold text-white text-balance">
+          ചാലിയാർ
+        </h1>
+        <p class="mt-1 text-title font-bold text-white/65">The Chaliyar</p>
+        <p class="mt-5 max-w-2xl body-small text-white/70 text-pretty">
+          {km(chaliyar.length)} kilometres from the Nilgiri foothills to the sea at
+          Beypore, falling {chaliyar.highest - chaliyar.lowest} m the whole way —
+          about {((chaliyar.highest - chaliyar.lowest) / (chaliyar.length / 1000)).toFixed(1)} m
+          for every kilometre travelled. Nothing about that is dramatic, and that
+          is the fact worth showing: this is a river that barely has to fall.
+        </p>
+
+        <p class="mt-8 inline-block border border-white/25 px-3 py-1.5 caption-text text-white/60">
+          Design prototype — real course, real elevation, no narration.
+        </p>
+      </div>
+
+      <span
+        class="absolute inset-x-0 bottom-5 flex justify-center text-white/45 motion-safe:animate-bounce"
+        aria-hidden="true"
+      ><i class="ti ti-chevron-down text-2xl"></i></span>
+    </section>
+
+    <!-- ══ FACTS + LOCATOR ══════════════════════════════════════════════ -->
+    <section class="relative z-10 bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto max-w-[68rem] px-5 py-14 sm:py-20">
+        <div class="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-start lg:gap-14">
+          <div>
+            <p class="eyebrow text-azure dark:text-azure-light">Where this is</p>
+            <p class="mt-3 font-malayalam text-[1.1875rem] leading-[1.85] text-text-primary dark:text-ivory text-pretty">
+              നിലമ്പൂരിനടുത്ത് മലനിരകളിൽ നിന്ന് തുടങ്ങി, എടവണ്ണയും അരീക്കോടും
+              കടന്ന്, ഫറോക്കിലൂടെ ബേപ്പൂരിൽ കടലിൽ ചേരുന്നു.
+            </p>
+            <p class="mt-3 body-small text-text-muted dark:text-ivory/50 text-pretty">
+              Down out of the hills near Nilambur, past Edavanna and Areekode,
+              through Feroke and into the sea at Beypore.
+            </p>
+
+            <dl class="mt-8 flex flex-wrap gap-x-8 gap-y-3 border-t border-rule pt-6 dark:border-ivory/10">
+              {facts.map(([ml, en, v]) => (
+                <div>
+                  <dt class="font-malayalam caption-text text-text-muted dark:text-ivory/45">
+                    {ml} <span class="text-text-light dark:text-ivory/25">{en}</span>
+                  </dt>
+                  <dd class="mt-0.5 article-title tabular-nums text-text-primary dark:text-ivory">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <PinMap
+            id="chaliyar-locator"
+            pins={locatorPins}
+            center={[11.24, 76.02]}
+            zoom={10}
+            label="Locator map — the towns along the Chaliyar"
+            class="h-[20rem] sm:h-[24rem]"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ THE JOURNEY ══════════════════════════════════════════════════ -->
+    <JourneyStage
+      journey={chaliyar}
+      heightVh={520}
+      autoplaySeconds={95}
+      kicker="Downstream · നിലമ്പൂർ → ബേപ്പൂർ"
+      title={`${km(chaliyar.length)} km to the sea, past ${places.length} towns`}
+      standfirst="Scroll to travel downstream. Fly above the valley, or drop onto the water and follow it."
+      overviewLabel="Above"
+      firstPersonLabel="On the water"
+      overviewIcon="ti-drone"
+      firstPersonIcon="ti-ripple"
+      playLabel="Flow"
+      markerNoun="Town"
+    />
+
+    <!-- ══ THE TOWNS ════════════════════════════════════════════════════ -->
+    <section class="relative z-10 bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto max-w-[68rem] px-5 py-16 sm:py-20">
+        <p class="eyebrow text-azure dark:text-azure-light">On the water</p>
+        <h2 class="mt-2 article-title text-text-primary dark:text-ivory">
+          The {places.length} towns, upstream to sea
+        </h2>
+
+        <div class="mt-8 overflow-x-auto">
+          <table class="w-full min-w-[34rem] border-collapse text-left">
+            <thead>
+              <tr class="border-b border-rule dark:border-ivory/12">
+                <th class="py-2 pr-4 caption-text font-normal text-text-muted dark:text-ivory/45">Town</th>
+                <th class="py-2 pr-4 caption-text font-normal text-text-muted dark:text-ivory/45">Elevation</th>
+                <th class="py-2 pr-4 caption-text font-normal text-text-muted dark:text-ivory/45">Downstream</th>
+                <th class="py-2 caption-text font-normal text-text-muted dark:text-ivory/45">Coordinates</th>
+              </tr>
+            </thead>
+            <tbody>
+              {places.map((p, i) => (
+                <tr class="border-b border-rule/60 dark:border-ivory/8">
+                  <td class="py-2.5 pr-4 text-text-primary dark:text-ivory">
+                    <span class="font-malayalam">{p.nameLocal}</span>
+                    <span class="ml-2 caption-text text-text-muted dark:text-ivory/45">{p.name}</span>
+                  </td>
+                  <td class="py-2.5 pr-4 tabular-nums text-text-primary dark:text-ivory/85">{p.elevation} m</td>
+                  <td class="py-2.5 pr-4 tabular-nums text-text-muted dark:text-ivory/55">
+                    {towns[i].km.toFixed(1)} km
+                  </td>
+                  <td class="py-2.5 tabular-nums caption-text text-text-light dark:text-ivory/35">
+                    {p.coords[1].toFixed(5)}, {p.coords[0].toFixed(5)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ══ THE RIVER ITSELF ════════════════════════════════════════ -->
+        <div class="mt-14 border-t border-rule pt-8 dark:border-ivory/10">
+          <p class="eyebrow text-azure dark:text-azure-light">The river</p>
+          <h2 class="mt-2 article-title text-text-primary dark:text-ivory">
+            What this stretch is part of
+          </h2>
+
+          <dl class="mt-6 grid gap-x-10 gap-y-4 sm:grid-cols-2">
+            {context.map(([k, v]) => (
+              <div class="border-t border-rule/60 pt-2 dark:border-ivory/8">
+                <dt class="caption-text text-text-muted dark:text-ivory/45">{k}</dt>
+                <dd class="mt-0.5 body-small text-text-primary dark:text-ivory/85 text-pretty">{v}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <!-- The discrepancy is the interesting part, so it gets its own
+               block rather than a footnote nobody reads. -->
+          <div class="mt-8 border-l-2 border-azure pl-5 dark:border-azure-light">
+            <p class="article-title text-text-primary dark:text-ivory">
+              {km(chaliyar.length)} km here, against a cited {river.length}
+            </p>
+            <p class="mt-2 max-w-3xl body-small text-text-muted dark:text-ivory/55 text-pretty">
+              The line drawn above is the OpenStreetMap way carrying the name
+              <em>Chaliyar river</em>, and it measures {km(chaliyar.length)} km from
+              {' '}{chaliyar.highest} m near the Wayanad–Malappuram border. The river is
+              usually given as {river.length} km, rising higher, in {river.rises}. So
+              some upper course is certainly missing from this journey — and
+              separately, Kerala river lengths are often quoted from a headwater
+              tributary rather than from where the main name begins, which would
+              account for part of the gap on its own.
+            </p>
+            <p class="mt-3 max-w-3xl body-small text-text-muted dark:text-ivory/55 text-pretty">
+              Which of those dominates is not something this data can settle, so
+              both figures are stated and neither is quietly preferred.
+            </p>
+          </div>
+        </div>
+
+        <!-- ══ THE REST OF THE SHELF ═══════════════════════════════════ -->
+        <div class="mt-14 border-t border-rule pt-8 dark:border-ivory/10">
+          <p class="eyebrow text-text-muted dark:text-ivory/45">Still to build</p>
+          <p class="mt-2 body-small text-text-muted dark:text-ivory/55 text-pretty">
+            Eight more rivers have course data. None has a journey yet — each
+            needs its towns looked up and its course checked, the way this one
+            did.
+          </p>
+          <ul class="mt-6 grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+            {shelf.map(([name, ml, length]) => (
+              <li class="border-t border-rule pt-2 dark:border-ivory/12">
+                <p class="font-malayalam text-text-primary dark:text-ivory/80">{ml}</p>
+                <p class="caption-text text-text-muted dark:text-ivory/45">
+                  {name} · {length} km
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p class="mt-12 border-t border-rule pt-4 caption-text text-text-light dark:border-ivory/10 dark:text-ivory/35">
+          River course: © OpenStreetMap contributors — way <code>{source.osmId}</code>,
+          by way of the Kerala rivers dataset. Town coordinates and Malayalam
+          names: OpenStreetMap via Overpass, looked up rather than reused; the
+          source dataset rounds them to about a kilometre and places Nilambur at
+          the river's headwater vertex, some 25 km from the town. Elevation data:
+          <Fragment set:html={TERRAIN_ATTRIBUTION} />, forced to descend
+          monotonically because a DEM reads uphill over open water. Length,
+          source, basin area, alternative names, tributaries and the list of
+          towns on the river: the English Wikipedia article
+          <a href={river.href} class="underline">Chaliyar</a>, CC BY-SA — facts
+          restated, none of its wording reproduced. Every town it names was then
+          looked up in OSM independently; one it lists, Kizhuparamba, has no
+          matching place there and is omitted rather than guessed at. Terrain
+          colouring and vegetation are impressions, not survey. Basemap ©
+          OpenStreetMap contributors, © CARTO.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="relative z-10"><Footer /></div>
+</Layout>

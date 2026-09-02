@@ -1,0 +1,11 @@
+{
+  "radius": {
+    "none": { "$type": "dimension", "$value": "0px" },
+    "sm": { "$type": "dimension", "$value": "2px" },
+    "full": { "$type": "dimension", "$value": "9999px" },
+
+    "md": { "$type": "fluidSize", "$value": { "min": "2px", "mid": "1px + 0.26vw", "max": "4px" } },
+    "lg": { "$type": "fluidSize", "$value": { "min": "3px", "mid": "1.5px + 0.39vw", "max": "5px" } },
+    "xl": { "$type": "fluidSize", "$value": { "min": "8px", "mid": "4px + 1.04vw", "max": "12px" } }
+  }
+}

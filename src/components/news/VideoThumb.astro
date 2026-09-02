@@ -1,0 +1,42 @@
+---
+// BLOCK · VideoThumb — the core video still: image + play affordance + duration,
+// with an optional overlaid title (shorts / cinematic). Renders as <a> when
+// `href` is given, else a <div> (so it can nest inside a parent link card).
+import Media from '../ui/Media.astro';
+import PlayButton from '../ui/PlayButton.astro';
+import Duration from '../ui/Duration.astro';
+import Kicker from '../ui/Kicker.astro';
+import Headline from '../ui/Headline.astro';
+import Badge from '../ui/Badge.astro';
+import type { VideoItem } from '../../lib/video-data';
+export interface Props {
+  item: VideoItem;
+  ratio?: string;
+  href?: string;
+  playSize?: 'sm' | 'md' | 'lg';
+  showTitle?: boolean;
+  live?: boolean;
+  class?: string;
+}
+const { item, ratio = '16/9', href, playSize = 'md', showTitle = false, live = false, class: className = '' } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+<Tag href={href} class:list={['mc', 'group relative block overflow-hidden bg-ink', className]}>
+  <Media seed={item.seed ?? item.href} ratio={ratio} overlay={showTitle ? 'strong' : false} zoom />
+  <span class="absolute inset-0 bg-ink/0 group-hover:bg-ink/15 transition-colors"></span>
+  <span class="absolute inset-0 grid place-items-center"><PlayButton size={playSize} variant="glass" /></span>
+
+  {live && <span class="absolute top-2 left-2"><Badge label="Live" variant="live" /></span>}
+  {!live && !showTitle && item.category && (
+    <span class="absolute top-2 left-2 bg-ink/55 px-1.5 py-0.5"><Kicker text={item.category} tone="onDark" /></span>
+  )}
+  {item.duration && <Duration value={item.duration} class="absolute bottom-2 right-2" />}
+
+  {showTitle && (
+    <span class="absolute inset-x-0 bottom-0 p-3 sm:p-4 block">
+      {item.category && <Kicker text={item.category} tone="onDark" class="mb-1 block" />}
+      <Headline as="h3" size="base" tone="onDark" text={item.title} clamp={2} />
+      {item.views && <span class="mt-1 block caption-text text-white/60 tabular-nums">{item.views} views</span>}
+    </span>
+  )}
+</Tag>

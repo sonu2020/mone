@@ -1,0 +1,57 @@
+---
+// ── /article/<variant> ───────────────────────────────────────────────────────
+// The article-page lab. One story document (src/lib/article-data.ts), four page
+// shapes, so the variants differ only in layout and never in content.
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/nav/HeaderBar.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import Footer from '../../components/Footer.astro';
+import StickyFooterAd from '../../components/ads/StickyFooterAd.astro';
+import ArticleLayoutSwitcher from '../../components/article/ArticleLayoutSwitcher.astro';
+
+import ArticleClassic from '../../components/article/layouts/ArticleClassic.astro';
+import ArticleFocus from '../../components/article/layouts/ArticleFocus.astro';
+import ArticleImmersive from '../../components/article/layouts/ArticleImmersive.astro';
+import ArticleReady from '../../components/article/layouts/ArticleReady.astro';
+import ArticleMagazine from '../../components/article/layouts/ArticleMagazine.astro';
+
+import { article, articleLayouts } from '../../lib/article-data';
+
+export function getStaticPaths() {
+  return articleLayouts.map((l) => ({ params: { variant: l.id }, props: { layout: l } }));
+}
+
+const { layout } = Astro.props;
+
+const variants = {
+  classic: ArticleClassic,
+  focus: ArticleFocus,
+  ready: ArticleReady,
+  immersive: ArticleImmersive,
+  magazine: ArticleMagazine,
+} as const;
+
+const Variant = variants[layout.id as keyof typeof variants];
+
+// `ready` carries its masthead unit above the header, the way the home page
+// does; the other variants draw their own leaderboard below the nav instead.
+const topAd = layout.id === 'ready';
+---
+
+<Layout
+  title={`${layout.label} — Article Lab | MediaOne`}
+  description={layout.signature}
+  topAd={topAd}
+  noindex={true}
+>
+  <Header />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page pb-24">
+    <Variant doc={article} />
+  </main>
+
+  <Footer />
+  <StickyFooterAd />
+  <ArticleLayoutSwitcher current={layout.id} />
+</Layout>

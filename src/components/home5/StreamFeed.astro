@@ -1,0 +1,112 @@
+---
+// BLOCK · StreamFeed — renders the block sequence from lib/home5-stream.ts and
+// owns the one piece of behaviour this page needs: revealing the run a batch
+// at a time as the reader arrives at the bottom of it.
+//
+// Every block is in the HTML from the start. The script hides the tail after
+// load and gives it back on scroll, which means the page works without
+// JavaScript (the whole stream is simply there), the reveal costs no network,
+// and nothing about the document depends on a fetch that might not answer.
+// What it buys is the feel of a stream that does not end — the reason to build
+// this page rather than another set of bands.
+import StreamRow from './StreamRow.astro';
+import StreamFeature from './StreamFeature.astro';
+import StreamVideos from './StreamVideos.astro';
+import StreamStrip from './StreamStrip.astro';
+import StreamMarker from './StreamMarker.astro';
+import AdSlot from '../AdSlot.astro';
+import { STREAM_INITIAL, STREAM_BATCH, type StreamBlock } from '../../lib/home5-stream';
+
+export interface Props {
+  blocks: StreamBlock[];
+  class?: string;
+}
+const { blocks, class: className = '' } = Astro.props;
+
+// A row followed by another row wants a hairline between them; a row followed
+// by a strip, an ad or a marker does not — those carry their own edges, and a
+// rule against them reads as a double border.
+const RULED = new Set(['row', 'feature']);
+const ruleAfter = (i: number) =>
+  RULED.has(blocks[i].kind) && blocks[i + 1] !== undefined && RULED.has(blocks[i + 1].kind);
+---
+
+<div
+  id="stream"
+  class:list={['mc', className]}
+  data-initial={STREAM_INITIAL}
+  data-batch={STREAM_BATCH}
+>
+  {blocks.map((block, i) => (
+    <div
+      class:list={['stream-block', ruleAfter(i) && 'border-b border-rule dark:border-ivory/10']}
+      data-index={i}
+    >
+      {block.kind === 'row' && <StreamRow story={block.story} />}
+      {block.kind === 'feature' && <StreamFeature story={block.story} />}
+      {block.kind === 'videos' && <StreamVideos label={block.label} href={block.href} videos={block.videos} />}
+      {block.kind === 'strip' && <StreamStrip label={block.label} href={block.href} stories={block.stories} />}
+      {block.kind === 'marker' && <StreamMarker label={block.label} />}
+      {block.kind === 'ad' && <AdSlot slot={block.slot} format="leaderboard" tone="gray" lazy class="my-6 sm:rounded-lg" />}
+    </div>
+  ))}
+
+  <!-- The sentinel doubles as the control. The observer clicks the button, so
+       there is exactly one code path for "show more" whether it was reached by
+       scrolling or by keyboard — and if IntersectionObserver is missing, the
+       button alone still works. -->
+  <div id="stream-more" class="hidden py-8 flex justify-center">
+    <button
+      type="button"
+      class="eyebrow rounded-full border border-rule dark:border-ivory/15 px-6 py-2.5 text-text-secondary dark:text-ivory/70 hover:border-azure/50 hover:text-azure dark:hover:text-azure-light transition-colors"
+    >
+      More stories
+    </button>
+  </div>
+</div>
+
+<script>
+  const stream = document.getElementById('stream');
+  const more = document.getElementById('stream-more');
+  const button = more?.querySelector('button');
+
+  if (stream && more && button) {
+    const blocks = Array.from(stream.querySelectorAll<HTMLElement>('.stream-block'));
+    const batch = Number(stream.dataset.batch) || 10;
+    let shown = Number(stream.dataset.initial) || 12;
+
+    // Hidden with the `hidden` attribute rather than a class: it takes the
+    // element out of the accessibility tree and out of tab order too, which a
+    // display rule alone would not guarantee across every element in here.
+    const apply = () => {
+      blocks.forEach((el, i) => el.toggleAttribute('hidden', i >= shown));
+      const done = shown >= blocks.length;
+      more.classList.toggle('hidden', done);
+      more.classList.toggle('flex', !done);
+      if (done) observer?.disconnect();
+    };
+
+    const reveal = () => {
+      shown += batch;
+      apply();
+    };
+
+    button.addEventListener('click', reveal);
+
+    // rootMargin runs the trigger a screen early, so the next batch is in
+    // place before the reader reaches the end of the current one and the feed
+    // never visibly stops.
+    const observer =
+      'IntersectionObserver' in window
+        ? new IntersectionObserver(
+            (entries) => {
+              if (entries.some((e) => e.isIntersecting)) reveal();
+            },
+            { rootMargin: '800px 0px' },
+          )
+        : null;
+
+    apply();
+    if (observer) observer.observe(more);
+  }
+</script>

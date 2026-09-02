@@ -1,0 +1,71 @@
+---
+// NAV · SubNavBar — the strip of tabs that sits under the header on an inner
+// page. Presentation only: it takes links and marks the one the page sits under.
+//
+// Two things feed it. SectionSubNav resolves a desk's children out of the shared
+// IA (src/lib/mega-nav.ts); Shelf passes its own taxonomy, which is real and
+// specific but has no place in the top-level nav. One component either way, so
+// a reader can't tell that the sources differ — which is the point.
+export interface Props {
+  links: { label: string; href: string }[];
+  /** Optional leading tab for the section root, e.g. "All". */
+  allHref?: string;
+  allLabel?: string;
+  /** Defaults to the page being rendered. */
+  pathname?: string;
+  label?: string;      // aria-label for the nav
+  class?: string;
+}
+const {
+  links,
+  allHref,
+  allLabel = 'All',
+  pathname = Astro.url.pathname,
+  label = 'Sections',
+  class: className = '',
+} = Astro.props;
+
+const path = pathname.replace(/\/+$/, '') || '/';
+
+// Mark the tab the page sits under, not only an exact hit — /videos/shows/x
+// should light "Shows". Longest match wins, so a section root (which every
+// descendant path also starts with) never outranks a real child.
+const candidates = [...(allHref ? [allHref] : []), ...links.map((l) => l.href)];
+const activeHref = candidates
+  .filter((h) => path === h || path.startsWith(`${h}/`))
+  .sort((a, b) => b.length - a.length)[0];
+
+const tab =
+  'inline-flex items-center h-10 px-2.5 border-b-2 border-transparent nav-text whitespace-nowrap ' +
+  'text-text-secondary dark:text-ivory/60 hover:text-azure hover:border-rule ' +
+  'dark:hover:text-azure-light dark:hover:border-ivory/20 ' +
+  'aria-[current=page]:border-azure aria-[current=page]:text-azure ' +
+  'dark:aria-[current=page]:border-azure-light dark:aria-[current=page]:text-azure-light ' +
+  'transition-colors';
+---
+
+{links.length > 0 && (
+  <nav
+    class:list={['mc', 'border-b border-rule dark:border-ivory/10 bg-bg-card dark:bg-brand-elevated', className]}
+    aria-label={label}
+  >
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+      <ul class="-mb-px flex items-stretch gap-1 h-10 overflow-x-auto scrollbar-none">
+        {allHref && (
+          <li class="shrink-0">
+            <a href={allHref} aria-current={activeHref === allHref ? 'page' : undefined} class={tab}>
+              {allLabel}
+            </a>
+          </li>
+        )}
+        {links.map((link) => (
+          <li class="shrink-0">
+            <a href={link.href} aria-current={activeHref === link.href ? 'page' : undefined} class={tab}>
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+)}

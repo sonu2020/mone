@@ -1,0 +1,388 @@
+{
+  "capturedAt": "2026-08-17",
+  "source": "https://www.youtube.com/@MediaoneTVLive",
+  "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+  "note": "Flat record of the YouTube videos referenced by the MediaOne site (src/lib/videos.ts allVideos + live channel). Metadata read from each YouTube watch page via yt-dlp; category/sitePublishDate are the site's editorial fields. `local` is set only for videos downloaded as MP4 into public/videos/ (H.264, <=720p) for the /video-alt showcase.",
+  "videos": [
+    {
+      "youtubeId": "vXi57M7Rdp0",
+      "title": "ആരാധകരെ വിറപ്പിച്ചെങ്കിലും നിറഞ്ഞാടി മെസി; തോറ്റ് മടങ്ങാന്‍ വന്നതല്ലെന്ന് ആരാധകര്‍",
+      "category": "Sports",
+      "durationSeconds": 139,
+      "durationText": "2:19",
+      "viewCount": 2097,
+      "viewsText": "2.1K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=vXi57M7Rdp0",
+      "embedUrl": "https://www.youtube.com/embed/vXi57M7Rdp0",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/vXi57M7Rdp0/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/vXi57M7Rdp0/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Aug 3, 2026",
+      "isFeatured": true,
+      "available": true,
+      "local": {
+        "src": "/videos/vXi57M7Rdp0.mp4",
+        "poster": "/videos/vXi57M7Rdp0.jpg"
+      }
+    },
+    {
+      "youtubeId": "lvDoIfhkJW8",
+      "title": "ചിലര്‍ കരയുന്നു, സന്തോഷിക്കുന്നു; അര്‍ജന്റീനയുടെ കളി കണ്ട ആളുകള്‍ക്ക് അറ്റാക്ക് വരാത്തത് ഭാ​ഗ്യം",
+      "category": "Sports",
+      "durationSeconds": 198,
+      "durationText": "3:18",
+      "viewCount": 4131,
+      "viewsText": "4.1K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=lvDoIfhkJW8",
+      "embedUrl": "https://www.youtube.com/embed/lvDoIfhkJW8",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/lvDoIfhkJW8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/lvDoIfhkJW8/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Aug 3, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/lvDoIfhkJW8.mp4",
+        "poster": "/videos/lvDoIfhkJW8.jpg"
+      }
+    },
+    {
+      "youtubeId": "189804av2W8",
+      "title": "'ഹൈ ബിപിയിൽ കളി കാണേണ്ടി വന്നു; ഫാൻസിനുണ്ടായ ടെൻഷൻ അർജന്റീന ടീമിന് ഇല്ലായിരുന്നു'....",
+      "category": "Sports",
+      "durationSeconds": 142,
+      "durationText": "2:22",
+      "viewCount": 1272,
+      "viewsText": "1.3K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=189804av2W8",
+      "embedUrl": "https://www.youtube.com/embed/189804av2W8",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/189804av2W8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/189804av2W8/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Aug 3, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/189804av2W8.mp4",
+        "poster": "/videos/189804av2W8.jpg"
+      }
+    },
+    {
+      "youtubeId": "Wq_RAGOgMuA",
+      "title": "തൃശൂരിൽ മിനി ബോട്ട് മറിഞ്ഞ് കാണാതായ രണ്ട് പേരുടെ മൃതദേഹം കണ്ടെത്തി",
+      "category": "News",
+      "durationSeconds": 104,
+      "durationText": "1:44",
+      "viewCount": 2819,
+      "viewsText": "2.8K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=Wq_RAGOgMuA",
+      "embedUrl": "https://www.youtube.com/embed/Wq_RAGOgMuA",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Wq_RAGOgMuA/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Wq_RAGOgMuA/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Aug 3, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/Wq_RAGOgMuA.mp4",
+        "poster": "/videos/Wq_RAGOgMuA.jpg"
+      }
+    },
+    {
+      "youtubeId": "4B9pqFW0nRM",
+      "title": "സ്‌പെയിനിനെ തളച്ചിട്ടു; അര്‍ജന്റീനയെ വിറപ്പിച്ചു! തോല്‍ക്കാൻ മനസില്ലാതെ പൊരുതി വീണ് കോപ് വെര്‍ദെ",
+      "category": "Sports",
+      "durationSeconds": 277,
+      "durationText": "4:37",
+      "viewCount": 1317,
+      "viewsText": "1.3K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=4B9pqFW0nRM",
+      "embedUrl": "https://www.youtube.com/embed/4B9pqFW0nRM",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/4B9pqFW0nRM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/4B9pqFW0nRM/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Aug 3, 2026",
+      "isFeatured": false,
+      "available": true
+    },
+    {
+      "youtubeId": "Tr3Wr40Z6TQ",
+      "title": "'ജീവനൊടുക്കിയത് CPM ഭരണസമിതിയുടെ സമ്മർദം മൂലം'; സാബുവിന്റെ മരണത്തിൽ അന്വേഷണം ക്രൈംബ്രാഞ്ചിന്",
+      "category": "Politics",
+      "durationSeconds": 93,
+      "durationText": "1:33",
+      "viewCount": 466,
+      "viewsText": "466 views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=Tr3Wr40Z6TQ",
+      "embedUrl": "https://www.youtube.com/embed/Tr3Wr40Z6TQ",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/Tr3Wr40Z6TQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Tr3Wr40Z6TQ/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Aug 3, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/Tr3Wr40Z6TQ.mp4",
+        "poster": "/videos/Tr3Wr40Z6TQ.jpg"
+      }
+    },
+    {
+      "youtubeId": "V32YtRVB1_g",
+      "title": "വടകരയിൽ ദേശീയപാതയിൽ വീണ്ടും മണ്ണിടിച്ചിൽ; മണ്ണും കല്ലും റോഡിലേക്ക് പതിച്ചു; വലിയ അപകട സാധ്യത",
+      "category": "News",
+      "durationSeconds": 110,
+      "durationText": "1:50",
+      "viewCount": 241,
+      "viewsText": "241 views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=V32YtRVB1_g",
+      "embedUrl": "https://www.youtube.com/embed/V32YtRVB1_g",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/V32YtRVB1_g/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/V32YtRVB1_g/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Aug 3, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/V32YtRVB1_g.mp4",
+        "poster": "/videos/V32YtRVB1_g.jpg"
+      }
+    },
+    {
+      "youtubeId": "OkF7APAHwbs",
+      "title": "ഇടിയുന്ന കെടുതി...; കനത്ത മഴയിൽ പാലക്കാട്‌ അലനല്ലൂരിൽ വീടുകളുടെ മതിൽ ഇടിഞ്ഞു; കുടുംബത്തെ മാറ്റി",
+      "category": "News",
+      "durationSeconds": 115,
+      "durationText": "1:55",
+      "viewCount": 15227,
+      "viewsText": "15.2K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=OkF7APAHwbs",
+      "embedUrl": "https://www.youtube.com/embed/OkF7APAHwbs",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/OkF7APAHwbs/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/OkF7APAHwbs/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Aug 3, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/OkF7APAHwbs.mp4",
+        "poster": "/videos/OkF7APAHwbs.jpg"
+      }
+    },
+    {
+      "youtubeId": "rY1kd5wYeKQ",
+      "title": "നാഥനില്ലാതെ കേരള ചലച്ചിത്ര അക്കാദമി; ഭരണ സ്തംഭനം മൂലം മേളകൾ അനിശ്ചിതത്വത്തിൽ",
+      "category": "Entertainment",
+      "durationSeconds": 384,
+      "durationText": "6:24",
+      "viewCount": 147,
+      "viewsText": "147 views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=rY1kd5wYeKQ",
+      "embedUrl": "https://www.youtube.com/embed/rY1kd5wYeKQ",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/rY1kd5wYeKQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/rY1kd5wYeKQ/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Jul 4, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/rY1kd5wYeKQ.mp4",
+        "poster": "/videos/rY1kd5wYeKQ.jpg"
+      }
+    },
+    {
+      "youtubeId": "jeHILGPRNJw",
+      "title": "എത്തുക നൂറിലേറെ രാജ്യങ്ങളിലെ പ്രതിനിധികൾ...; ഖാംനഈയുടെ വിലാപ യാത്രാ ചടങ്ങുകൾക്കൊരുങ്ങി തെഹ്റാൻ",
+      "category": "World",
+      "durationSeconds": 0,
+      "durationText": null,
+      "viewCount": null,
+      "viewsText": null,
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=jeHILGPRNJw",
+      "embedUrl": "https://www.youtube.com/embed/jeHILGPRNJw",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/jeHILGPRNJw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/jeHILGPRNJw/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Jul 4, 2026",
+      "isFeatured": false,
+      "available": false
+    },
+    {
+      "youtubeId": "I_IunvAVYNk",
+      "title": "പ്രതിസന്ധി ON...; പുതിയ കരാറുമായി കമ്പനികൾ; വരുമാനം കുറഞ്ഞ് ഓൺലൈൻ ടാക്സി ഡ്രൈവർമാർ; സർക്കാർ ഇടപെടണം",
+      "category": "Business",
+      "durationSeconds": 324,
+      "durationText": "5:24",
+      "viewCount": 1549,
+      "viewsText": "1.5K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=I_IunvAVYNk",
+      "embedUrl": "https://www.youtube.com/embed/I_IunvAVYNk",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/I_IunvAVYNk/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/I_IunvAVYNk/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Jul 4, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/I_IunvAVYNk.mp4",
+        "poster": "/videos/I_IunvAVYNk.jpg"
+      }
+    },
+    {
+      "youtubeId": "-WGXg4-2bTk",
+      "title": "ഫേക്കിന് ആദരം..; കാഫിർ സ്ക്രീൻഷോട്ട് കേസിൽ ജാമ്യം ലഭിച്ച ജിതിന് DYFIയുടെ സ്വീകരണം",
+      "category": "Politics",
+      "durationSeconds": 162,
+      "durationText": "2:42",
+      "viewCount": 930,
+      "viewsText": "930 views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=-WGXg4-2bTk",
+      "embedUrl": "https://www.youtube.com/embed/-WGXg4-2bTk",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/-WGXg4-2bTk/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/-WGXg4-2bTk/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Jul 4, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/-WGXg4-2bTk.mp4",
+        "poster": "/videos/-WGXg4-2bTk.jpg"
+      }
+    },
+    {
+      "youtubeId": "rr9S8rMRsFo",
+      "title": "2 വർഷം വേട്ടയാടി; കാഫിർ സ്‌ക്രീൻഷോട്ട് കേസിൽ പ്രതിയാക്കിയതിനെതിരെ നിയമ പോരാട്ടത്തിനിറങ്ങി കാസിം",
+      "category": "Politics",
+      "durationSeconds": 257,
+      "durationText": "4:17",
+      "viewCount": 2110,
+      "viewsText": "2.1K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=rr9S8rMRsFo",
+      "embedUrl": "https://www.youtube.com/embed/rr9S8rMRsFo",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/rr9S8rMRsFo/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/rr9S8rMRsFo/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Jul 4, 2026",
+      "isFeatured": false,
+      "available": true
+    },
+    {
+      "youtubeId": "KCMMCvrSnzY",
+      "title": "വിശദീകരണവുമായി അദാനി...; 'ഓഹരി കൈമാറ്റം ഉണ്ടായാലും വിഴിഞ്ഞത് MSCക്ക് കുത്തകാവകാശം ഉണ്ടാകില്ല'",
+      "category": "Business",
+      "durationSeconds": 257,
+      "durationText": "4:17",
+      "viewCount": 673,
+      "viewsText": "673 views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=KCMMCvrSnzY",
+      "embedUrl": "https://www.youtube.com/embed/KCMMCvrSnzY",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/KCMMCvrSnzY/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/KCMMCvrSnzY/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Jul 4, 2026",
+      "isFeatured": false,
+      "available": true
+    },
+    {
+      "youtubeId": "sQJoM7RYmVE",
+      "title": "AMMAയിൽ ത്രില്ലർ ട്വിസ്റ്റ് തുടരുന്നു; രമേഷ് പിഷാരടി രാജിവച്ചു; നടിമാരുടെ വാർത്താസമ്മേളനം ഇന്ന്",
+      "category": "Entertainment",
+      "durationSeconds": 187,
+      "durationText": "3:07",
+      "viewCount": 1669,
+      "viewsText": "1.7K views",
+      "uploadDate": "20260704",
+      "channel": "MediaOne News",
+      "channelId": "UCpt10lzibN9Ux-tFGVAnrBw",
+      "watchUrl": "https://www.youtube.com/watch?v=sQJoM7RYmVE",
+      "embedUrl": "https://www.youtube.com/embed/sQJoM7RYmVE",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/sQJoM7RYmVE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/sQJoM7RYmVE/maxresdefault.jpg"
+      },
+      "sitePublishDate": "Jul 4, 2026",
+      "isFeatured": false,
+      "available": true,
+      "local": {
+        "src": "/videos/sQJoM7RYmVE.mp4",
+        "poster": "/videos/sQJoM7RYmVE.jpg"
+      }
+    },
+    {
+      "youtubeId": "-8d8-c0yvyU",
+      "title": "MediaOne TV Live | Malayalam News Live | 24X7 Breaking News | Kerala News Live 2026-08-17 02:24",
+      "category": "Live",
+      "durationSeconds": null,
+      "durationText": null,
+      "viewCount": 207886896,
+      "viewsText": "207.9M views",
+      "uploadDate": "20240826",
+      "channel": "MediaoneTV Live",
+      "channelId": "UC-f7r46JhYv78q5pGrO6ivA",
+      "watchUrl": "https://www.youtube.com/watch?v=-8d8-c0yvyU",
+      "embedUrl": "https://www.youtube.com/embed/-8d8-c0yvyU",
+      "thumbnail": {
+        "small": "https://i.ytimg.com/vi/-8d8-c0yvyU/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/-8d8-c0yvyU/maxresdefault.jpg"
+      },
+      "sitePublishDate": null,
+      "isFeatured": false,
+      "available": true
+    }
+  ]
+}

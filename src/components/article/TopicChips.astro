@@ -1,0 +1,19 @@
+---
+// ATOM · TopicChips — "RELATED TOPICS :" and its chips. Uppercase Latin labels,
+// square outline, hairline border that takes the accent on hover.
+export interface Props {
+  topics: string[];
+  label?: string;
+  class?: string;
+}
+const { topics, label = 'Related Topics', class: className = '' } = Astro.props;
+---
+<div class:list={['mc flex flex-wrap items-center gap-x-3 gap-y-2', className]}>
+  <span class="eyebrow text-text-muted shrink-0">{label} :</span>
+  {topics.map((t) => (
+    <a
+      href="/latest-news"
+      class="px-2.5 py-1 border border-rule dark:border-ivory/20 eyebrow text-text-secondary hover:border-azure hover:text-azure dark:hover:text-azure-light transition-colors"
+    >{t}</a>
+  ))}
+</div>

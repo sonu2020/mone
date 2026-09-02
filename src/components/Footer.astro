@@ -1,0 +1,145 @@
+---
+import Logo from './Logo.astro';
+import { footerColumns, mobileFooterLinks, socialLinks, legalLinks } from '../lib/site-sections';
+
+const currentYear = new Date().getFullYear();
+
+/* Tabler icon class names for each social platform */
+const socialIcons: Record<string, string> = {
+  Facebook:  'ti-brand-facebook',
+  X:         'ti-brand-x',
+  YouTube:   'ti-brand-youtube',
+  Instagram: 'ti-brand-instagram',
+  LinkedIn:  'ti-brand-linkedin',
+  Telegram:  'ti-brand-telegram',
+};
+---
+
+<!-- No top margin: the footer meets the last band on its own azure rule. Pages
+     that want air before it should end on a band that carries its own. -->
+<footer class:list={['mc', 'w-full bg-nav-bg-dark']} role="contentinfo">
+  <!-- Azure top rule matching header -->
+  <div class="h-0.5 w-full bg-azure"></div>
+
+  <!-- ═══════ Desktop footer columns (md+) ═══════ -->
+  <div class="hidden md:block max-w-site mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10">
+    <div class="grid grid-cols-6 gap-x-6 gap-y-10">
+      {footerColumns.map((col) => (
+        <nav aria-label={col.title}>
+          <h2 class="eyebrow text-ivory/40">{col.title}</h2>
+          <ul class="mt-4 space-y-2">
+            {col.links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="text-nav text-ivory/60 hover:text-azure-light transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2 rounded"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))}
+    </div>
+  </div>
+
+  <!-- ═══════ Mobile footer links (< md) ═══════ -->
+  <div class="md:hidden px-4 pt-10 pb-6">
+    <ul class="flex flex-wrap justify-center gap-x-4 gap-y-2">
+      {mobileFooterLinks.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            class="text-nav text-ivory/55 hover:text-azure-light transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2 rounded"
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <!-- ═══════ Bottom band: logo+copyright (left) · legal+socials (right) ═══════ -->
+  <div class="border-t border-white/8">
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+      <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+        <div class="flex items-center gap-3 shrink-0">
+          <a href="/" class="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light focus-visible:outline-offset-4 rounded" aria-label="MediaOne home">
+            <Logo class="h-6 lg:h-7 w-auto fill-current text-ivory/80 hover:text-azure-light transition-colors" />
+          </a>
+
+          <span class="h-5 w-px bg-white/15" aria-hidden="true"></span>
+
+          <button
+            id="footer-theme-toggle"
+            type="button"
+            class="group inline-flex items-center gap-1.5 text-ivory/45 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-light focus-visible:outline-offset-2 rounded"
+          >
+            <i class="ti ti-sun text-base hidden dark:inline" aria-hidden="true"></i>
+            <i class="ti ti-moon text-base inline dark:hidden" aria-hidden="true"></i>
+            <span class="caption-text dark:hidden">Dark</span>
+            <span class="caption-text hidden dark:inline">Light</span>
+            <span class="sr-only dark:hidden">Switch to dark mode</span>
+            <span class="sr-only hidden dark:inline">Switch to light mode</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: legal links + social icons -->
+      <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-5">
+        <ul class="flex flex-wrap justify-center gap-x-4 gap-y-1">
+          {legalLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="text-meta text-ivory/40 hover:text-azure-light transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2 rounded"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div class="flex items-center gap-3">
+          {socialLinks.map((s) => (
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center size-8 rounded-full border border-white/10 text-ivory/50 hover:text-white hover:border-azure-light/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2"
+              aria-label={s.label}
+            >
+              <i class={`ti ${socialIcons[s.label]} text-base`} aria-hidden="true"></i>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ Copyright bar ═══════ -->
+  <div class="border-t border-white/8">
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <p class="caption-text text-ivory/30 text-center">
+        &copy; {currentYear} MediaOne Online. All rights reserved. Powered by <a href="https://www.hocalwire.com/" target="_blank" rel="noopener noreferrer" class="hover:text-ivory/50 transition-colors">Hocalwire</a>
+      </p>
+    </div>
+  </div>
+
+</footer>
+
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('footer-theme-toggle');
+    if (!btn) return;
+
+    // Writes the same key Layout's pre-paint script reads, so the choice made
+    // here is the one the next page loads with and there is no flash.
+    btn.addEventListener('click', function () {
+      var dark = document.documentElement.classList.toggle('dark');
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+    });
+  })();
+</script>

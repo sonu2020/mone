@@ -1,0 +1,132 @@
+---
+export interface Props {
+  slot?: string;
+  format?:
+    | "masthead"
+    | "billboard"
+    | "leaderboard"
+    | "leaderboard-lg"
+    | "rectangle"
+    | "rectangle-lg"
+    | "skyscraper"
+    | "mobile-banner"
+    | "mobile-leaderboard";
+  lazy?: boolean;
+  /** How the ad band separates itself from the page.
+   *  'sage' tints it a grayish green; 'gray' drops it to the page surface, a
+   *  clear step below the white the content sits on, so paid space reads as
+   *  the floor of the page rather than as part of it. Both follow the scheme. */
+  tone?: "plain" | "sage" | "gray";
+  class?: string;
+}
+
+const {
+  slot = "default",
+  format = "leaderboard",
+  lazy = false,
+  tone = "plain",
+  class: className = "",
+} = Astro.props;
+
+const toneClass =
+  tone === "sage"
+    ? "bg-ad-surface dark:bg-ad-surface-dark"
+    : tone === "gray"
+      ? "bg-bg-page dark:bg-brand-elevated"
+      : "";
+
+// On a filled band the frame needs to sit against the fill rather than against
+// the page, or the ad reads as a card floating on a stripe.
+const frameClass =
+  tone === "gray"
+    ? "bg-bg-card dark:bg-brand-dark border-rule dark:border-ivory/10"
+    : "bg-ivory-dark dark:bg-brand-elevated border-rule dark:border-ivory/10";
+
+const ENABLE_ADS = true;
+
+// One box per format, plus `masthead`: a single box whose size steps down the
+// standard ladder at each breakpoint rather than four boxes taking turns being
+// `hidden`. One node means one slot, one measured element and no duplicate ad
+// requests when real inventory replaces the placeholder — the breakpoint
+// decides which of the sizes below the slot is asking for.
+//
+//   ≥1280  970x250 billboard
+//   ≥1024  970x90  large leaderboard
+//   ≥768   728x90  leaderboard
+//   <768   320x100 mobile leaderboard
+const sizeMap = {
+  masthead:
+    "w-full max-w-[320px] h-[100px] md:max-w-[728px] md:h-[90px] lg:max-w-[970px] xl:h-[250px] mx-auto",
+  billboard: "h-[250px] w-full max-w-[970px] mx-auto",
+  leaderboard: "h-[90px] w-full max-w-[728px] mx-auto",
+  "leaderboard-lg": "h-[90px] w-full max-w-[970px] mx-auto",
+  rectangle: "h-[250px] w-full max-w-[300px] mx-auto",
+  "rectangle-lg": "h-[250px] w-full max-w-[336px] mx-auto",
+  skyscraper: "h-[600px] w-[120px] lg:w-[160px] mx-auto hidden lg:block",
+  "mobile-banner": "h-[50px] w-full max-w-[320px] mx-auto lg:hidden",
+  "mobile-leaderboard": "h-[100px] w-full max-w-[320px] mx-auto lg:hidden",
+};
+
+const wrapperClass = lazy ? "ad-lazy" : "";
+
+const isLeaderboard = [
+  "masthead",
+  "billboard",
+  "leaderboard",
+  "leaderboard-lg",
+  "mobile-banner",
+  "mobile-leaderboard",
+].includes(format);
+
+// The sizes this slot is willing to take, largest first. The placeholder only
+// needs one box; a real ad server needs the whole ladder, so it ships in the
+// markup as `data-ad-sizes` and the tag reads it instead of re-deriving it.
+const sizeLadder = {
+  masthead: "970x250,970x90,728x90,320x100",
+  billboard: "970x250,970x90,728x90",
+  leaderboard: "728x90",
+  "leaderboard-lg": "970x90,728x90",
+  rectangle: "300x250",
+  "rectangle-lg": "336x280,300x250",
+  skyscraper: "160x600,120x600",
+  "mobile-banner": "320x50",
+  "mobile-leaderboard": "320x100,320x50",
+};
+const adImage = isLeaderboard
+  ? "/images/ads/leaderboard_ad.png"
+  : "/images/ads/rectangle_ad.png";
+---
+
+{
+  ENABLE_ADS && (
+    <div
+      class:list={[
+        "mc",
+        `w-full flex flex-col items-center py-4 ${toneClass} ${wrapperClass} ${className}`,
+      ]}
+      style="background-color: oklch(0.965 0.004 250);"
+      data-ad-slot={slot}
+      data-ad-format={format}
+      data-ad-sizes={sizeLadder[format]}
+      data-ad-lazy={lazy}
+    >
+      <span class="text-[9px] uppercase tracking-widest text-ink-muted/50 dark:text-ivory/30 mb-1 select-none block">
+        Advertisement
+      </span>
+      <div
+        class:list={[
+          "relative overflow-hidden border transition-opacity duration-300 rounded-sm",
+          frameClass,
+          sizeMap[format],
+        ]}
+      >
+        <img
+          src={adImage}
+          alt="Advertisement"
+          class="w-full h-full object-cover select-none"
+          loading={lazy ? "lazy" : "eager"}
+        />
+      </div>
+    </div>
+  )
+}

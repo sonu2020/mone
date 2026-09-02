@@ -1,0 +1,46 @@
+---
+// BLOCK · ArticleHeadline — kicker + badge, h1, dek. `tone="onDark"` is for the
+// immersive opener where the lockup sits over the art.
+import Badge from '../ui/Badge.astro';
+export interface Props {
+  kicker?: string;
+  badge?: string;
+  title: string;
+  dek?: string;
+  size?: 'hero' | 'display';
+  tone?: 'default' | 'onDark';
+  class?: string;
+}
+const {
+  kicker,
+  badge,
+  title,
+  dek,
+  size = 'hero',
+  tone = 'default',
+  class: className = '',
+} = Astro.props;
+
+const onDark = tone === 'onDark';
+const titleCls = size === 'display' ? 'display-text' : 'hero-text';
+---
+<div class:list={['mc', className]}>
+  {(kicker || badge) && (
+    <div class="flex items-center gap-3">
+      {kicker && (
+        <span class:list={['eyebrow', onDark ? 'text-azure-light' : 'text-azure']}>{kicker}</span>
+      )}
+      {badge && <Badge label={badge} variant={onDark ? 'solid' : 'outline'} />}
+    </div>
+  )}
+  <h1
+    class:list={[
+      'mt-3 text-balance',
+      titleCls,
+      onDark ? 'text-white' : 'text-text-primary',
+    ]}
+  >{title}</h1>
+  {dek && (
+    <p class:list={['mt-4 lead-text', onDark ? 'text-white/80' : 'text-text-secondary']}>{dek}</p>
+  )}
+</div>

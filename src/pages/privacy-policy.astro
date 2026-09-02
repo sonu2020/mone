@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Privacy Policy — MediaOne" description="Privacy policy for MediaOne Online">
+  <Header />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto px-4 sm:px-6 md:px-8 py-10">
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">Privacy Policy</span>
+      </nav>
+
+      <h1 class="text-hero font-bold text-text-primary text-balance">Privacy Policy</h1>
+
+      <div class="mt-8 max-w-prose space-y-5 text-body text-text-primary">
+        <p>
+          MediaOne respects your privacy and is committed to protecting your personal information. This policy explains how we collect, use, and safeguard the data you share with us.
+        </p>
+        <p>
+          We may collect information such as your name, email address, and browsing behavior to improve our services and deliver relevant content. We do not sell or share your personal data with third parties for marketing purposes.
+        </p>
+        <p>
+          We use cookies and analytics tools to understand how our audience interacts with our website. You can manage your cookie preferences through your browser settings.
+        </p>
+        <p>
+          By using MediaOne Online, you consent to this privacy policy. We may update this policy from time to time, and any changes will be posted on this page.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

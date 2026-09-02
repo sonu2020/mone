@@ -1,0 +1,227 @@
+---
+// INSPECTOR · McInspector — the PUBLIC_MC_OUTLINE audit toolbar.
+//
+// Renders nothing in normal mode: the bundled script calls mountMcInspector(),
+// which returns immediately unless <html> carries the `mc-outline` class that
+// Layout.astro stamps when PUBLIC_MC_OUTLINE=true. When it does, a fixed
+// toggle button and a toolbar sheet appear — components inventory, the type
+// scales (coloured, hover-highlights usage) and the token-compliance audit
+// with curated fixes (LeadPackage first).
+//
+// All chrome is token-styled; the audit logic lives in src/lib/mc-inspector.ts.
+// Styles are is:global because the toolbar DOM is built at runtime, outside
+// Astro's scoping — every selector is prefixed with `mci-` so nothing leaks.
+---
+
+<style is:global>
+  /* ── The toggle button ─────────────────────────────────────────────── */
+  .mci-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--color-rule);
+    background: var(--color-ink);
+    color: var(--color-ivory);
+    font-size: 1.125rem;
+    cursor: pointer;
+    transition: color 160ms ease-out;
+  }
+  .mci-toggle:hover { color: var(--color-azure-light); }
+  .mci-toggle i { line-height: 1; }
+
+  /* ── The sheet ─────────────────────────────────────────────────────── */
+  .mci-sheet {
+    position: fixed;
+    right: 1rem;
+    bottom: 4.25rem;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    width: 22rem;
+    max-width: calc(100vw - 2rem);
+    max-height: min(70vh, 42rem);
+    border: 1px solid var(--color-rule);
+    background: var(--color-bg-card);
+    color: var(--color-ink);
+    box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-azure) 12%, transparent);
+    font-family: var(--font-sans);
+  }
+  :root.dark .mci-sheet { background: var(--color-brand-dark); color: var(--color-ivory); }
+
+  .mci-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 0.875rem 0.5rem;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .mci-title { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
+  .mci-kicker { font-family: var(--font-sans); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-azure); }
+  .mci-sub { font-size: 0.75rem; color: var(--color-ink-muted); }
+  :root.dark .mci-sub { color: var(--color-ivory); opacity: 0.6; }
+  .mci-close {
+    border: 1px solid var(--color-rule);
+    background: transparent;
+    color: var(--color-ink-muted);
+    width: 1.75rem;
+    height: 1.75rem;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: color 160ms ease-out, border-color 160ms ease-out;
+  }
+  .mci-close:hover { color: var(--color-ink); border-color: var(--color-ink); }
+  :root.dark .mci-close:hover { color: var(--color-ivory); border-color: var(--color-ivory); }
+
+  .mci-tabs { display: flex; border-bottom: 1px solid var(--color-rule); }
+  .mci-tabs button {
+    flex: 1;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    padding: 0.5rem 0.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    transition: color 160ms ease-out;
+  }
+  .mci-tabs button.is-active { border-bottom-color: var(--color-azure); color: var(--color-azure); }
+
+  .mci-body { overflow-y: auto; overscroll-behavior: contain; padding: 0.5rem 0.625rem 0.75rem; }
+  .mci-list { display: flex; flex-direction: column; }
+
+  /* ── Components rows ────────────────────────────────────────────────── */
+  .mci-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    border-bottom: 1px solid var(--color-rule-light);
+    background: transparent;
+    padding: 0.5rem 0.25rem;
+    cursor: pointer;
+    transition: background-color 160ms ease-out;
+  }
+  .mci-row:hover { background: var(--color-light-gray); }
+  :root.dark .mci-row:hover { background: var(--color-brand-overlay); }
+  .mci-row-name { font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 600; color: var(--color-ink); }
+  :root.dark .mci-row-name { color: var(--color-ivory); }
+  .mci-n { font-style: normal; color: var(--color-azure); font-size: 0.6875rem; }
+  .mci-row-cls { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--color-ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+
+  /* ── Type scales ────────────────────────────────────────────────────── */
+  .mci-scale {
+    display: grid;
+    grid-template-columns: 0.625rem minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    border-bottom: 1px solid var(--color-rule-light);
+    background: transparent;
+    padding: 0.5rem 0.25rem;
+    cursor: pointer;
+    transition: background-color 160ms ease-out;
+  }
+  .mci-scale:hover { background: var(--color-light-gray); }
+  :root.dark .mci-scale:hover { background: var(--color-brand-overlay); }
+  .mci-swatch { width: 0.625rem; height: 0.625rem; flex-shrink: 0; }
+  .mci-scale-sample { overflow: hidden; white-space: nowrap; font-weight: 600; }
+  .mci-scale-meta { display: flex; flex-direction: column; min-width: 0; }
+  .mci-scale-name { font-size: 0.75rem; font-weight: 600; color: var(--color-ink); }
+  :root.dark .mci-scale-name { color: var(--color-ivory); }
+  .mci-scale-token { font-family: var(--font-mono); font-size: 0.625rem; color: var(--color-ink-muted); }
+  .mci-scale-clamp { font-size: 0.625rem; color: var(--color-ink-muted); }
+  .mci-scale-count { grid-column: 3; text-align: right; font-size: 0.625rem; color: var(--color-azure); }
+
+  /* Elements highlighted while a scale is hovered */
+  .mci-type-hl {
+    outline: 2px solid var(--color-azure) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* ── Fix / audit ────────────────────────────────────────────────────── */
+  .mci-fix { display: flex; flex-direction: column; gap: 0.75rem; }
+  .mci-fix-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--color-rule); }
+  .mci-clear {
+    border: 1px solid var(--color-rule);
+    background: transparent;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    transition: color 160ms ease-out, border-color 160ms ease-out;
+  }
+  .mci-clear:hover { color: var(--color-ink); border-color: var(--color-ink); }
+  :root.dark .mci-clear:hover { color: var(--color-ivory); border-color: var(--color-ivory); }
+  .mci-audit { display: flex; flex-direction: column; gap: 0.375rem; }
+  .mci-clean { font-size: 0.75rem; color: var(--color-ink-muted); padding: 0.375rem 0; }
+  .mci-vio {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    border: 1px solid color-mix(in oklch, var(--color-accent-red) 30%, var(--color-rule));
+    background: color-mix(in oklch, var(--color-accent-red) 5%, transparent);
+    padding: 0.375rem 0.5rem;
+  }
+  .mci-vio-cls { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 700; color: var(--color-ink); word-break: break-all; }
+  :root.dark .mci-vio-cls { color: var(--color-ivory); }
+  .mci-vio-type { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-accent-red); }
+  .mci-vio-note { font-size: 0.6875rem; color: var(--color-ink-muted); }
+  .mci-fixes { display: flex; flex-direction: column; gap: 0.5rem; }
+  .mci-fixes-title { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-azure); padding-top: 0.25rem; }
+  .mci-fix-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border: 1px solid var(--color-rule);
+    padding: 0.5rem;
+  }
+  .mci-fix-row.is-review { background: color-mix(in oklch, var(--color-azure) 5%, transparent); }
+  .mci-fix-from { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--color-ink); }
+  :root.dark .mci-fix-from { color: var(--color-ivory); }
+  .mci-fix-from s { color: var(--color-accent-red); }
+  .mci-fix-from b { color: var(--color-ink); }
+  .mci-apply {
+    align-self: flex-start;
+    border: 1px solid var(--color-azure);
+    background: transparent;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--color-azure);
+    cursor: pointer;
+    transition: background-color 160ms ease-out, color 160ms ease-out;
+  }
+  .mci-apply:hover { background: var(--color-azure); color: var(--color-ivory); }
+  .mci-empty { font-size: 0.75rem; color: var(--color-ink-muted); padding: 0.5rem 0; }
+  .mci-hint { font-size: 0.6875rem; color: var(--color-ink-muted); line-height: 1.45; }
+  .mci-hint strong { color: var(--color-ink); }
+  :root.dark .mci-hint strong { color: var(--color-ivory); }
+
+  /* Selected component on the page */
+  .mci-sel {
+    outline: 2px solid var(--color-azure) !important;
+    outline-offset: 3px !important;
+  }
+</style>
+
+<script>
+  import { mountMcInspector } from '../lib/mc-inspector';
+
+  mountMcInspector();
+  document.addEventListener('astro:page-load', mountMcInspector);
+</script>

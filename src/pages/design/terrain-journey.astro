@@ -1,0 +1,300 @@
+---
+// DESIGN · terrain-journey — the documentation page for the journeys package.
+//
+// This is the page to read before building the next interactive map feature.
+// It documents the contract, the recipe, and the mistakes that cost real time —
+// the last of which is the part that actually saves anyone anything.
+//
+// The package itself lives in packages/terrain-journey and knows nothing about
+// this site; two features consume it today.
+import DesignShell from '../../components/design/DesignShell.astro';
+
+import { churam } from '../../lib/journeys/churam';
+import { chaliyar } from '../../lib/journeys/chaliyar';
+
+/** Live figures, read off the journeys rather than typed here. */
+const built = [
+  {
+    href: '/features/thamarassery-churam',
+    name: 'Thamarassery Churam',
+    kind: 'road',
+    j: churam,
+    views: 'Chase / Driver',
+  },
+  {
+    href: '/features/rivers-of-kerala',
+    name: 'The Chaliyar',
+    kind: 'river',
+    j: chaliyar,
+    views: 'Above / On the water',
+  },
+];
+
+const contract = `interface Journey {
+  id: string;
+  bbox: [west, south, east, north];
+  route: [lng, lat, metresASL, metresFromStart][];
+  markers: Marker[];      // hairpins, towns, confluences
+  places: Place[];        // named, labelled, beside the line
+  ribbon: { kind: 'road' | 'river'; width; lift; tubeRadius };
+  verticalScale: { overview: number; firstPerson: number };
+  length: number; lowest: number; highest: number;
+
+  palette?: Partial<Palette>;      // colours by role
+  scenery?: Partial<Scenery>;      // facets, trees
+  camera?: Partial<CameraSpec>;    // per-journey framing
+  markerRadius?: number;
+}`;
+
+const usage = `---
+import JourneyStage from '../../components/journey/JourneyStage.astro';
+import { chaliyar } from '../../lib/journeys/chaliyar';
+---
+
+<JourneyStage
+  journey={chaliyar}
+  overviewLabel="Above"
+  firstPersonLabel="On the water"
+  playLabel="Flow"
+  markerNoun="Town"
+/>`;
+
+/** The two views, and why each number pulls the opposite way. */
+const disagreements = [
+  {
+    what: 'Look-ahead',
+    overview: 'Long — hundreds of metres',
+    first: 'Short — tens of metres',
+    why:
+      'Aimed down the instantaneous tangent the overview whips through 170° at every hairpin, and hides the very thing worth showing. Averaged, the heading barely moves while the traveller sweeps the turn beneath it, so the bend unrolls as a shape. First person wants the opposite: the turning is the experience. Set long, its aim point at a hairpin apex sits most of the way back round the loop — so the camera stares across the gap at the road it just left.',
+  },
+  {
+    what: 'Position smoothing',
+    overview: 'Damped',
+    first: 'None — exact every frame',
+    why:
+      'A damped first-person position looks harmless on a straight, then cuts the corner at a hairpin and puts the viewpoint out over the drop. Only the aim is damped, and that is what supplies the feeling of steering into a bend rather than snapping to it.',
+  },
+  {
+    what: 'Vertical scale',
+    overview: 'Exaggerated',
+    first: 'True',
+    why:
+      'Geometry is built at true scale; exaggeration is a Y scale on the group holding it, so the views disagree without rebuilding a vertex. From height, real relief is a gentle ramp and exaggeration makes it legible. From inside, that same factor doubles every gradient the body reads. Whichever is in force is stated on screen.',
+  },
+];
+
+/** Each of these was a bug, found by looking rather than by reasoning. */
+const traps = [
+  [
+    'Reading a WebGL canvas with drawImage returns black',
+    'Without preserveDrawingBuffer the buffer is gone by the time you read it. It looks exactly like a scene failing to render. Screenshot the page instead.',
+  ],
+  [
+    'Eye height is measured from the surface, not the route',
+    'The ribbon sits above the route. Measuring from the route put the viewpoint 0.7 m over the tarmac, and the road filled the lower half of the screen.',
+  ],
+  [
+    'The line must ride over whichever surface is higher',
+    'The route carries per-point DEM samples; the terrain mesh is a coarser grid over the same DEM and averages a valley floor upward. Drawn at its own elevation the line runs underneath its own landscape — a 105 km river was invisible from directly above it.',
+  ],
+  [
+    'Clear the sightline, not the ground',
+    'Keeping the camera above the ground underfoot lets it burrow into a hillside. Keeping it above the highest point between it and its target still fails, because the ray dips back into that ridge. Solve the ray equation — but only over the near two-thirds, or the 1/(1−t) term multiplies the margin twentyfold and flings the camera kilometres up.',
+  ],
+  [
+    'Aim the clearance at the traveller, not the aim point',
+    'The aim sits further down the line, so its ray is shallower. Clearing it leaves the steeper ray to the traveller cutting straight through the ridge.',
+  ],
+  [
+    'Controls cannot live inside the stage',
+    'A position:fixed element at z-index 0 is its own stacking context, so nothing inside it rises above z-index 10 page content and the buttons are unclickable. The stage is aria-hidden too, which is no place for interactive controls.',
+  ],
+  [
+    'Zoom, facets and tree spacing scale with the bbox',
+    'A 6 km ghat needs six DEM tiles at zoom 13; a 105 km river covers the same ground in 143. Zoom is chosen against a tile budget and facet size follows it down — detail finer than the DEM carries buys triangles and nothing else.',
+  ],
+  [
+    'Cones read as spruce',
+    'Which puts an alpine forest on a tropical ghat. A faceted icosahedron is truer for broadleaf canopy, and canopy should be about half as wide as the tree is tall — wider turns every tree into a hedge.',
+  ],
+];
+---
+
+<DesignShell
+  title="terrain-journey — scroll-driven 3D journeys | MediaOne Design"
+  description="The contract, recipe and pitfalls for building interactive terrain features."
+  eyebrow="Package"
+  heading="terrain-journey"
+  lede="Scroll-driven 3D journeys over real terrain. Give it a line through the world — a road, a river, a trek — with real coordinates and elevations, and it renders a low-poly landscape you can travel along two ways."
+  active="components"
+>
+  <!-- ══ WHAT IS BUILT ════════════════════════════════════════════════ -->
+  <section class="mt-10">
+    <h2 class="article-title text-text-primary dark:text-ivory">Built on it</h2>
+    <div class="mt-5 grid gap-5 sm:grid-cols-2">
+      {built.map((b) => (
+        <a
+          href={b.href}
+          class="group block border border-rule p-5 transition-colors hover:border-azure dark:border-ivory/12 dark:hover:border-azure-light"
+        >
+          <p class="eyebrow text-azure dark:text-azure-light">{b.kind}</p>
+          <h3 class="mt-2 article-title text-text-primary group-hover:text-azure dark:text-ivory dark:group-hover:text-azure-light">
+            {b.name}
+          </h3>
+          <dl class="mt-4 flex flex-wrap gap-x-6 gap-y-2 caption-text tabular-nums text-text-muted dark:text-ivory/50">
+            <div><dt class="inline">Length </dt><dd class="inline text-text-primary dark:text-ivory/80">{(b.j.length / 1000).toFixed(1)} km</dd></div>
+            <div><dt class="inline">Route </dt><dd class="inline text-text-primary dark:text-ivory/80">{b.j.route.length} pts</dd></div>
+            <div><dt class="inline">Markers </dt><dd class="inline text-text-primary dark:text-ivory/80">{b.j.markers.length}</dd></div>
+            <div><dt class="inline">Rise </dt><dd class="inline text-text-primary dark:text-ivory/80">{b.j.highest - b.j.lowest} m</dd></div>
+          </dl>
+          <p class="mt-3 caption-text text-text-light dark:text-ivory/35">{b.views}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- ══ THE RULE ═════════════════════════════════════════════════════ -->
+  <section class="mt-14 border-l-2 border-azure pl-5 dark:border-azure-light">
+    <h2 class="article-title text-text-primary dark:text-ivory">
+      Geography is derived, not recalled
+    </h2>
+    <p class="mt-3 max-w-3xl body-small text-text-muted dark:text-ivory/60 text-pretty">
+      Coordinates, names and elevations come from OpenStreetMap and a DEM, through
+      a build script. This is not a style preference. A first draft of one journey
+      was typed from memory and put a village four kilometres from where it is, on
+      a ridge, a thousand metres above the valley floor it actually sits on.
+      Another dataset labelled a river's <em>headwater vertex</em> with the name of
+      a town 25 km downstream. Both looked entirely plausible on screen.
+    </p>
+    <p class="mt-3 max-w-3xl body-small font-semibold text-text-primary dark:text-ivory/80">
+      If a figure cannot be traced to a query, it does not go in.
+    </p>
+  </section>
+
+  <!-- ══ CONTRACT ═════════════════════════════════════════════════════ -->
+  <section class="mt-14">
+    <h2 class="article-title text-text-primary dark:text-ivory">The contract</h2>
+    <p class="mt-2 max-w-3xl body-small text-text-muted dark:text-ivory/55">
+      One shape describes a road climbing a ghat and a river running to the sea.
+      Everything after <code>highest</code> is optional.
+    </p>
+    <pre class="mt-5 overflow-x-auto border border-rule bg-bg-page p-5 text-[0.75rem] leading-[1.7] text-text-primary dark:border-ivory/12 dark:bg-brand-dark dark:text-ivory/80"><code>{contract}</code></pre>
+  </section>
+
+  <!-- ══ USAGE ════════════════════════════════════════════════════════ -->
+  <section class="mt-12">
+    <h2 class="article-title text-text-primary dark:text-ivory">Using it here</h2>
+    <p class="mt-2 max-w-3xl body-small text-text-muted dark:text-ivory/55">
+      <code>JourneyStage.astro</code> owns the markup, styling and controls; the
+      package owns the terrain, the camera and the loop. A new feature is a data
+      file and this tag.
+    </p>
+    <pre class="mt-5 overflow-x-auto border border-rule bg-bg-page p-5 text-[0.75rem] leading-[1.7] text-text-primary dark:border-ivory/12 dark:bg-brand-dark dark:text-ivory/80"><code>{usage}</code></pre>
+  </section>
+
+  <!-- ══ THE TWO VIEWS ════════════════════════════════════════════════ -->
+  <section class="mt-14">
+    <h2 class="article-title text-text-primary dark:text-ivory">
+      The two views disagree on purpose
+    </h2>
+    <div class="mt-6 space-y-6">
+      {disagreements.map((d) => (
+        <div class="border-t border-rule pt-4 dark:border-ivory/12">
+          <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1">
+            <h3 class="article-title text-text-primary dark:text-ivory">{d.what}</h3>
+            <p class="caption-text text-text-muted dark:text-ivory/50">
+              overview: <span class="text-azure dark:text-azure-light">{d.overview}</span>
+              <span class="mx-2 text-text-light dark:text-ivory/25">·</span>
+              first person: <span class="text-azure dark:text-azure-light">{d.first}</span>
+            </p>
+          </div>
+          <p class="mt-2 max-w-3xl body-small text-text-muted dark:text-ivory/55 text-pretty">{d.why}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ══ THE REVEAL CARD ══════════════════════════════════════════════ -->
+  <section class="mt-14">
+    <h2 class="article-title text-text-primary dark:text-ivory">The reveal card</h2>
+    <p class="mt-2 max-w-3xl body-small text-text-muted dark:text-ivory/55 text-pretty">
+      A marker carrying a <code>title</code> gets a card that appears as the
+      traveller reaches it, holds while it is the nearest marker, and hands over
+      to the next — so on a long journey there is always something on screen
+      naming where you are.
+    </p>
+    <p class="mt-3 max-w-3xl body-small text-text-muted dark:text-ivory/55 text-pretty">
+      Sticky, but <strong>positionally aware</strong>. It moves to whichever side
+      the place is actually on so it never covers it, tracks the place's height,
+      and points at it with a caret. When the place goes behind the camera the
+      caret swings round rather than the card vanishing — <em>you have just
+      passed it</em> is information too. Markers with no title get no card; a
+      hairpin's number already says everything about it.
+    </p>
+    <p class="mt-3 max-w-3xl body-small text-text-primary dark:text-ivory/75 text-pretty">
+      <code>note</code> is the one field in the format where a fabrication would
+      be least visible. Only ever write there what a source actually says. Six of
+      the Chaliyar's ten towns have no note, and the card is better for it.
+    </p>
+  </section>
+
+  <!-- ══ TRAPS ════════════════════════════════════════════════════════ -->
+  <section class="mt-14">
+    <h2 class="article-title text-text-primary dark:text-ivory">
+      Things that cost real time
+    </h2>
+    <p class="mt-2 max-w-3xl body-small text-text-muted dark:text-ivory/55">
+      Each of these was a bug, and each was found by looking at the screen rather
+      than by reasoning about the code. This list is the most useful thing on this
+      page.
+    </p>
+    <ol class="mt-6 space-y-5">
+      {traps.map(([title, body], i) => (
+        <li class="grid gap-2 border-t border-rule pt-4 sm:grid-cols-[2rem_1fr] dark:border-ivory/12">
+          <span class="caption-text tabular-nums text-text-light dark:text-ivory/30">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <div>
+            <h3 class="article-title text-text-primary dark:text-ivory">{title}</h3>
+            <p class="mt-1.5 max-w-3xl body-small text-text-muted dark:text-ivory/55 text-pretty">{body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- ══ RECIPE ═══════════════════════════════════════════════════════ -->
+  <section class="mt-14">
+    <h2 class="article-title text-text-primary dark:text-ivory">Building the next one</h2>
+    <ol class="mt-5 max-w-3xl list-decimal space-y-3 pl-5 body-small text-text-muted dark:text-ivory/60 marker:text-azure dark:marker:text-azure-light">
+      <li>Query the line from OSM via Overpass, stitched and oriented in travel order.</li>
+      <li>Sample a DEM per point. Thin to a few hundred, keeping every marker apex.</li>
+      <li>Look up places. <strong>Never</strong> reuse rounded coordinates from another dataset.</li>
+      <li>Emit a module exporting a <code>Journey</code>, with a header recording every source and every judgement call.</li>
+      <li>Verify: markers land where the source says, the line is visible in both views, reduced motion holds one frame, and the server-rendered fallback lists everything.</li>
+    </ol>
+    <p class="mt-5 max-w-3xl body-small text-text-muted dark:text-ivory/60 text-pretty">
+      Detection thresholds must be <strong>calibrated against known anchors, not
+      tuned until they agree with a number you already believed</strong>. On the
+      churam, OSM names only two of the nine hairpins; every parameter set that
+      placed those two at ordinals 7 and 8 was kept, and nine was the majority
+      outcome of a constraint that never mentioned nine.
+    </p>
+  </section>
+
+  <!-- ══ STATUS ═══════════════════════════════════════════════════════ -->
+  <section class="mt-14 border border-rule p-5 dark:border-ivory/12">
+    <h2 class="article-title text-text-primary dark:text-ivory">Status — 0.1.0, in-repo</h2>
+    <ul class="mt-3 max-w-3xl list-disc space-y-2 pl-5 body-small text-text-muted dark:text-ivory/55">
+      <li>
+        <strong>Ships TypeScript source, not a build.</strong> Fine for a workspace
+        consumed by Vite; a compile step is needed before it is usable from plain
+        JS or publishable to npm.
+      </li>
+      <li>No tests of its own — verified through the two features that consume it.</li>
+      <li>No terrain occlusion for labels: one behind a ridge still shows.</li>
+      <li>Checked at 1440×900 only.</li>
+    </ul>
+  </section>
+</DesignShell>

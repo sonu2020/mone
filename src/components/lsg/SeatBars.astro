@@ -1,0 +1,36 @@
+---
+// BARS · SeatBars — seats per front as share-of-total bars. No layout
+// animation: widths are static, so reduced-motion and print stay quiet.
+import { FRONTS, FRONT_FILL, fmt, frontLabel, type Seats } from '../../lib/lsg';
+
+export interface Props {
+  seats: Seats;
+  /** Override the denominator (e.g. declared wards when seats trail them). */
+  total?: number;
+  size?: 'sm' | 'md';
+}
+
+const { seats, total, size = 'md' } = Astro.props;
+const sum = total ?? FRONTS.reduce((s, f) => s + seats[f], 0);
+---
+
+<div class:list={['mc', 'space-y-2', size === 'sm' && 'space-y-1.5']}>
+  {FRONTS.map((f) => {
+    const pct = sum > 0 ? (seats[f] / sum) * 100 : 0;
+    return (
+      <div
+        class:list={[
+          'grid items-center gap-3',
+          size === 'sm' ? 'grid-cols-[2.75rem_1fr_3.25rem] gap-2' : 'grid-cols-[3.25rem_1fr_3.5rem]',
+        ]}
+      >
+        <span class="caption-text font-semibold text-ink dark:text-ivory">{frontLabel(f)}</span>
+        <div class:list={['overflow-hidden bg-rule dark:bg-rule', size === 'sm' ? 'h-1' : 'h-1.5']} role="img"
+          aria-label={`${frontLabel(f)} ${seats[f]} of ${sum}`}>
+          <span class:list={['block h-full', FRONT_FILL[f]]} style={`width:${pct}%`}></span>
+        </div>
+        <span class="text-right tabular-nums text-ink dark:text-ivory caption-text font-semibold">{fmt(seats[f])}</span>
+      </div>
+    );
+  })}
+</div>

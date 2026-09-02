@@ -1,0 +1,971 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// ─── Slides ────────────────────────────────────────────────────────────────
+// Each slide is a self-contained pitch frame. Content density is intentionally
+// low — a deck reads at a glance. Long bodies belong in the deck notes, not
+// the slide. One idea per frame.
+
+const slides = [
+  {
+    n: '00',
+    eyebrow: 'A Pitch to MediaOne',
+    title: 'A new face for the newsroom.',
+    body: 'An editorial design language for MediaOne — drawn from the Wired tradition, rendered for Malayalam.',
+  },
+  {
+    n: '01',
+    eyebrow: 'The Mandate',
+    title: 'A magazine, not a dashboard.',
+    body: 'MediaOne is a newsroom. The site must read as a publication — not as a SaaS marketing page, not as a video portal, not as a feed. The interface serves the story; chrome earns its place or is removed.',
+  },
+  {
+    n: '02',
+    eyebrow: 'The Heritage',
+    title: 'The Wired discipline.',
+    body: 'We studied Wired — the flagship technology magazine. A white canvas, a strict wordmark, a tall narrow display face, three typographic roles, and almost no color. A printed magazine ported to the screen. We borrowed the discipline, not the surface.',
+  },
+  {
+    n: '03',
+    eyebrow: 'Brand Character',
+    title: 'One voice. One blue. No red.',
+    body: 'MediaOne speaks once. A single identity replaces the legacy multi-brand switcher. The MediaOne blue (#166bc0) is the only chromatic accent — eyebrows, links, hover, the masthead rule. Navy ink on a cool white canvas does the rest. Red is gone. Hierarchy comes from scale and weight, not color.',
+  },
+  {
+    n: '04',
+    eyebrow: 'Color',
+    title: 'Navy and azure, never black and white.',
+    body: 'Neutrals sampled from mediaoneonline.com — cool navy and slate, never pure #000 / #fff. Values are OKLCH so lightness and chroma stay perceptually even across the scale. One accent, spent once per view. Restraint is the identity.',
+    swatches: [
+      { cls: 'bg-ink', name: 'ink', note: '#2e4164 — headlines, body, footer' },
+      { cls: 'bg-ink-light', name: 'ink-light', note: 'secondary text' },
+      { cls: 'bg-ink-muted', name: 'ink-muted', note: 'timestamps, captions' },
+      { cls: 'bg-rule', name: 'rule', note: '1px hairline dividers' },
+      { cls: 'bg-ivory-dark', name: 'ivory-dark', note: 'soft bands, hovers' },
+      { cls: 'bg-ivory', name: 'ivory', note: 'page canvas' },
+      { cls: 'bg-azure', name: 'azure', note: '#166bc0 — the one accent' },
+      { cls: 'bg-brand-dark', name: 'brand-dark', note: 'dark mode canvas' },
+    ],
+  },
+  {
+    n: '05',
+    eyebrow: 'Typography',
+    title: 'Two faces. One baseline.',
+    body: 'Anek Latin leads the stack; Anek Malayalam falls through per-glyph. The faces are metrically matched — a single superfamily — so mixed Malayalam and Latin lines stay on one baseline. No serif display face: Playfair has no Malayalam. The scale, line-height, and weight of every role are fixed in tokens; nothing is set ad hoc in markup.',
+    specimens: [
+      { font: 'Anek Latin', text: 'AaBbGg 0123', sub: 'The press guards democracy.' },
+      { font: 'Anek Malayalam', text: 'അആഇ ൦൧൨൩', sub: 'മാധ്യമം ജനാധിപത്യത്തിന്റെ കാവലാൾ.' },
+    ],
+  },
+  {
+    n: '06',
+    eyebrow: 'Type Scale',
+    title: 'Ten roles. No ad hoc sizes.',
+    body: 'Ten named tokens cover every typographic job in the product. Display for splashes, hero for the lead story, down to caption for fine print. Pick the role, never the size.',
+    scale: [
+      { t: 'display', role: 'Cover splash, system hero' },
+      { t: 'hero', role: 'Lead story headline' },
+      { t: 'title', role: 'Section feature' },
+      { t: 'section', role: 'Section heading' },
+      { t: 'headline', role: 'Card / list headline' },
+      { t: 'lead', role: 'Article lead paragraph' },
+      { t: 'body', role: 'Long-form body' },
+      { t: 'nav', role: 'Navigation, links' },
+      { t: 'meta', role: 'Timestamps, bylines' },
+      { t: 'caption', role: 'Fine print, captions' },
+    ],
+  },
+  {
+    n: '07',
+    eyebrow: 'Geometry & Elevation',
+    title: 'Square. Hairline. Flat.',
+    body: 'Zero-radius corners across the entire UI — buttons, inputs, cards, the masthead. No soft drop-shadows; surface contrast and a 1px rule carry all visual hierarchy. Surfaces meet with rules, not glow. The only circle is the share icon and the author avatar.',
+  },
+  {
+    n: '08',
+    eyebrow: 'Motion',
+    title: 'Small moves. ≤200ms.',
+    body: 'Transform and opacity only — never layout properties. Ease-out. Under 200ms for any feedback. prefers-reduced-motion is honored globally. No parallax, no scroll-jacking, no carousel auto-play. The page does not perform; it loads.',
+  },
+  {
+    n: '09',
+    eyebrow: 'Composition',
+    title: 'Atoms, blocks, patterns.',
+    body: 'The interface is built in three layers. Atoms set one decision — a kicker, a timestamp, one headline size. Blocks compose atoms into a story unit. Patterns arrange blocks into a page. Build by composing these — never re-style markup ad hoc. Cards are the exception, not the default; most content lives in hairline-separated rows.',
+  },
+  {
+    n: '10',
+    eyebrow: 'Rules',
+    title: 'Do. Don\'t.',
+    dos: [
+      'Reserve ink for headlines, body, and the footer fill.',
+      'Spend the azure accent once per view — a label, a link, the rule.',
+      'Use square corners and hairline rules everywhere.',
+      'Pick a type token; let hierarchy come from size and weight.',
+    ],
+    donts: [
+      'No gradients, no background-clip: text, no blurred panes.',
+      'No second accent, no red, no pure #000 / #fff.',
+      'No soft drop-shadows on cards.',
+      'No letter-spacing on Malayalam — tracking collides conjuncts.',
+    ],
+  },
+  // ─── Strategy sliders ────────────────────────────────────────────────
+  // Each slider is a decision we keep making. `at` is the position of the
+  // mark, 0–100 (left → right). Sliders are not commitments — they are
+  // public positions the team can defend and revisit.
+  {
+    n: '11',
+    eyebrow: 'Strategy',
+    title: 'Where we play. Where we don\'t.',
+    body: 'Each slider is a decision we keep making. The dot is where MediaOne stands today. Move it deliberately, defend it with evidence, revisit it next quarter.',
+    sliders: [
+      { left: 'Marketing site', right: 'Newsroom product', at: 78, note: 'The site is the product, not the brochure.' },
+      { left: 'Multi-brand', right: 'Single voice', at: 100, note: 'MediaOne only. The switcher is archived.' },
+      { left: 'One-off theme', right: 'Living system', at: 90, note: 'Tokens in app.css, dogfooded on /system.' },
+      { left: 'Ads only', right: 'Diversified revenue', at: 55, note: 'Display is the floor, not the ceiling.' },
+    ],
+  },
+  {
+    n: '12',
+    eyebrow: 'Axis 1 · Website as a Product',
+    title: 'The site is the product.',
+    body: 'Treat mediaoneonline.com as a software product, not a marketing surface. Reading depth, return visits, and habit beat raw pageviews. The newsroom ships every day; the product ships with it.',
+    sliders: [
+      { left: 'Brochure', right: 'Editorial product', at: 85, note: 'Reading depth, not bounce rate.' },
+      { left: 'Campaign drops', right: 'Continuous shipping', at: 90, note: 'No launch days. Ship every day.' },
+      { left: 'Pageviews', right: 'Time well spent', at: 72, note: 'Lift depth-per-visit before reach.' },
+    ],
+  },
+  {
+    n: '13',
+    eyebrow: 'Axis 2 · Design System as a Product',
+    title: 'The system is a product.',
+    body: 'The design system is not a one-time deliverable. It is owned, versioned, dogfooded, and shipped alongside the newsroom. New work that does not follow it is a bug — fix the work, not the system.',
+    sliders: [
+      { left: 'Style guide', right: 'Living system', at: 92, note: '/system is the spec; app.css is the source.' },
+      { left: 'Optional adoption', right: 'Non-negotiable', at: 100, note: 'Tokens only. Compose blocks. No ad hoc markup.' },
+      { left: 'Big-bang refresh', right: 'Continuous evolution', at: 85, note: 'Tokens evolve atomically per PR.' },
+    ],
+  },
+  {
+    n: '14',
+    eyebrow: 'Axis 3 · Revenue & Retention',
+    title: 'Earn the next visit.',
+    body: 'Display ads stay — they are the floor. The ceiling is built from native units, sponsored verticals, video pre-roll, and membership. Retention comes from the home shelf and section rails that make the reader return tomorrow.',
+    sliders: [
+      { left: 'Display only', right: 'Diversified mix', at: 60, note: 'Native + video + membership grow the floor.' },
+      { left: 'Drive-by traffic', right: 'Daily habit', at: 75, note: 'Shelves make the home worth returning to.' },
+      { left: 'Reach-first', right: 'Relationship-first', at: 70, note: 'An email or follow beats another bounce.' },
+      { left: 'Roadmap forecast', right: 'Ship-led learning', at: 80, note: 'Ship, measure, keep, repeat — weekly.' },
+    ],
+  },
+  {
+    n: '15',
+    eyebrow: 'Guidance to the Team',
+    title: 'Your move.',
+    body: 'The sliders are not positions to defend — they are decisions to revisit. Pick one this quarter. Move it ten points. Defend the move with evidence. Build the newsroom, not the template.',
+  },
+];
+---
+
+<Layout
+  title="Pitch — MediaOne Design Language"
+  description="A pitch deck for the MediaOne design system: aesthetics, brand character, and the rules we ship by."
+  topAd={false}
+>
+  <main class="slide-deck" data-slide-deck>
+    <!-- Progress hairline -->
+    <div class="slide-progress" data-progress aria-hidden="true"><span data-progress-bar></span></div>
+
+    <!-- Slides -->
+    <div class="slides" data-slides>
+      {slides.map((s, i) => (
+        <section
+          class={`slide ${s.swatches ? 'slide--swatches' : ''} ${s.specimens ? 'slide--specimens' : ''} ${s.scale ? 'slide--scale' : ''} ${s.dos ? 'slide--rules' : ''} ${s.sliders ? 'slide--sliders' : ''}`}
+          data-slide
+          data-index={i}
+          aria-hidden={i === 0 ? 'false' : 'true'}
+          aria-label={`Slide ${i + 1} of ${slides.length}`}
+        >
+          <div class="slide__inner">
+            <header class="slide__head">
+              <p class="eyebrow text-azure dark:text-azure-light">{s.eyebrow}</p>
+              <span class="slide__num tabular-nums">{s.n}</span>
+            </header>
+
+            {s.title && <h2 class="slide__title">{s.title}</h2>}
+            {s.body && <p class="slide__body">{s.body}</p>}
+
+            {/* Color swatches */}
+            {s.swatches && (
+              <ul class="swatches">
+                {s.swatches.map((w) => (
+                  <li class="swatch">
+                    <span class={`swatch__chip ${w.cls}`}></span>
+                    <span class="swatch__name font-mono">{w.name}</span>
+                    <span class="swatch__note">{w.note}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {/* Type specimens */}
+            {s.specimens && (
+              <div class="specimens">
+                {s.specimens.map((sp) => (
+                  <figure class="specimen">
+                    <p class="eyebrow text-ink-muted dark:text-ivory/40">{sp.font}</p>
+                    <p class="specimen__text text-title text-ink dark:text-ivory">{sp.text}</p>
+                    <p class="specimen__sub text-body text-ink-light dark:text-ivory/70">{sp.sub}</p>
+                  </figure>
+                ))}
+              </div>
+            )}
+
+            {/* Type scale */}
+            {s.scale && (
+              <ol class="scale-list">
+                {s.scale.map((row, j) => (
+                  <li class="scale-row">
+                    <span class={`scale-text text-${row.t}`} style={`--row-i:${j}`}>
+                      വാർത്ത ലോകത്തെ മാറ്റുന്നു
+                    </span>
+                    <span class="scale-meta">
+                      <span class="font-mono text-meta text-ink dark:text-ivory">text-{row.t}</span>
+                      <span class="text-meta text-ink-muted dark:text-ivory/40">{row.role}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            {/* Do / Don't */}
+            {s.dos && (
+              <div class="rules-grid">
+                <div class="rules-col">
+                  <p class="eyebrow text-azure dark:text-azure-light">Do</p>
+                  <ul class="rules-list">
+                    {s.dos.map((d) => <li class="rules-item"><span class="rules-mark rules-mark--do">+</span><span>{d}</span></li>)}
+                  </ul>
+                </div>
+                <div class="rules-col">
+                  <p class="eyebrow text-ink-muted dark:text-ivory/40">Don't</p>
+                  <ul class="rules-list">
+                    {s.donts.map((d) => <li class="rules-item"><span class="rules-mark rules-mark--dont">−</span><span>{d}</span></li>)}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Strategy sliders */}
+            {s.sliders && (
+              <ul class="sliders">
+                {s.sliders.map((sl) => (
+                  <li class="slider">
+                    <div class="slider__labels">
+                      <span class="slider__end" data-closer={sl.at < 50 ? '' : undefined}>{sl.left}</span>
+                      <span class="slider__end slider__end--right" data-closer={sl.at >= 50 ? '' : undefined}>{sl.right}</span>
+                    </div>
+                    <div class="slider__track" role="img" aria-label={`Slider: ${sl.left} to ${sl.right}, positioned at ${sl.at}%`}>
+                      <span class="slider__mark" style={`left:${sl.at}%`}></span>
+                    </div>
+                    <p class="slider__note">{sl.note}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <!-- Controls -->
+    <nav class="slide-nav" aria-label="Slide navigation">
+      <button class="slide-btn" data-prev aria-label="Previous slide" disabled>
+        <i class="ti ti-arrow-left" aria-hidden="true"></i>
+      </button>
+
+      <ol class="slide-dots" data-dots aria-label="Jump to slide">
+        {slides.map((_, i) => (
+          <li>
+            <button
+              class={`slide-dot ${i === 0 ? 'is-active' : ''}`}
+              data-dot={i}
+              aria-label={`Go to slide ${i + 1}`}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+            ></button>
+          </li>
+        ))}
+      </ol>
+
+      <button class="slide-btn" data-next aria-label="Next slide">
+        <i class="ti ti-arrow-right" aria-hidden="true"></i>
+      </button>
+
+      <p class="slide-count font-mono tabular-nums" data-count aria-hidden="true">01 / {String(slides.length).padStart(2, '0')}</p>
+
+      <button class="slide-esc" data-exit aria-label="Exit to site" title="Exit to home">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </nav>
+
+    <!-- Hint -->
+    <p class="slide-hint" data-hint aria-hidden="true">
+      <span>←</span><span>→</span><span>space</span><span class="slide-hint__sep">·</span><span>esc to exit</span>
+    </p>
+  </main>
+</Layout>
+
+<style>
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     Slide deck — pitch presentation. Self-contained styles. Uses tokens.
+     Each slide fills the viewport; only the active one is announced.
+     Motion is transform/opacity only, ≤200ms ease-out, reduced-motion aware.
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  .slide-deck {
+    position: fixed;
+    inset: 0;
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    overflow: hidden;
+    isolation: isolate;
+    /* Subtle paper texture via repeating gradient-free tint is forbidden; use solid tokens. */
+  }
+  :global(.dark) .slide-deck {
+    background: var(--color-brand-dark);
+    color: var(--color-ivory);
+  }
+
+  /* Progress hairline — top edge fills as you advance */
+  .slide-progress {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: transparent;
+    z-index: 40;
+  }
+  .slide-progress > span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--color-azure);
+    transition: width 400ms ease-out;
+  }
+
+  /* Slides track — single column, each slide absolutely stacked */
+  .slides {
+    position: absolute;
+    inset: 0;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(24px);
+    transition:
+      opacity 200ms ease-out,
+      transform 200ms ease-out,
+      visibility 0s linear 200ms;
+    will-change: opacity, transform;
+  }
+  .slide::-webkit-scrollbar { display: none; }
+  .slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition:
+      opacity 280ms ease-out,
+      transform 280ms ease-out,
+      visibility 0s linear;
+  }
+  .slide.is-active[data-direction="back"] {
+    transform: translateX(-24px);
+  }
+  .slide.is-active[data-direction="back"].is-active {
+    transform: translateX(0);
+  }
+
+  .slide__inner {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: clamp(2.5rem, 4rem + 6vw, 7rem) clamp(1.5rem, 1rem + 4vw, 4rem) clamp(4rem, 3rem + 4vw, 7rem);
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    container-type: inline-size;
+  }
+
+  .slide__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+    border-bottom: 1px solid var(--color-rule);
+  }
+  :global(.dark) .slide__head { border-color: oklch(0.24 0.018 262); }
+
+  .slide__num {
+    font-size: var(--text-meta);
+    line-height: 1.3;
+    font-weight: 500;
+    color: var(--color-ink-muted);
+  }
+  :global(.dark) .slide__num { color: oklch(0.62 0.015 256); }
+
+  .slide__title {
+    font-size: var(--text-display);
+    line-height: var(--text-display--line-height);
+    font-weight: var(--text-display--font-weight);
+    text-wrap: balance;
+    max-width: 18ch;
+    color: var(--color-ink);
+  }
+  :global(.dark) .slide__title { color: var(--color-ivory); }
+
+  .slide__body {
+    margin-top: clamp(1rem, 0.8rem + 1vw, 1.75rem);
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
+    max-width: 56ch;
+    color: var(--color-ink-light);
+  }
+  :global(.dark) .slide__body { color: oklch(0.78 0.01 256); }
+
+  /* ━━━━ Slide variants ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  /* Color swatches */
+  .swatches {
+    margin-top: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 1rem 1.25rem;
+    max-width: 56rem;
+  }
+  .swatch {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .swatch__chip {
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--color-rule);
+  }
+  :global(.dark) .swatch__chip { border-color: oklch(0.28 0.018 262); }
+  .swatch__name { font-size: var(--text-meta); color: var(--color-ink); }
+  :global(.dark) .swatch__name { color: var(--color-ivory); }
+  .swatch__note { font-size: var(--text-caption); color: var(--color-ink-muted); }
+  :global(.dark) .swatch__note { color: oklch(0.62 0.015 256); }
+
+  /* Type specimens */
+  .specimens {
+    margin-top: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--color-rule);
+    border: 1px solid var(--color-rule);
+    max-width: 56rem;
+  }
+  :global(.dark) .specimens { background: oklch(0.24 0.018 262); border-color: oklch(0.24 0.018 262); }
+  .specimen {
+    margin: 0;
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    background: var(--color-ivory);
+    display: grid;
+    gap: 0.5rem;
+  }
+  :global(.dark) .specimen { background: var(--color-brand-dark); }
+  .specimen__text { margin: 0; }
+  .specimen__sub { margin: 0; }
+
+  /* Type scale list — sized so a tall slide scrolls gracefully on mobile */
+  .scale-list {
+    list-style: none;
+    margin: clamp(1.5rem, 1rem + 2vw, 2.5rem) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--color-rule);
+    max-width: 56rem;
+  }
+  :global(.dark) .scale-list { border-color: oklch(0.24 0.018 262); }
+  .scale-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  :global(.dark) .scale-row { border-color: oklch(0.24 0.018 262); }
+  .scale-text {
+    color: var(--color-ink);
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  :global(.dark) .scale-text { color: var(--color-ivory); }
+  .scale-meta {
+    display: grid;
+    gap: 0.15rem;
+    text-align: right;
+  }
+
+  /* Do / Don't */
+  .rules-grid {
+    margin-top: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--color-rule);
+    border: 1px solid var(--color-rule);
+    max-width: 56rem;
+  }
+  @container (min-width: 640px) {
+    .rules-grid { grid-template-columns: 1fr 1fr; }
+  }
+  :global(.dark) .rules-grid { background: oklch(0.24 0.018 262); border-color: oklch(0.24 0.018 262); }
+  .rules-col {
+    background: var(--color-ivory);
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    display: grid;
+    gap: 0.75rem;
+  }
+  :global(.dark) .rules-col { background: var(--color-brand-dark); }
+  .rules-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+  .rules-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.6rem;
+    align-items: start;
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink-light);
+  }
+  :global(.dark) .rules-item { color: oklch(0.78 0.01 256); }
+  .rules-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 1px solid currentColor;
+    font-size: 0.85rem;
+    line-height: 1;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    margin-top: 0.1rem;
+  }
+  .rules-mark--do { color: var(--color-azure); }
+  :global(.dark) .rules-mark--do { color: var(--color-azure-light); }
+  .rules-mark--dont { color: var(--color-ink-muted); }
+  :global(.dark) .rules-mark--dont { color: oklch(0.62 0.015 256); }
+
+  /* ━━━━ Strategy sliders ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  .sliders {
+    list-style: none;
+    margin: clamp(1.5rem, 1rem + 2vw, 2.5rem) 0 0;
+    padding: 0;
+    display: grid;
+    gap: clamp(1rem, 0.8rem + 1vw, 1.75rem);
+    max-width: 56rem;
+  }
+  .slider {
+    display: grid;
+    gap: 0.5rem;
+    /* Keep the row flush at the track so eyes compare marks down the column */
+    grid-template-rows: auto auto auto;
+  }
+  .slider__labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--text-meta);
+    color: var(--color-ink-light);
+  }
+  :global(.dark) .slider__labels { color: oklch(0.78 0.01 256); }
+  .slider__end { letter-spacing: 0; text-align: left; }
+  .slider__end--right { text-align: right; }
+  /* Bold the end the team is closer to — the dot already says it, the label confirms it */
+  .slider__end--right[data-closer],
+  .slider__end[data-closer] { color: var(--color-ink); font-weight: 600; }
+  :global(.dark) .slider__end--right[data-closer],
+  :global(.dark) .slider__end[data-closer] { color: var(--color-ivory); }
+
+  .slider__track {
+    position: relative;
+    height: 1px;
+    background: var(--color-rule);
+    /* Breathing room so the mark sits visually centred on the line, not flush */
+    margin: 0.4rem 0;
+  }
+  :global(.dark) .slider__track { background: oklch(0.28 0.018 262); }
+
+  .slider__mark {
+    position: absolute;
+    top: 50%;
+    width: 0.75rem;
+    height: 0.75rem;
+    background: var(--color-azure);
+    transform: translate(-50%, -50%);
+    border-radius: 0; /* square, per brand geometry */
+    transition: none;
+  }
+  :global(.dark) .slider__mark { background: var(--color-azure-light); }
+
+  .slider__note {
+    margin: 0;
+    font-size: var(--text-caption);
+    line-height: var(--text-caption--line-height);
+    color: var(--color-ink-muted);
+    max-width: 52ch;
+  }
+  :global(.dark) .slider__note { color: oklch(0.62 0.015 256); }
+
+  /* Stack the mark labels above their track at very small viewports */
+  @media (max-width: 480px) {
+    .slider__labels { flex-direction: column; gap: 0.15rem; }
+    .slider__end { text-align: left; }
+    .slider__end--right { text-align: left; }
+  }
+
+  /* ━━━━ Nav ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  .slide-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: clamp(0.75rem, 0.5rem + 1vw, 1.5rem) clamp(1rem, 0.7rem + 1vw, 2rem);
+    z-index: 50;
+    pointer-events: none;
+  }
+  .slide-nav > * { pointer-events: auto; }
+
+  .slide-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    border: 1px solid var(--color-rule);
+    cursor: pointer;
+    transition: background 160ms ease-out, color 160ms ease-out, border-color 160ms ease-out, opacity 160ms ease-out;
+    font-size: 1.125rem;
+  }
+  .slide-btn:hover:not(:disabled) {
+    background: var(--color-ink);
+    color: var(--color-ivory);
+    border-color: var(--color-ink);
+  }
+  :global(.dark) .slide-btn {
+    background: var(--color-brand-elevated);
+    color: var(--color-ivory);
+    border-color: oklch(0.28 0.018 262);
+  }
+  :global(.dark) .slide-btn:hover:not(:disabled) {
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    border-color: var(--color-ivory);
+  }
+  .slide-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .slide-btn:focus-visible {
+    outline: 2px solid var(--color-azure);
+    outline-offset: 2px;
+  }
+  :global(.dark) .slide-btn:focus-visible { outline-color: var(--color-azure-light); }
+
+  .slide-dots {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .slide-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    padding: 0;
+    background: var(--color-rule);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 160ms ease-out, width 200ms ease-out;
+    border-radius: 0; /* square, per brand */
+  }
+  :global(.dark) .slide-dot { background: oklch(0.3 0.018 262); }
+  .slide-dot:hover { background: var(--color-ink-muted); }
+  :global(.dark) .slide-dot:hover { background: oklch(0.5 0.018 256); }
+  .slide-dot.is-active {
+    background: var(--color-azure);
+    width: 1.5rem;
+  }
+  :global(.dark) .slide-dot.is-active { background: var(--color-azure-light); }
+  .slide-dot:focus-visible {
+    outline: 2px solid var(--color-azure);
+    outline-offset: 2px;
+  }
+  :global(.dark) .slide-dot:focus-visible { outline-color: var(--color-azure-light); }
+
+  .slide-count {
+    position: absolute;
+    right: clamp(1rem, 0.7rem + 1vw, 2rem);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: var(--text-meta);
+    color: var(--color-ink-muted);
+    pointer-events: none;
+  }
+  :global(.dark) .slide-count { color: oklch(0.62 0.015 256); }
+
+  .slide-esc {
+    position: absolute;
+    left: clamp(1rem, 0.7rem + 1vw, 2rem);
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    background: transparent;
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-rule);
+    cursor: pointer;
+    transition: background 160ms ease-out, color 160ms ease-out;
+    font-size: 1.125rem;
+  }
+  .slide-esc:hover {
+    background: var(--color-ink);
+    color: var(--color-ivory);
+    border-color: var(--color-ink);
+  }
+  :global(.dark) .slide-esc {
+    color: oklch(0.62 0.015 256);
+    border-color: oklch(0.28 0.018 262);
+  }
+  :global(.dark) .slide-esc:hover {
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    border-color: var(--color-ivory);
+  }
+  .slide-esc:focus-visible {
+    outline: 2px solid var(--color-azure);
+    outline-offset: 2px;
+  }
+
+  /* Hint — appears until first interaction */
+  .slide-hint {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: clamp(1rem, 0.7rem + 1vw, 1.75rem);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-caption);
+    color: var(--color-ink-muted);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 600ms ease-out;
+    z-index: 45;
+  }
+  :global(.dark) .slide-hint { color: oklch(0.62 0.015 256); }
+  .slide-hint span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.35rem;
+    border: 1px solid var(--color-rule);
+    font-family: var(--font-mono);
+    line-height: 1;
+  }
+  :global(.dark) .slide-hint span { border-color: oklch(0.28 0.018 262); }
+  .slide-hint__sep { border: 0; min-width: 0; padding: 0; }
+  .slide-hint.is-hidden { opacity: 0; }
+
+  /* Honor reduced motion — the deck still works, just without cross-fade */
+  @media (prefers-reduced-motion: reduce) {
+    .slide,
+    .slide.is-active,
+    .slide-progress > span,
+    .slide-dot,
+    .slide-btn,
+    .slide-esc,
+    .slide-hint {
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Small screens — pull nav closer, lighten padding */
+  @media (max-width: 640px) {
+    .slide-nav { gap: 0.5rem; }
+    .slide-btn { width: 2.5rem; height: 2.5rem; }
+    .slide-esc { width: 2.5rem; height: 2.5rem; }
+    .slide-count { display: none; }
+    .slide-dots { gap: 0.35rem; }
+    /* Hide mid dots on tiny screens for breathing room */
+    .slide-dots li:nth-child(n+6):nth-child(-n+11) { display: none; }
+  }
+</style>
+
+<script>
+  (() => {
+    const deck = document.querySelector('[data-slide-deck]');
+    if (!deck) return;
+    const slides = Array.from(deck.querySelectorAll('[data-slide]'));
+    const dots = Array.from(deck.querySelectorAll('[data-dot]'));
+    const prev = deck.querySelector('[data-prev]');
+    const next = deck.querySelector('[data-next]');
+    const exit = deck.querySelector('[data-exit]');
+    const count = deck.querySelector('[data-count]');
+    const bar = deck.querySelector('[data-progress-bar]');
+    const hint = deck.querySelector('[data-hint]');
+    const total = slides.length;
+    let i = 0;
+    let hintHidden = false;
+
+    function render(dir = 0) {
+      const active = slides[i];
+      slides.forEach((s, j) => {
+        const isActive = j === i;
+        s.classList.toggle('is-active', isActive);
+        s.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        if (dir !== 0 && j === i) {
+          s.setAttribute('data-direction', dir < 0 ? 'back' : 'fwd');
+        } else if (j !== i) {
+          s.removeAttribute('data-direction');
+        }
+      });
+      dots.forEach((d, j) => {
+        d.classList.toggle('is-active', j === i);
+        d.setAttribute('aria-pressed', j === i ? 'true' : 'false');
+      });
+      if (prev) prev.disabled = i === 0;
+      if (next) next.disabled = i === total - 1;
+      if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+      if (bar) bar.style.width = `${((i + 1) / total) * 100}%`;
+      // Move focus to the slide for screen readers, without scrolling jank
+      if (active) active.scrollTop = 0;
+    }
+
+    function go(n) {
+      const target = Math.max(0, Math.min(total - 1, n));
+      if (target === i) return;
+      const dir = target < i ? -1 : 1;
+      i = target;
+      render(dir);
+      hideHint();
+    }
+
+    function hideHint() {
+      if (hintHidden || !hint) return;
+      hintHidden = true;
+      hint.classList.add('is-hidden');
+      setTimeout(() => { if (hint) hint.remove(); }, 800);
+    }
+
+    prev && prev.addEventListener('click', () => go(i - 1));
+    next && next.addEventListener('click', () => go(i + 1));
+    exit && exit.addEventListener('click', () => { window.location.href = '/'; });
+
+    dots.forEach((d, j) => d.addEventListener('click', () => go(j)));
+
+    deck.addEventListener('click', (e) => {
+      // Click on background to advance, but never when clicking a control
+      if (e.target.closest('button, a, .slide-nav, .slide__inner')) return;
+      go(i + 1);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      // Respect form fields
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'PageDown':
+          e.preventDefault(); go(i + 1); break;
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault(); go(i - 1); break;
+        case ' ':
+          // Space advances — except when shift held (shift+space goes back)
+          e.preventDefault();
+          go(e.shiftKey ? i - 1 : i + 1);
+          break;
+        case 'Home':
+          e.preventDefault(); go(0); break;
+        case 'End':
+          e.preventDefault(); go(total - 1); break;
+        case 'Escape':
+          e.preventDefault(); window.location.href = '/'; break;
+      }
+    });
+
+    // Touch — swipe to navigate
+    let sx = 0, dx = 0, swiping = false;
+    deck.addEventListener('touchstart', (e) => {
+      sx = e.touches[0].clientX; dx = 0; swiping = true;
+    }, { passive: true });
+    deck.addEventListener('touchmove', (e) => {
+      if (!swiping) return;
+      dx = e.touches[0].clientX - sx;
+    }, { passive: true });
+    deck.addEventListener('touchend', () => {
+      if (!swiping) return;
+      swiping = false;
+      const threshold = 40;
+      if (dx > threshold) go(i - 1);
+      else if (dx < -threshold) go(i + 1);
+    });
+
+    // Wheel — horizontal wheel advances; vertical still scrolls within slide
+    let wheelLock = 0;
+    deck.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaX) < 12) return;
+      e.preventDefault();
+      const now = Date.now();
+      if (now - wheelLock < 450) return;
+      wheelLock = now;
+      if (e.deltaX > 0) go(i + 1);
+      else go(i - 1);
+    }, { passive: false });
+
+    // Sync if url has #slide-N
+    const hash = location.hash.match(/slide-(\d+)/);
+    if (hash) go(parseInt(hash[1], 10) - 1);
+    else render();
+
+    // Update hash on change for shareable deep links
+    let pushLock = 0;
+    function pushHash() {
+      const now = Date.now();
+      if (now - pushLock < 400) return;
+      pushLock = now;
+      history.replaceState(null, '', `#slide-${i + 1}`);
+    }
+    // Observe internal i changes via the active class toggling
+    const obs = new MutationObserver(() => pushHash());
+    slides.forEach((s) => obs.observe(s, { attributes: true, attributeFilter: ['class'] }));
+  })();
+</script>

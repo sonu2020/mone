@@ -1,0 +1,128 @@
+---
+import '../styles/app.css';
+import AdSlot from '../components/AdSlot.astro';
+import McInspector from '../components/McInspector.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+  topAd?: boolean;
+  /** Which unit the masthead band carries. `leaderboard` (728x90) is the site
+   *  default; `masthead` opts a page into the full ladder — 970x250 on wide
+   *  desktops, stepping down to 970x90, 728x90 and 320x100. Detail pages that
+   *  can carry a billboard above the fold use it; index pages, where the band
+   *  is the first thing between the reader and the grid, do not. */
+  topAdFormat?: 'leaderboard' | 'masthead';
+  /** Keep a page out of search results — archives, labs and previews that
+   *  duplicate a canonical page (e.g. /old-home against /). */
+  noindex?: boolean;
+  /** Tone for the masthead ad band above the header. Gray by default, so the
+   *  band sits back from the page rather than reading as its first content. */
+  adTone?: 'plain' | 'sage' | 'gray';
+}
+
+const { title, description, topAd = true, topAdFormat = 'leaderboard', noindex = false, adTone = 'gray' } = Astro.props;
+
+// Audit aid: every custom component marks its root with `mc` (inert by
+// default). Set PUBLIC_MC_OUTLINE=true to outline those roots — the visual
+// marker is off unless this env var is set. See docs/component-stock.md.
+const mcOutline = import.meta.env.PUBLIC_MC_OUTLINE === 'true';
+---
+
+<!DOCTYPE html>
+<!-- `lang-ml` ships in the markup rather than being applied by script, so a
+     page with JavaScript off is Malayalam — the site's own language — instead
+     of both languages stacked. The pre-paint script below swaps it. -->
+<html lang="ml" dir="ltr" class:list={['lang-ml', mcOutline && 'mc-outline']}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#f8f9fa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1017" media="(prefers-color-scheme: dark)" />
+
+    <!-- Anek Latin + Anek Malayalam: variable fonts with wdth + wght axes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,100..800&family=Anek+Malayalam:wdth,wght@75..125,100..800&family=Noto+Sans+Malayalam:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Set theme before paint to avoid a flash. -->
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Set language before paint, same contract as the theme above.
+         Pages that carry paired [data-ml] / [data-en] strings switch between
+         them on this class; pages that don't are unaffected. -->
+    <script is:inline>
+      (function () {
+        try {
+          var lang = localStorage.getItem('lang');
+          if (lang !== 'en') return;               // 'ml' is already in the markup
+          document.documentElement.classList.remove('lang-ml');
+          document.documentElement.classList.add('lang-en');
+          document.documentElement.lang = 'en';
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Lazy-load ads after page paint to avoid CLS -->
+    <script is:inline>
+      (function () {
+        function loadAds() {
+          document.querySelectorAll('.ad-lazy').forEach(function (el) {
+            el.classList.add('ad-loaded');
+          });
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAds, { timeout: 3000 });
+        } else {
+          setTimeout(loadAds, 1500);
+        }
+      })();
+    </script>
+
+    <!-- Sticky header scroll shadow -->
+    <script is:inline>
+      (function () {
+        var header = document.getElementById('site-header');
+        if (!header) return;
+        var ticking = false;
+        function onScroll() {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(function () {
+            header.classList.toggle('is-scrolled', window.scrollY > 4);
+            ticking = false;
+          });
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+      })();
+    </script>
+
+    <!-- Page-specific head content — a stylesheet or preload that belongs to
+         one route rather than the site. Used by /demo/fonts to widen Noto's
+         weight range without changing what every other page downloads. -->
+    <slot name="head" />
+  </head>
+  <body class="min-h-dvh flex flex-col">
+    {topAd && <AdSlot slot="header-top" format={topAdFormat} lazy={true} tone={adTone} />}
+    <slot />
+    {mcOutline && <McInspector />}
+  </body>
+</html>

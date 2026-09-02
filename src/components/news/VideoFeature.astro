@@ -1,0 +1,46 @@
+---
+// BLOCK · VideoFeature — a watch module: a large inline player with caption,
+// plus an "Up next" rail of compact video rows. The shape of a /videos landing.
+import VideoPlayer from './VideoPlayer.astro';
+import VideoThumb from './VideoThumb.astro';
+import Kicker from '../ui/Kicker.astro';
+import Headline from '../ui/Headline.astro';
+import type { VideoItem } from '../../lib/video-data';
+export interface Props {
+  feature: VideoItem;
+  items: VideoItem[];
+  upNextLabel?: string;
+  class?: string;
+}
+const { feature, items, upNextLabel = 'അടുത്തത്', class: className = '' } = Astro.props;
+---
+<div class:list={['mc', 'grid grid-cols-1 lg:grid-cols-12 lg:gap-8', className]}>
+  <div class="lg:col-span-8">
+    <VideoPlayer src={feature.src} title={feature.title} seed={feature.seed} />
+    <div class="pt-4">
+      {feature.category && <Kicker text={feature.category} class="mb-1.5 block" />}
+      <Headline as="h2" size="lg" text={feature.title} />
+      <div class="mt-2 flex items-center gap-2 caption-text text-text-muted tabular-nums">
+        {feature.views && <span>{feature.views} views</span>}
+        {feature.views && feature.date && <span>·</span>}
+        {feature.date && <span>{feature.date}</span>}
+        {feature.duration && <><span>·</span><span>{feature.duration}</span></>}
+      </div>
+    </div>
+  </div>
+
+  <aside class="lg:col-span-4 mt-8 lg:mt-0">
+    <h3 class="section-header text-ink pb-2.5 mb-4 border-b-2 border-ink">{upNextLabel}</h3>
+    <div class="divide-y divide-rule">
+      {items.map((v) => (
+        <a href={v.href} class="group flex gap-3 py-3 first:pt-0">
+          <VideoThumb item={v} ratio="16/9" playSize="sm" class="w-32 sm:w-36 shrink-0" />
+          <div class="min-w-0 flex flex-col justify-center">
+            <Headline as="h4" size="base" text={v.title} clamp={2} />
+            {v.views && <span class="mt-1 caption-text text-text-muted tabular-nums">{v.views} views</span>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </aside>
+</div>

@@ -1,0 +1,213 @@
+---
+// BLOCK · ScheduleList — the broadcast day, rendered once and reused wherever
+// the schedule appears. One component so the instances can't drift apart.
+//
+// `layout` fits it to its container:
+//   'timeline' — an EPG track: contiguous cells running left to right, the live
+//                one parked at the head. ~44px tall, scrolls horizontally.
+//                This is what hangs off the LIVE cell.
+//   'list'     — the same day stacked vertically, for tall narrow columns like
+//                the video modal's sidebar, where a track has nowhere to run.
+//
+// The site is static, so the live slot can't be resolved at build time. Every
+// slot ships in the markup — readable with JS off — and the script at the foot
+// of this file marks the live cell against Asia/Kolkata and parks it in view.
+// Astro bundles that script once no matter how many instances a page renders.
+import { schedule, formatTime, toMinutes } from '../../lib/live-tv';
+
+export interface Props {
+  layout?: 'timeline' | 'list';
+  tone?: 'card' | 'dark';   // dark = the modal's theater surface
+  heading?: string;
+  viewAllHref?: string;
+  maxHeight?: string;       // list layout only — tailwind max-h-* on the scroller
+  class?: string;
+}
+const {
+  layout = 'timeline',
+  tone = 'card',
+  heading = 'Today on MediaOne',
+  viewAllHref = '/live',
+  maxHeight = 'max-h-[19rem]',
+  class: className = '',
+} = Astro.props;
+
+const dark = tone === 'dark';
+const timeline = layout === 'timeline';
+
+const t = {
+  frame: dark ? '' : 'rounded-xs border border-rule dark:border-ivory/15 bg-bg-card dark:bg-brand-elevated shadow-xl overflow-hidden',
+  head: dark ? 'border-white/10' : 'border-rule dark:border-ivory/10',
+  headText: dark ? 'text-ivory/70' : 'text-text-secondary dark:text-ivory/70',
+  link: dark ? 'text-azure-light hover:text-white' : 'text-azure dark:text-azure-light hover:underline underline-offset-2',
+  divide: dark ? 'divide-white/[0.08]' : 'divide-rule/60 dark:divide-ivory/[0.07]',
+  hover: dark ? 'hover:bg-white/5' : 'hover:bg-ink/[0.03] dark:hover:bg-white/5',
+  time: dark ? 'text-ivory/45' : 'text-text-muted dark:text-ivory/45',
+  title: dark ? 'text-ivory' : 'text-text-primary dark:text-ivory',
+  titleHover: dark ? 'group-hover/row:text-azure-light' : 'group-hover/row:text-azure dark:group-hover/row:text-azure-light',
+  sub: dark ? 'text-ivory/40' : 'text-text-muted dark:text-ivory/40',
+};
+
+// Kind reads as a colour on each cell's leading edge.
+const tick: Record<string, string> = {
+  news: 'bg-accent-red',
+  talk: 'bg-azure',
+  show: 'bg-accent-cyan',
+  special: 'bg-azure-light',
+};
+
+// Every slot carries its own times and labels, so the client formats nothing.
+const slotData = (slot: (typeof schedule)[number]) => ({
+  'data-slot': true,
+  'data-start': toMinutes(slot.start),
+  'data-end': toMinutes(slot.end),
+  'data-start-label': formatTime(slot.start),
+  'data-end-label': formatTime(slot.end),
+  'data-title-ml': slot.titleML,
+  'data-title-en': slot.title,
+});
+---
+
+<div class:list={['mc', t.frame, className]}>
+  <!-- Light header: this is a dropdown, not a section of the page — a heavy
+       uppercase band label would outweigh the list it introduces. -->
+  <div class:list={['flex items-baseline gap-2 px-3 py-1.5 border-b', t.head]}>
+    <span class:list={['caption-text', t.headText]}>{heading}</span>
+    <span class:list={['caption-text', t.sub]}>IST</span>
+    <a href={viewAllHref} class:list={['ml-auto caption-text', t.link]}>View all</a>
+  </div>
+
+  {timeline ? (
+    <!-- ── EPG track ─────────────────────────────────────────────────────── -->
+    <ol data-schedule class:list={['relative flex overflow-x-auto scrollbar-none divide-x', t.divide]}>
+      {schedule.map((slot) => {
+        const Row = slot.slug ? 'a' : 'div';
+        return (
+          <li
+            {...slotData(slot)}
+            class:list={[
+              'group/row relative w-28 shrink-0 transition-colors',
+              t.hover,
+              'data-[state=now]:bg-accent-red/[0.08] data-[state=past]:opacity-40',
+            ]}
+          >
+            <span class:list={['absolute inset-x-0 top-0 h-[2px]', tick[slot.kind] ?? 'bg-azure']} aria-hidden="true"></span>
+            <!-- Two lines and no more — the English title and the full time
+                 range are what the stacked layout is for. `title` carries them
+                 for anyone who hovers. -->
+            <Row
+              href={slot.slug ? `/programs/${slot.slug}` : undefined}
+              title={`${formatTime(slot.start)} – ${formatTime(slot.end)} · ${slot.title}${slot.repeat ? ' (repeat)' : ''}`}
+              class="block px-2 pt-1.5 pb-1.5"
+            >
+              <span class="flex items-center gap-1">
+                <span
+                  class="hidden size-1 shrink-0 rounded-full bg-accent-red heartbeat group-data-[state=now]/row:block"
+                  aria-hidden="true"
+                ></span>
+                <time class:list={['caption-text leading-none tabular-nums font-semibold', t.time, 'group-data-[state=now]/row:text-accent-red']}>
+                  {formatTime(slot.start)}
+                </time>
+                {slot.repeat && (
+                  <span class:list={['caption-text leading-none', t.sub]} aria-label="Repeat">R</span>
+                )}
+              </span>
+              <span class:list={[
+                "mt-1 block truncate font-malayalam text-[0.8125rem] leading-4 [font-variation-settings:'wdth'_95,'wght'_580] transition-colors",
+                t.title, t.titleHover,
+              ]}>{slot.titleML}</span>
+            </Row>
+          </li>
+        );
+      })}
+    </ol>
+  ) : (
+    <!-- ── Stacked ────────────────────────────────────────────────────────
+         Clean rows in body text: a time, a title, and a dot on whatever is on
+         air. No dividers, no colour ticks, no English second line — in a
+         dropdown this narrow those read as noise, and the timeline layout
+         above already carries the fuller version. -->
+    <ol data-schedule class:list={['relative overflow-y-auto scrollbar-none py-1', maxHeight]}>
+      {schedule.map((slot) => {
+        const Row = slot.slug ? 'a' : 'div';
+        return (
+          <li
+            {...slotData(slot)}
+            class:list={[
+              'group/row transition-colors',
+              t.hover,
+              'data-[state=past]:opacity-35',
+            ]}
+          >
+            <Row
+              href={slot.slug ? `/programs/${slot.slug}` : undefined}
+              title={slot.title}
+              class="flex items-baseline gap-3 px-3 py-[0.3125rem]"
+            >
+              <time class:list={['w-[3.75rem] shrink-0 caption-text tabular-nums', t.time, 'group-data-[state=now]/row:font-semibold group-data-[state=now]/row:text-accent-red']}>
+                {formatTime(slot.start)}
+              </time>
+              <span class:list={[
+                'min-w-0 flex-1 truncate body-small transition-colors',
+                t.title, t.titleHover,
+                'group-data-[state=now]/row:font-semibold',
+              ]}>{slot.titleML}</span>
+              <span
+                class="hidden size-1.5 shrink-0 self-center rounded-full bg-accent-red heartbeat group-data-[state=now]/row:block"
+                aria-hidden="true"
+              ></span>
+            </Row>
+          </li>
+        );
+      })}
+    </ol>
+  )}
+</div>
+
+<script>
+  // One pass marks the live row in every schedule instance on the page.
+  const lists = Array.from(document.querySelectorAll('[data-schedule]'));
+
+  if (lists.length) {
+    // The grid is published in IST; read the viewer's clock in that zone so a
+    // reader in the Gulf still sees what is actually going out on air.
+    const istMinutes = () => {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).formatToParts(new Date());
+      const h = Number(parts.find((p) => p.type === 'hour')?.value ?? 0) % 24;
+      const m = Number(parts.find((p) => p.type === 'minute')?.value ?? 0);
+      return h * 60 + m;
+    };
+
+    const render = () => {
+      const now = istMinutes();
+
+      for (const list of lists) {
+        let live = null;
+
+        for (const row of list.querySelectorAll('[data-slot]')) {
+          const start = Number(row.dataset.start);
+          const end = Number(row.dataset.end);
+          row.dataset.state = now >= end ? 'past' : now >= start ? 'now' : 'next';
+          if (row.dataset.state === 'now') live = row;
+        }
+
+        // Park the live cell at the head the first time this instance fills.
+        // One assignment covers both layouts: the axis that doesn't scroll
+        // reads 0 anyway.
+        if (live && !list.dataset.parked) {
+          list.scrollLeft = Math.max(live.offsetLeft - 4, 0);
+          list.scrollTop = Math.max(live.offsetTop - 4, 0);
+          list.dataset.parked = '1';
+        }
+      }
+    };
+
+    render();
+    setInterval(render, 30000);
+  }
+</script>

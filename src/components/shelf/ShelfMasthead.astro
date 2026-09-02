@@ -1,0 +1,39 @@
+---
+// COMPONENT · ShelfMasthead — the opening of /shelf.
+//
+// Type only, no image, no cards, no counters racing the eye downward — Shelf
+// is the in-depth section, and the title page still leads with the word
+// alone. Kept compact rather than full-bleed: a contents line and a nav of
+// its own already sit above/below this, so the masthead itself is a header,
+// not the whole first screen.
+//
+// The rule under the title is the only ornament, which is the house position:
+// elevation is a hairline.
+export interface Props {
+  title: string;
+  /** One line on what the section is for. Kept to a sentence. */
+  standfirst: string;
+  /** e.g. "24 pieces · 5 collections" — small, factual, out of the way. */
+  meta?: string;
+  eyebrow?: string;
+  class?: string;
+}
+
+const { title, standfirst, meta, eyebrow = 'MediaOne', class: className = '' } = Astro.props;
+---
+
+<header class:list={['mc', 'border-b border-rule dark:border-ivory/10', className]}>
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+    <p class="eyebrow text-azure dark:text-azure-light">{eyebrow}</p>
+
+    <h1 class="mt-2 text-[clamp(2.25rem,6vw,4.5rem)] leading-[0.95] font-bold tracking-tight text-text-primary">
+      {title}
+    </h1>
+
+    <p class="mt-4 lead-text text-text-secondary max-w-[34ch]">{standfirst}</p>
+
+    {meta && (
+      <p class="mt-5 caption-text tabular-nums text-text-muted">{meta}</p>
+    )}
+  </div>
+</header>

@@ -1,0 +1,78 @@
+---
+// BLOCK · CategoryColumnsShelf — a horizontal grid displaying 4 news categories side-by-side.
+// Each column displays a top border, a section link header with a chevron,
+// a lead story (image-top + headline + excerpt), and 2 text-only stories separated by rules.
+import Media from '../ui/Media.astro';
+import Headline from '../ui/Headline.astro';
+import type { SectionCluster } from '../../lib/home-data';
+
+export interface Props {
+  clusters: SectionCluster[];
+  class?: string;
+}
+
+const { clusters, class: className = '' } = Astro.props;
+---
+
+<section class:list={['mc', 'py-7 lg:py-10', className]}>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+    {clusters.slice(0, 4).map((cluster) => (
+      <div class="flex flex-col">
+        <!-- Column Header Accent -->
+        <div class="border-t border-ink/40 dark:border-ivory/20 pt-2.5 mb-4">
+          <a href={cluster.href} class="group inline-flex items-center gap-1 text-ink dark:text-ivory hover:text-azure dark:hover:text-azure-light transition-colors">
+            {cluster.nameEn ? (
+              <span class="eyebrow">{cluster.nameEn}</span>
+            ) : (
+              <span class="text-sm font-bold">{cluster.name}</span>
+            )}
+            <svg viewBox="0 0 24 24" class="size-3 fill-none stroke-current stroke-2.5 ml-0.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- Stories Content -->
+        <div class="flex-1 flex flex-col justify-between">
+          <!-- Lead Story (image-top) -->
+          <a href={cluster.lead.href} class="group block mb-4">
+            <Media seed={cluster.lead.href} ratio="16/10" class="mb-3 rounded-sm" zoom />
+            {cluster.lead.category && (
+              <span class="eyebrow text-azure dark:text-azure-light mb-1.5 block">{cluster.lead.category}</span>
+            )}
+            <Headline as="h3" size="base" text={cluster.lead.title} clamp={3} class="font-bold leading-snug" />
+            {cluster.lead.excerpt && (
+              <p class="mt-2 body-small text-text-secondary dark:text-ivory/70 line-clamp-3">
+                {cluster.lead.excerpt}
+              </p>
+            )}
+            {cluster.lead.date && (
+              <p class="mt-2 caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+                {cluster.lead.date}
+              </p>
+            )}
+          </a>
+
+          <!-- Text-only items list -->
+          <ul class="divide-y divide-rule dark:divide-ivory/10 border-t border-rule dark:border-ivory/10">
+            {cluster.items.slice(0, 2).map((story) => (
+              <li class="py-3">
+                <a href={story.href} class="group block">
+                  {story.category && (
+                    <span class="eyebrow text-azure dark:text-azure-light mb-1 block">{story.category}</span>
+                  )}
+                  <Headline as="h4" size="base" text={story.title} clamp={2} class="font-normal text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light leading-snug" />
+                  {story.date && (
+                    <p class="mt-1.5 caption-text text-text-muted dark:text-ivory/45 tabular-nums">
+                      {story.date}
+                    </p>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

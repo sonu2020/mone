@@ -1,0 +1,394 @@
+---
+// ── /travel/<trek> · a trek, told long ──────────────────────────────────────
+// One page per trek in src/lib/travelogue.ts. Malayalam leads and English
+// glosses under it.
+//
+// Reading model is the photo essay — one narrow measure of prose down the
+// middle, photographs and maps breaking out wider, nothing beside the text. A
+// chapter is a list of blocks (prose, plate, map, food, sight, note) rather
+// than a fixed shape, because reporting a walk does not come in one rhythm.
+//
+// Motion: the hero parallaxes, plates settle and scale as they arrive, inline
+// maps zoom in once when the reader reaches them, and the corner HUD follows
+// the route. All of it is off under prefers-reduced-motion.
+//
+// No site frame — see ImmersiveBar.
+import Layout from '../../layouts/Layout.astro';
+import ImmersiveBar from '../../components/travel/ImmersiveBar.astro';
+import Footer from '../../components/Footer.astro';
+import VideoModal from '../../components/VideoModal.astro';
+import ScheduleList from '../../components/live/ScheduleList.astro';
+import BandHeading from '../../components/home4/BandHeading.astro';
+import RouteMap from '../../components/travel/RouteMap.astro';
+import StoryBlocks from '../../components/travel/StoryBlocks.astro';
+import Media from '../../components/ui/Media.astro';
+
+import JourneyStage from '../../components/journey/JourneyStage.astro';
+
+import { treks, totalKm, highestPoint, waypointOf } from '../../lib/travelogue';
+import type { Trek } from '../../lib/travelogue';
+import { journeyFor, type TrekJourney } from '../../lib/journeys';
+import { allVideos } from '../../lib/videos';
+import { toModalVideos, type ModalVideo } from '../../lib/video-modal';
+import { LIVE_CHANNEL } from '../../lib/live-tv';
+
+export async function getStaticPaths() {
+  const { treks } = await import('../../lib/travelogue');
+  return treks.map((t) => ({ params: { trek: t.slug }, props: { trek: t } }));
+}
+
+const { trek } = Astro.props as { trek: Trek };
+
+const km = totalKm(trek);
+const peak = highestPoint(trek);
+const coverage = allVideos.slice(0, 4);
+
+// Not every trek has one. When it does, the whole page has to stack above it —
+// see the note on <main> below.
+const tj: TrekJourney | null = journeyFor(trek.slug);
+
+const liveModalVideo: ModalVideo = {
+  id: LIVE_CHANNEL.id,
+  title: `${LIVE_CHANNEL.titleML} | ${LIVE_CHANNEL.title}`,
+  category: 'Live TV',
+  meta: 'Streaming now · 24×7',
+  poster: LIVE_CHANNEL.poster,
+  src: '',
+  embedUrl: LIVE_CHANNEL.embedUrl,
+  isLive: true,
+};
+---
+
+<Layout
+  title={`${trek.titleML} | ${trek.title} — Travel | MediaOne`}
+  description={trek.standfirst}
+  topAd={false}
+>
+  <ImmersiveBar title={trek.titleML} backHref="/travel" backLabel="Travel" />
+
+  <!--
+    The background lives on each block rather than on <main>, because a trek
+    with a journey puts a `position: fixed` stage at z-index 0 behind the whole
+    page. One opaque background up here would hide it completely; the stacking
+    contract needs every sibling to carry its own and sit at z-10.
+  -->
+  <main class="flex-1">
+    <!-- ══ HERO — full viewport, parallaxing ════════════════════════════ -->
+    <section
+      data-immersive-hero
+      class="relative z-10 h-[100svh] min-h-[30rem] w-full overflow-hidden bg-nav-bg"
+    >
+      <img
+        data-parallax
+        src={trek.heroImage}
+        alt=""
+        class="absolute inset-0 h-[125%] w-full object-cover will-change-transform"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <span class="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-ink/20"></span>
+
+      <div class="relative h-full mx-auto max-w-[68rem] px-5 flex flex-col justify-end pb-16 sm:pb-20">
+        <p class="eyebrow text-white/60">ട്രെക്ക് · {trek.state}</p>
+        <h1 class="mt-3 font-malayalam text-display font-bold text-white text-balance">{trek.titleML}</h1>
+        <p class="mt-1 text-title font-bold text-white/70">{trek.title}</p>
+        <p class="mt-4 font-malayalam text-[1.0625rem] leading-[1.8] text-white/85 max-w-2xl text-pretty">
+          {trek.standfirstML}
+        </p>
+      </div>
+
+      {trek.heroCredit && (
+        <p class="absolute right-3 top-16 max-w-[12rem] text-right caption-text text-white/40">
+          {trek.heroCredit}
+        </p>
+      )}
+
+      <span
+        class="absolute inset-x-0 bottom-5 flex justify-center text-white/50 motion-safe:animate-bounce"
+        aria-hidden="true"
+      ><i class="ti ti-chevron-down text-2xl"></i></span>
+    </section>
+
+    <!-- ══ THE FACTS ════════════════════════════════════════════════════ -->
+    <div class="relative z-10 bg-bg-card"><div class="mx-auto max-w-[42rem] px-5 pt-14 sm:pt-20">
+      <p class="caption-text text-text-muted dark:text-ivory/45">
+        {trek.authorML} · {trek.published}
+      </p>
+      <p class="mt-5 body-small text-text-secondary dark:text-ivory/60 text-pretty">{trek.standfirst}</p>
+
+      <dl class="mt-8 flex flex-wrap gap-x-8 gap-y-3 pt-6 border-t border-rule dark:border-ivory/10">
+        {[
+          ['ദൂരം', 'Distance', `${km} km`],
+          ['ഉയരം', 'Summit', `${peak} m`],
+          ['ദിവസം', 'Days', String(trek.days)],
+          ['തുടക്കം', 'Trailhead', trek.waypoints[0].name],
+        ].map(([ml, en, v]) => (
+          <div>
+            <dt class="font-malayalam caption-text text-text-muted dark:text-ivory/45">
+              {ml} <span class="text-text-light dark:text-ivory/25">{en}</span>
+            </dt>
+            <dd class="mt-0.5 article-title tabular-nums text-text-primary dark:text-ivory">{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div></div>
+
+    {tj && (
+      <>
+        <!-- ══ THE CLIMB, IN 3D ═══════════════════════════════════════ -->
+        <JourneyStage
+          journey={tj.journey}
+          heightVh={480}
+          autoplaySeconds={85}
+          kicker={tj.kicker}
+          title={tj.title}
+          standfirst={tj.standfirst}
+          overviewLabel={tj.overviewLabel}
+          firstPersonLabel={tj.firstPersonLabel}
+          overviewIcon={tj.overviewIcon}
+          firstPersonIcon={tj.firstPersonIcon}
+          playLabel={tj.playLabel}
+          markerNoun={tj.markerNoun}
+        />
+
+        <!-- ══ THE CLIMB, IN NUMBERS ══════════════════════════════════ -->
+        <section class="relative z-10 bg-bg-card">
+          <div class="mx-auto max-w-[42rem] px-5 py-16 sm:py-20">
+            <p class="eyebrow text-accent-red">കണക്ക് · By the numbers</p>
+            <h2 class="mt-2 font-malayalam text-title font-bold text-text-primary dark:text-ivory">
+              എന്താണ് ഈ കയറ്റം
+            </h2>
+            <p class="mt-1 headline-deck text-text-muted dark:text-ivory/45">
+              What the climb actually is
+            </p>
+
+            <dl class="mt-8 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
+              {tj.numbers.map(([label, value, note]) => (
+                <div class="border-t border-rule pt-3 dark:border-ivory/12">
+                  <dt class="caption-text text-text-muted dark:text-ivory/45">{label}</dt>
+                  <dd class="mt-1 text-title font-bold tabular-nums text-text-primary dark:text-ivory">{value}</dd>
+                  <dd class="mt-1 caption-text text-text-light dark:text-ivory/40 text-pretty">{note}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <!-- The discrepancy gets said out loud, not buried. -->
+            {tj.caveat && (
+              <div class="mt-10 border-l-2 border-accent-red pl-5">
+                <p class="article-title text-text-primary dark:text-ivory">{tj.caveat.title}</p>
+                <p class="mt-2 body-small text-text-muted dark:text-ivory/55 text-pretty">
+                  {tj.caveat.body}
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <!-- ══ BEFORE YOU GO ══════════════════════════════════════════ -->
+        <section class="relative z-10 bg-bg-page dark:bg-brand-dark">
+          <div class="mx-auto max-w-[42rem] px-5 py-16 sm:py-20">
+            <p class="eyebrow text-accent-red">പോകുംമുമ്പ് · Before you go</p>
+            <h2 class="mt-2 font-malayalam text-title font-bold text-text-primary dark:text-ivory">
+              ഈ വഴി പറയുന്നത്
+            </h2>
+            <p class="mt-1 headline-deck text-text-muted dark:text-ivory/45">
+              What the route itself tells you
+            </p>
+
+            <ul class="mt-8 space-y-6">
+              {tj.tips.map(([icon, title, body]) => (
+                <li class="grid grid-cols-[1.75rem_1fr] gap-x-3">
+                  <i class:list={['ti', icon, 'mt-0.5 text-lg text-accent-red']} aria-hidden="true"></i>
+                  <div>
+                    <h3 class="article-title text-text-primary dark:text-ivory">{title}</h3>
+                    <p class="mt-1 body-small text-text-muted dark:text-ivory/55 text-pretty">{body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <!-- ══ SOURCES ══════════════════════════════════════════ -->
+            <div class="mt-12 border-t border-rule pt-6 dark:border-ivory/10">
+              <p class="eyebrow text-text-muted dark:text-ivory/45">Sources</p>
+              <dl class="mt-4 space-y-3">
+                {[
+                  [
+                    'OpenStreetMap',
+                    'ODbL',
+                    'https://www.openstreetmap.org/relation/13650202',
+                    'The trail — relation 13650202 “Subramanya to Kumara Parvatha”, of which way/247218409 (8.25 km) and way/1019511800 (0.22 km) form the line. Also the peaks, Kallu Mantapa, Bhattara Mane and the tap.',
+                  ],
+                  [
+                    'Terrain Tiles on AWS Open Data',
+                    'Open data',
+                    'https://registry.opendata.aws/terrain-tiles/',
+                    'Every elevation on this page, sampled at zoom 13 — about 19 m per pixel. The summit reads 1,716 m here against OpenStreetMap’s surveyed 1,712; the four-metre disagreement is left as it is rather than averaged away.',
+                  ],
+                  [
+                    'Wikimedia Commons',
+                    'CC BY-SA 4.0',
+                    'https://commons.wikimedia.org/wiki/File:Kumara_parvatha,_Kukke_Sri_Subrahmanya,_Dakshina_Kananda.jpg',
+                    'The photograph at the top, by BHARATHESHA ALASANDEMAJALU.',
+                  ],
+                  [
+                    'Community GPS tracks — not used',
+                    'Not open',
+                    null,
+                    'Recorded tracks on sites like Wikiloc give longer distances than the mapped trail does, and would probably explain some of the gap. They are uploaded by individuals and not openly licensed, so nothing from them is in this page — including the figures.',
+                  ],
+                ].map(([name, licence, href, what]) => (
+                  <div class="grid gap-1 sm:grid-cols-[13rem_1fr] sm:gap-x-5">
+                    <dt class="caption-text text-text-primary dark:text-ivory/70">
+                      {href ? (
+                        <a href={href} class="underline decoration-rule underline-offset-2 hover:text-azure dark:hover:text-azure-light">{name}</a>
+                      ) : name}
+                      <span class="ml-2 text-text-light dark:text-ivory/30">{licence}</span>
+                    </dt>
+                    <dd class="caption-text text-text-muted dark:text-ivory/45 text-pretty">{what}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p class="mt-5 caption-text text-text-light dark:text-ivory/35 text-pretty">
+                Terrain colouring and vegetation in the 3D view are impressions.
+                The landform, the path, the waypoints and every elevation are
+                measured. Vertical scale is true in both views — nothing here is
+                exaggerated.
+              </p>
+            </div>
+          </div>
+        </section>
+      </>
+    )}
+
+    <!-- ══ THE WALK ═════════════════════════════════════════════════════ -->
+    <article class="relative z-10 bg-bg-card">
+      {trek.chapters.map((chapter, i) => {
+        const wp = waypointOf(trek, chapter.waypoint);
+        return (
+          <section data-chapter={i} class="chapter pt-16 sm:pt-24">
+            <header class="mx-auto max-w-[42rem] px-5">
+              <p class="flex flex-wrap items-baseline gap-x-2.5 eyebrow text-accent-red">
+                {chapter.kicker}
+                <span class="caption-text tabular-nums text-text-muted dark:text-ivory/40">
+                  {wp.km} km · {wp.elevation} m
+                </span>
+              </p>
+              <h2 class="mt-2 font-malayalam text-title font-bold text-text-primary dark:text-ivory text-balance">
+                {chapter.titleML}
+              </h2>
+              <p class="mt-1 headline-deck text-text-muted dark:text-ivory/45">{chapter.title}</p>
+            </header>
+
+            <div class="mt-7">
+              <StoryBlocks blocks={chapter.blocks} waypoint={wp} slug={trek.slug} />
+            </div>
+          </section>
+        );
+      })}
+    </article>
+
+    <!-- ══ COVERAGE ═════════════════════════════════════════════════════ -->
+    <section class="mx-auto max-w-[68rem] px-5 pt-20 pb-16">
+      <BandHeading label="More from the road" href="/videos" viewAllHref="/videos" class="mb-6" />
+      <ul class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
+        {coverage.map((video) => (
+          <li>
+            <a href="/videos" data-video-open={video.slug} class="group block">
+              <div class="relative aspect-video overflow-hidden bg-black/10 dark:bg-black/40">
+                <Media seed={video.thumbnail} src={video.thumbnailUrl} ratio="16/9" w={420} class="w-full h-full object-cover" zoom />
+                <span class="absolute inset-0 grid place-items-center bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="grid size-9 place-items-center rounded-full bg-white/90 text-nav-bg">
+                    <i class="ti ti-player-play text-lg" aria-hidden="true"></i>
+                  </span>
+                </span>
+              </div>
+              <h3 class="mt-2.5 headline-deck text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light line-clamp-2 transition-colors">
+                {video.title}
+              </h3>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- ══ ROUTE HUD ════════════════════════════════════════════════════ -->
+    <RouteMap trek={trek} />
+
+  </main>
+
+  <!--
+    Two HUDs, one corner. While the 3D climb owns the viewport it carries its
+    own readout and elevation strip, and the flat route map sits on top of both.
+    It stands down for the duration and returns when the reader is back on the
+    prose.
+
+    `.tj-live` is set on <html> by JourneyStage. Inert on treks with no journey,
+    since nothing there ever sets it.
+  -->
+  <style is:global>
+    html.tj-live #route-hud {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+
+  <Footer />
+
+  <VideoModal videos={[liveModalVideo, ...toModalVideos(allVideos)]}>
+    <ScheduleList slot="live-panel" tone="dark" />
+  </VideoModal>
+</Layout>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    /* Chapters settle in; the photographs are the event. */
+    .chapter { opacity: 0.5; transition: opacity 0.6s ease-out; }
+    .chapter.is-read { opacity: 1; }
+
+    /* Plates arrive slightly oversized and settle to true scale. */
+    [data-zoom] img {
+      transform: scale(1.06);
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-zoom].is-shown img { transform: scale(1); }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var reduce = window.matchMedia
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+
+    // ── Hero parallax. The image is 125% tall, so it can travel 25% of the
+    //    hero's height without ever exposing an edge.
+    var hero = document.querySelector('[data-immersive-hero]');
+    var img = document.querySelector('[data-parallax]');
+    var ticking = false;
+
+    function frame() {
+      ticking = false;
+      if (!hero || !img) return;
+      var h = hero.offsetHeight;
+      var y = Math.min(Math.max(window.scrollY, 0), h);
+      img.style.transform = 'translate3d(0,' + (y * 0.2).toFixed(1) + 'px,0)';
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(frame);
+    }, { passive: true });
+    frame();
+
+    // ── Plates settle to true scale as they arrive.
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-shown'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '-10% 0px -10% 0px', threshold: 0 });
+
+    document.querySelectorAll('[data-zoom]').forEach(function (n) { io.observe(n); });
+  })();
+</script>

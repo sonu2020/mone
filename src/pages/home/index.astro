@@ -1,0 +1,5 @@
+---
+// /home → redirect to the default layout experiment.
+import { defaultLayout } from '../../lib/home-layouts';
+return Astro.redirect(`/home/${defaultLayout}`);
+---

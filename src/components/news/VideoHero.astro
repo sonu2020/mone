@@ -1,0 +1,57 @@
+---
+// BLOCK · VideoHero — full-bleed cinematic video. A muted, looping background
+// clip under a scrim, with the headline and a Watch CTA bottom-left. `height`
+// tunes the stage. Honors reduced-motion (the clip simply doesn't autoplay).
+import PlayButton from '../ui/PlayButton.astro';
+import Kicker from '../ui/Kicker.astro';
+import Headline from '../ui/Headline.astro';
+import DummyImage from '../DummyImage.astro';
+import { SAMPLE_LANDSCAPE } from '../../lib/video-data';
+import type { VideoItem } from '../../lib/video-data';
+export interface Props {
+  item: VideoItem;
+  height?: 'hero' | 'tall' | 'screen';
+  excerpt?: string;
+  class?: string;
+}
+const { item, height = 'tall', excerpt, class: className = '' } = Astro.props;
+const heightCls = { hero: 'min-h-[58vh]', tall: 'min-h-[76vh]', screen: 'min-h-[88vh]' }[height];
+---
+<section class:list={['mc', 'relative w-full overflow-hidden bg-ink flex items-end', heightCls, className]}>
+  <!-- Still fallback sits under the video; the clip covers it once it plays. -->
+  <DummyImage seed={item.seed ?? 'video-hero'} class="absolute inset-0 w-full h-full" />
+  <video
+    class="vh-video absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700"
+    muted loop playsinline preload="metadata" aria-hidden="true"
+  >
+    <source src={item.src ?? SAMPLE_LANDSCAPE} type="video/mp4" />
+  </video>
+  <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/10"></div>
+
+  <div class="relative w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+    <a href={item.href} class="group block max-w-3xl">
+      {item.category && <Kicker text={item.category} tone="onDark" class="mb-3 block" />}
+      <Headline as="h1" size="hero" tone="onDark" text={item.title} clamp={3} />
+      {excerpt && <p class="mt-4 lead-text text-white/80 max-w-prose">{excerpt}</p>}
+      <div class="mt-6 flex items-center gap-3">
+        <PlayButton size="sm" variant="solid" />
+        <span class="nav-text font-semibold text-white">Watch</span>
+        {(item.duration || item.views) && (
+          <span class="caption-text text-white/55 tabular-nums">
+            {item.duration}{item.duration && item.views && ' · '}{item.views && `${item.views} views`}
+          </span>
+        )}
+      </div>
+    </a>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('.vh-video').forEach(function (v) {
+      var p = v.play();
+      if (p && p.then) p.then(function () { v.classList.remove('opacity-0'); }).catch(function () {});
+    });
+  })();
+</script>

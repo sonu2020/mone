@@ -1,0 +1,87 @@
+---
+// BLOCK · DeskMasthead — the breadcrumb and title line every standard page opens
+// with. Extracted from DeskPage so the video pages open the same way rather than
+// each inventing a banner.
+//
+// English only: the desk name used to print twice, once in each script, which is
+// a lot of furniture for a label the breadcrumb above already gives. Document
+// titles stay bilingual — that is where the Malayalam does real work.
+export interface Props {
+  title: string;
+  description?: string;
+  /** A short line under the title — a tagline, not the fuller `description`. */
+  subtitle?: string;
+  /** Crumbs between Home and the title, in order. */
+  crumbs?: { label: string; href?: string }[];
+  /** A crumb after the title — a page number, say. The title stays the H1. */
+  tail?: string;
+  /** Off for the section page, which drops the breadcrumb entirely. */
+  showBreadcrumb?: boolean;
+  /** Renders a "Follow" button that opens SignupModal, naming this topic. */
+  topic?: string;
+  class?: string;
+}
+const {
+  title,
+  description,
+  subtitle,
+  crumbs = [],
+  tail,
+  showBreadcrumb = true,
+  topic,
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={['mc', className]}>
+  {showBreadcrumb && (
+    <nav class="flex flex-wrap items-center gap-1.5 pt-3 caption-text text-text-muted dark:text-ivory/40" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-azure dark:hover:text-azure-light transition-colors">Home</a>
+      {crumbs.map((c) => (
+        <>
+          <span aria-hidden="true">/</span>
+          {c.href
+            ? <a href={c.href} class="hover:text-azure dark:hover:text-azure-light transition-colors">{c.label}</a>
+            : <span class="text-text-secondary dark:text-ivory/60">{c.label}</span>}
+        </>
+      ))}
+      <span aria-hidden="true">/</span>
+      <span class="text-text-secondary dark:text-ivory/60">{title}</span>
+      {tail && (
+        <>
+          <span aria-hidden="true">/</span>
+          <span class="text-text-secondary dark:text-ivory/60 tabular-nums">{tail}</span>
+        </>
+      )}
+    </nav>
+  )}
+
+  <header
+    class:list={[
+      'flex flex-wrap items-baseline gap-x-4 gap-y-1 pb-3 border-b border-rule dark:border-ivory/10',
+      showBreadcrumb ? 'pt-1.5' : 'pt-3',
+    ]}
+  >
+    <div class="flex flex-col gap-0.5">
+      <h1 class="text-title font-bold text-text-primary dark:text-ivory">{title}</h1>
+      {subtitle && (
+        <p class="body-small text-text-muted dark:text-ivory/50">{subtitle}</p>
+      )}
+    </div>
+    {description && (
+      <p class="w-full sm:w-auto sm:ml-auto body-small text-text-secondary dark:text-ivory/55 max-w-prose">
+        {description}
+      </p>
+    )}
+    {topic && (
+      <button
+        type="button"
+        data-signup-open
+        data-signup-topic={topic}
+        class="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 border border-rule dark:border-ivory/15 caption-text font-semibold text-text-secondary dark:text-ivory/70 hover:border-azure hover:text-azure dark:hover:border-azure-light dark:hover:text-azure-light transition-colors"
+      >
+        <i class="ti ti-plus text-sm" aria-hidden="true"></i> Follow
+      </button>
+    )}
+  </header>
+</div>

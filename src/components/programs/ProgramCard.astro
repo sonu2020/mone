@@ -1,0 +1,64 @@
+---
+// COMPONENT · ProgramCard — one programme in the directory grid.
+//
+// Built to the house standard: square corners, one hairline, no filled box and
+// no shadow. The poster does the work; the rule under it separates rows the way
+// every other grid on the site does.
+//
+// It carries freshness on the face because this slate ranges from programmes
+// that published today to ones dormant over a year — a grid that hides that
+// invites a reader into a show which stopped last February.
+import type { CatalogueProgram } from '../../lib/program-catalogue';
+
+export interface Props {
+  program: CatalogueProgram;
+  /** Authored blurb — the live site publishes none, so this is ours. */
+  description?: string;
+  schedule?: string;
+  freshness: string;
+  active: boolean;
+  class?: string;
+}
+
+const { program, description, schedule, freshness, active, class: className = '' } = Astro.props;
+---
+
+<article class:list={['mc', className]}>
+  <a href={program.href} class="group block">
+    <div class="relative aspect-[16/9] overflow-hidden bg-placeholder">
+      <img
+        src={program.poster.small}
+        alt=""
+        width="320"
+        height="180"
+        loading="lazy"
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+      <!-- Category-label pattern from the system: solid azure for a live state,
+           hairline outline for a quiet one. -->
+      <span
+        class:list={[
+          'absolute top-0 left-0 inline-flex items-center gap-1.5 px-2.5 py-1 eyebrow',
+          active ? 'bg-azure text-ivory' : 'bg-ink/85 text-ivory/80',
+        ]}
+      >
+        {active && <span class="inline-block size-1.5 bg-ivory" aria-hidden="true"></span>}
+        {freshness}
+      </span>
+    </div>
+
+    {/* English is the standard for the programme's name; the Malayalam title
+        used to sit under it as a second heading and made the card top-heavy. */}
+    <div class="mt-3">
+      <h3 class="article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-1">
+        {program.title}
+      </h3>
+      <p class="mt-1 caption-text text-text-muted tabular-nums">
+        {program.listingEpisodes} episodes{schedule && ` · ${schedule}`}
+      </p>
+      {description && (
+        <p class="mt-2 body-small text-text-secondary line-clamp-2">{description}</p>
+      )}
+    </div>
+  </a>
+</article>

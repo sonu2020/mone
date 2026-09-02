@@ -1,0 +1,102 @@
+---
+// BLOCK · EditorialShelf — a premium composition layout pattern for features.
+// Features a vertical accent bar next to the section heading, a 50/50 split hero band,
+// and a 3-column grid underneath that can render either vertical card grids or two-row lists.
+import Media from '../ui/Media.astro';
+import Kicker from '../ui/Kicker.astro';
+import Headline from '../ui/Headline.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import StoryCard from './StoryCard.astro';
+import type { Story } from '../../lib/home-data';
+
+export interface Props {
+  title: string;
+  titleEn?: string;
+  viewAllHref?: string;
+  heroStory: Story;
+  gridStories: Story[];
+  gridVariant?: 'columns' | 'lists'; // 'columns' (16:10 card per col), 'lists' (2 horizontal cards stacked per col)
+  heroBgClass?: string;             // e.g. bg-ivory-dark or bg-bg-card
+  class?: string;
+}
+
+const {
+  title,
+  titleEn,
+  viewAllHref,
+  heroStory,
+  gridStories,
+  gridVariant = 'columns',
+  heroBgClass = 'bg-ivory-dark dark:bg-brand-elevated',
+  class: className = '',
+} = Astro.props;
+---
+
+<section class:list={['mc', 'py-7 lg:py-10', className]}>
+  <!-- Section Heading (following internal system standards) -->
+  <SectionHeading title={title} titleEn={titleEn} viewAllHref={viewAllHref} />
+
+  <div class="flex flex-col gap-6 lg:gap-8 mt-5">
+    <!-- 50/50 Split Hero Band -->
+    <a href={heroStory.href} class="group block overflow-hidden border border-rule dark:border-ivory/10 bg-bg-card dark:bg-brand-elevated rounded-sm">
+      <div class="grid grid-cols-1 lg:grid-cols-2">
+        {/* Left Side: Image */}
+        <div class="relative aspect-video lg:aspect-auto min-h-[200px] sm:min-h-[280px] lg:min-h-[360px]">
+          <Media seed={heroStory.href} ratio="16/9" class="w-full h-full lg:absolute lg:inset-0" zoom />
+        </div>
+        {/* Right Side: Text Panel */}
+        <div class:list={['p-6 sm:p-8 lg:p-10 flex flex-col justify-center', heroBgClass]}>
+          {heroStory.category && (
+            <span class="eyebrow text-azure dark:text-azure-light mb-2.5 block">
+              {heroStory.category}
+            </span>
+          )}
+          <h3 class="article-title-lg font-bold text-balance leading-tight text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+            {heroStory.title}
+          </h3>
+          {heroStory.excerpt && (
+            <p class="mt-3.5 body-small max-w-prose text-text-secondary dark:text-ivory/70 line-clamp-3 md:line-clamp-4">
+              {heroStory.excerpt}
+            </p>
+          )}
+        </div>
+      </div>
+    </a>
+
+    <!-- Bottom Grid Section -->
+    {gridVariant === 'columns' ? (
+      /* Variant A: Columns (3 columns, 1 article each with top image) */
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {gridStories.slice(0, 3).map((story) => (
+          <StoryCard story={story} ratio="16/10" />
+        ))}
+      </div>
+    ) : (
+      /* Variant B: Lists (3 columns with vertical dividers, 2 horizontal cards each) */
+      <div class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-rule dark:divide-ivory/10 gap-6 lg:gap-0">
+        {Array.from({ length: 3 }).map((_, colIndex) => {
+          const colStories = gridStories.slice(colIndex * 2, colIndex * 2 + 2);
+          return (
+            <div class:list={[
+              'flex flex-col gap-4 lg:gap-5',
+              colIndex > 0 ? 'lg:pl-6' : '',
+              colIndex < 2 ? 'lg:pr-6 pb-6 lg:pb-0' : 'pb-0'
+            ]}>
+              {colStories.map((story) => (
+                <a href={story.href} class="group flex gap-3 sm:gap-4 items-center">
+                  <Media seed={story.href} ratio="1/1" class="w-16 h-16 sm:w-20 sm:h-20 shrink-0" zoom />
+                  <div class="flex-1 min-w-0">
+                    {story.category && <Kicker text={story.category} class="mb-1 block" />}
+                    <h4 class="article-title text-text-primary dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-2 text-sm sm:text-base leading-snug">
+                      {story.title}
+                    </h4>
+                  </div>
+                </a>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</section>

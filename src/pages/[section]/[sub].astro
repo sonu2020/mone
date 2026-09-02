@@ -1,0 +1,82 @@
+---
+// ── /<section>/<sub> · a sub-section desk ────────────────────────────────────
+// Every child the menu points at — /politics/elections, /sports/cricket,
+// /business/markets — rendered on the same shell as its parent. Before this
+// route, 28 links in the mega panels and the contextual sub-nav went nowhere.
+//
+// Stories are the parent desk's, filtered to this path. Most are thin or empty
+// today: the IA is published ahead of the content, and a desk that says it has
+// nothing yet is better than a link that 404s. They fill on their own as
+// stories start carrying the sub-section path.
+//
+// /gulf/<country> is excluded — it has a hand-built route of its own.
+//
+// Not indexed while empty-ish: the parent desk is the URL worth ranking, and a
+// near-empty page competing with it helps nobody.
+import Layout from '../../layouts/Layout.astro';
+import HeaderBar from '../../components/nav/HeaderBar.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import Footer from '../../components/Footer.astro';
+import VideoModal from '../../components/VideoModal.astro';
+import ScheduleList from '../../components/live/ScheduleList.astro';
+import DeskPage from '../../components/desk/DeskPage.astro';
+
+import { getSubDesk, getDeskPage, subDeskPaths } from '../../lib/desk';
+import { latest } from '../../lib/home4-data';
+import { allVideos } from '../../lib/videos';
+import { todaysVideos } from '../../lib/videos';
+import { toModalVideos, modalShows, type ModalVideo } from '../../lib/video-modal';
+import { LIVE_CHANNEL } from '../../lib/live-tv';
+
+export async function getStaticPaths() {
+  const { subDeskPaths } = await import('../../lib/desk');
+  return subDeskPaths().map(({ section, sub, link }) => ({
+    params: { section, sub },
+    props: { parent: section, link },
+  }));
+}
+
+const { parent, link } = Astro.props;
+const desk = getSubDesk(parent, link);
+const page = getDeskPage(desk, 1);
+
+// The modal doubles as a video browser, so it needs more than a queue.
+const modalToday = todaysVideos().map((v) => ({
+  id: v.slug,
+  title: v.title,
+  time: v.publishTime,
+  poster: v.thumbnailUrl || '',
+}));
+const shows = await modalShows(parent);
+
+const liveModalVideo: ModalVideo = {
+  id: LIVE_CHANNEL.id,
+  title: `${LIVE_CHANNEL.titleML} | ${LIVE_CHANNEL.title}`,
+  category: 'Live TV',
+  meta: 'Streaming now · 24×7',
+  poster: LIVE_CHANNEL.poster,
+  src: '',
+  embedUrl: LIVE_CHANNEL.embedUrl,
+  isLive: true,
+};
+---
+
+<Layout
+  title={`${desk.label} — MediaOne`}
+  description={desk.description}
+  adTone="gray"
+  noindex={desk.stories.length === 0}
+>
+  <HeaderBar isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav pathname={link.href} />
+
+  <main class="flex-1 bg-bg-page">
+    <DeskPage desk={desk} page={page} videos={allVideos.slice(0, 5)} trending={latest.slice(0, 5)} latest={latest.slice(5, 11)} />
+  </main>
+
+  <Footer />
+
+  <VideoModal videos={[liveModalVideo, ...toModalVideos(allVideos)]} today={modalToday} programs={shows}>
+    <ScheduleList slot="live-panel" tone="dark" />
+  </VideoModal>
+</Layout>

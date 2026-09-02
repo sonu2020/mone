@@ -1,0 +1,30 @@
+---
+// ATOM · SectionHeading — a homepage block label: Malayalam title with a short
+// azure accent rule, an English kicker, and an optional "View all". This is the
+// lightweight section identity (distinct from SectionHeader, the section-page
+// masthead banner).
+export interface Props {
+  title: string;
+  titleEn?: string;
+  href?: string;
+  viewAllHref?: string;
+  accent?: boolean;
+  class?: string;
+}
+const { title, titleEn, href, viewAllHref, accent = true, class: className = '' } = Astro.props;
+const TitleTag = href ? 'a' : 'div';
+---
+<div class:list={['mc', 'flex items-baseline justify-between gap-4 mb-5 lg:mb-6', className]}>
+  <TitleTag href={href} class="group flex items-baseline gap-2.5 min-w-0">
+    <h2
+      class:list={[
+        'section-header text-ink group-hover:text-azure transition-colors',
+        accent && 'relative pb-1.5 after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-9 after:bg-azure',
+      ]}
+    >{title}</h2>
+    {titleEn && <span class="eyebrow text-text-muted shrink-0">{titleEn}</span>}
+  </TitleTag>
+  {viewAllHref && (
+    <a href={viewAllHref} class="shrink-0 eyebrow text-azure hover:text-azure-dark transition-colors">View all →</a>
+  )}
+</div>

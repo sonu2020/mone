@@ -1,0 +1,144 @@
+---
+// ── /design ──────────────────────────────────────────────────────────────────
+// The design-system hub. Principles first, then the four sub-pages: what each
+// one answers and when to open it.
+import DesignShell from '../../components/design/DesignShell.astro';
+import { SOURCE } from '../../lib/home4-data';
+
+const principles = [
+  {
+    title: 'Editorial restraint',
+    body: 'The interface serves the story, never the other way around. Almost everything lives flat on the canvas. Chrome earns its place or it is removed.',
+  },
+  {
+    title: 'Type carries the identity',
+    body: 'Anek Latin and Anek Malayalam, a single metrically matched superfamily on fixed scales. Hierarchy comes from size and weight, not decoration.',
+  },
+  {
+    title: 'Blue, spent once',
+    body: 'One reserved accent, the MediaOne blue, for eyebrows, links, hover, and the masthead rule. Navy ink on a cool white canvas does the rest. No second voice, and no red.',
+  },
+  {
+    title: 'Square and hairline',
+    body: 'Zero-radius geometry, 1px rules, and no drop-shadows. Elevation is a single line; surfaces meet with rules, not glow.',
+  },
+  {
+    title: 'No gradients, no glass',
+    body: 'Honest flat surfaces. Photography brings the color; placeholders are tinted blocks, never rainbow fills or blurred panes.',
+  },
+  {
+    title: 'One identity',
+    body: 'MediaOne only. The legacy multi-brand switcher is archived, not wired. A single voice reads as confidence.',
+  },
+];
+
+const sections = [
+  {
+    n: '01',
+    label: 'Tokens',
+    href: '/design/tokens',
+    question: 'What are the raw values?',
+    body: 'The token browser — every color, type size, spacing, radius and container in one quick-glance view, with swatches and click-to-copy chips. Parsed from the @theme block, so it can\'t drift.',
+  },
+  {
+    n: '02',
+    label: 'Gallery',
+    href: '/design/kitchen',
+    question: 'What can I compose with?',
+    body: 'Atoms, blocks and bands rendered live, with a filter and status chips. The band set is what the homepage is built from.',
+  },
+  {
+    n: '03',
+    label: 'Catalogue',
+    href: '/design/components',
+    question: 'What props does it take?',
+    body: 'The composition components and their public API — the reference to check before wiring one into a page.',
+  },
+  {
+    n: '04',
+    label: 'Archive',
+    href: '/design/archive',
+    question: 'What did this replace?',
+    body: 'Superseded lockups, still rendering because the older homepage variants ship them. Not for new work.',
+  },
+];
+---
+
+<DesignShell
+  title="MediaOne Design System"
+  description="The philosophy, tokens and components behind the MediaOne newsroom interface."
+  eyebrow="Overview"
+  heading="The MediaOne Design Language"
+  lede="An editorial system in the Wired tradition — a strict black-on-white magazine, rendered for a Malayalam newsroom. Cool navy neutrals sampled from the live site, Anek type, and the MediaOne blue as the only accent."
+  active="overview"
+>
+  <!-- Sections -->
+  <section aria-labelledby="sections-heading">
+    <h2 id="sections-heading" class="eyebrow text-text-muted dark:text-ivory/40 mb-5">The system</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-rule dark:bg-ivory/10 border border-rule dark:border-ivory/10">
+      {sections.map((s) => (
+        <a href={s.href} class="group bg-bg-card p-6 lg:p-7 hover:bg-bg-page dark:hover:bg-brand-elevated transition-colors">
+          <div class="flex items-baseline gap-3">
+            <span class="eyebrow text-azure tabular-nums">{s.n}</span>
+            <h3 class="text-section font-semibold text-ink dark:text-ivory group-hover:text-azure transition-colors">{s.label}</h3>
+            <span class="ml-auto eyebrow text-text-muted dark:text-ivory/30 group-hover:text-azure transition-colors">→</span>
+          </div>
+          <p class="mt-2 headline-deck text-text-navy-deep dark:text-ivory/80">{s.question}</p>
+          <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">{s.body}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Principles -->
+  <section class="mt-14" aria-labelledby="principles-heading">
+    <h2 id="principles-heading" class="eyebrow text-text-muted dark:text-ivory/40">Principles</h2>
+    <ol class="mt-5 border-t border-rule dark:border-ivory/10 max-w-3xl">
+      {principles.map((p, i) => (
+        <li class="grid grid-cols-[auto_1fr] gap-5 sm:gap-8 py-6 border-b border-rule dark:border-ivory/10">
+          <span class="text-section text-azure/40 dark:text-azure-light/40 tabular-nums leading-none">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <div>
+            <h3 class="text-headline font-bold text-ink dark:text-ivory">{p.title}</h3>
+            <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">{p.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Where it ships -->
+  <section class="mt-14" aria-labelledby="ships-heading">
+    <h2 id="ships-heading" class="eyebrow text-text-muted dark:text-ivory/40 mb-5">Where it ships</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-px bg-rule dark:bg-ivory/10 border border-rule dark:border-ivory/10">
+      <div class="bg-bg-card p-6 hover:bg-bg-page dark:hover:bg-brand-elevated transition-colors">
+        <a href="/" class="eyebrow text-azure hover:text-azure-dark transition-colors">/</a>
+        <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">
+          The homepage built from the band set, rendering the {SOURCE.url.replace('https://www.', '')}
+          snapshot captured {SOURCE.capturedAt}. The layout it replaced is archived at
+          <a href="/old-home" class="text-azure hover:text-azure-dark transition-colors">/old-home</a>.
+        </p>
+      </div>
+      <div class="bg-bg-card p-6 hover:bg-bg-page dark:hover:bg-brand-elevated transition-colors">
+        <a href="/article/classic" class="eyebrow text-azure hover:text-azure-dark transition-colors">/article</a>
+        <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">
+          The article-page lab: one story document rendered through four page shapes —
+          Classic, Focus, Immersive, Magazine. Press 1–4 to switch.
+        </p>
+      </div>
+      <div class="bg-bg-card p-6">
+        <p class="eyebrow text-text-muted dark:text-ivory/40">app.css</p>
+        <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">
+          The single source of truth: every token in one <code class="font-mono">@theme</code> block.
+        </p>
+      </div>
+      <div class="bg-bg-card p-6">
+        <p class="eyebrow text-text-muted dark:text-ivory/40">DESIGN.md</p>
+        <p class="mt-2 body-small text-text-secondary dark:text-ivory/60">
+          The source analysis this discipline is drawn from.
+        </p>
+      </div>
+    </div>
+  </section>
+</DesignShell>

@@ -1,0 +1,137 @@
+---
+// ── /home5 · the stream homepage ─────────────────────────────────────────────
+// A variant of the homepage that keeps the top of the page and rearranges
+// everything under it.
+//
+// The homepage at / sorts the day into departments: Kerala, Magazine,
+// Entertainment, Sports, Gulf, National, World, each its own band with its own
+// heading and its own internal layout. That is a good page for a reader who
+// arrives knowing which desk they want. It is a slower one for the reader who
+// just wants to see what happened, because the news is cut into seven piles
+// and the ninth Kerala story sits above the first World one.
+//
+// This page keeps the lead package and the shelf exactly as the homepage has
+// them — the top of the page is the top of the page — and then, below the
+// shelf, drops the grouping entirely. What follows is one dated run of news
+// blocks, desks interleaved so no two neighbours are from the same one, in the
+// manner of mathrubhumi.com: the desk is a kicker on each story rather than a
+// heading over a set of them, and the reader scrolls rather than steps. It
+// reveals a batch at a time as they go, so the page has no visible bottom.
+//
+// Nothing here is shared with /: the stream lives in src/components/home5/ and
+// src/lib/home5-stream.ts, and the only things borrowed from the homepage are
+// the head-of-page bands themselves, imported unchanged. Editing this page
+// cannot move the homepage, and vice versa.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+import AdSlot from '../components/AdSlot.astro';
+import VideoModal from '../components/VideoModal.astro';
+import ScheduleList from '../components/live/ScheduleList.astro';
+
+// The head of the page, straight from the homepage's band set.
+import LeadPackage from '../components/home4/LeadPackage.astro';
+import ShelfBand from '../components/home4/ShelfBand.astro';
+
+// Everything below it.
+import StreamFeed from '../components/home5/StreamFeed.astro';
+import StreamRail from '../components/home5/StreamRail.astro';
+
+import { leadStories, latest, shelf, feed } from '../lib/home4-data';
+import { buildStream, mostRead } from '../lib/home5-stream';
+import { allVideos, todaysVideos } from '../lib/videos';
+import { toModalVideos, modalShows, type ModalVideo } from '../lib/video-modal';
+import { trendingTopics } from '../lib/mega-nav';
+import { LIVE_CHANNEL } from '../lib/live-tv';
+
+// Same two placement switches the homepage carries, at the same settings, so
+// the masthead reads identically on both.
+const LIVE_IN_HEADER = true;
+const TOPICS_IN_HEADER = true;
+
+const [hero, ...heroRest] = leadStories;
+
+const blocks = buildStream();
+
+// The shared video modal, wired exactly as on the homepage — the stream's
+// video strip opens it through the same `data-video-open` hook.
+const modalToday = todaysVideos().map((v) => ({
+  id: v.slug,
+  title: v.title,
+  time: v.publishTime,
+  poster: v.thumbnailUrl || '',
+}));
+const shows = await modalShows();
+
+const liveModalVideo: ModalVideo = {
+  id: LIVE_CHANNEL.id,
+  title: `${LIVE_CHANNEL.titleML} | ${LIVE_CHANNEL.title}`,
+  category: 'Live TV',
+  meta: 'Streaming now · 24×7',
+  poster: LIVE_CHANNEL.poster,
+  src: '',
+  embedUrl: LIVE_CHANNEL.embedUrl,
+  isLive: true,
+};
+---
+
+<Layout
+  title="MediaOne | വാർത്തകൾ, ലൈവ് ടിവി, വിശകലനം"
+  description="വാർത്തകൾ, ലൈവ് ടിവി, വിശകലനം — കേരളം, ഇന്ത്യ, ഗൾഫ്, ലോകം. MediaOne: Malayalam news, live TV and analysis."
+  adTone="gray"
+>
+  <Header isBreaking={false} showTopics={TOPICS_IN_HEADER} liveUnit={LIVE_IN_HEADER} />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full max-w-site mx-auto bg-bg-card">
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 1 · LEAD — unchanged from the homepage -->
+        <LeadPackage
+          lead={hero}
+          rows={[...heroRest, ...latest]}
+          feed={feed}
+          topics={TOPICS_IN_HEADER ? [] : trendingTopics}
+          onAir={!LIVE_IN_HEADER}
+          flushTop
+        />
+      </div>
+
+      <AdSlot slot="home5-lead" format="leaderboard" lazy />
+
+      <div class="px-4 sm:px-6 lg:px-8">
+        <!-- 2 · SHELF — unchanged from the homepage -->
+        <ShelfBand
+          label="Shelf"
+          href="/shelf"
+          viewAllHref="/shelf"
+          lead={shelf[0]}
+          cards={shelf.slice(1, 4)}
+          rail={shelf.slice(4, 7)}
+          adSlot="home5-shelf-rail"
+        />
+      </div>
+
+      <!-- 3 · THE STREAM — everything the homepage would have banded.
+           The feed is capped well below the shelf's full width: forty
+           headlines set across the whole page would be a table of contents,
+           not a run of stories. The rail takes the space that leaves. -->
+      <div class="px-4 sm:px-6 lg:px-8 pb-10">
+        <div class="grid grid-cols-1 gap-x-10 xl:gap-x-14 lg:grid-cols-12">
+          <div class="lg:col-span-8 min-w-0">
+            <StreamFeed blocks={blocks} />
+          </div>
+
+          <div class="hidden lg:block lg:col-span-4">
+            <StreamRail stories={mostRead} adSlot="home5-rail" class="py-6" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+
+  <VideoModal videos={[liveModalVideo, ...toModalVideos(allVideos)]} today={modalToday} programs={shows}>
+    <ScheduleList slot="live-panel" tone="dark" />
+  </VideoModal>
+</Layout>

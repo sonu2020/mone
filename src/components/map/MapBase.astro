@@ -1,0 +1,157 @@
+---
+// BASE · MapBase — everything every map on the site needs, and nothing about
+// any particular map.
+//
+// This used to live inside RouteMap: the Leaflet tags, the tile theme, the pin
+// styling and the readiness poller. InlineMap used all four and defined none of
+// them, so an InlineMap on a page without a RouteMap rendered an empty box. Any
+// third map would have been a third copy of the same boot.
+//
+// So the loader moved here and became idempotent by construction rather than by
+// page-authoring discipline: it injects Leaflet once, guarded by element id, no
+// matter how many maps a page mounts. Include this component wherever a map is
+// used and stop thinking about it.
+//
+// The styles are `is:global` because Leaflet builds its DOM at runtime, outside
+// Astro's scoping. Astro still bundles a component's styles once regardless of
+// instance count, so they deduplicate on their own — only the inline script
+// needed the guard.
+//
+// Nothing here renders. The page is complete without Leaflet; if the CDN never
+// answers, `mapReady` gives up quietly and every consumer is written to survive
+// that.
+---
+
+<script is:inline>
+  (function () {
+    // Guarded, so mounting several maps on one page injects one Leaflet.
+    if (window.mapReady) return;
+
+    var CSS_URL = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    var CSS_SRI = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+    var JS_URL = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    var JS_SRI = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+
+    if (!document.getElementById('leaflet-css')) {
+      var link = document.createElement('link');
+      link.id = 'leaflet-css';
+      link.rel = 'stylesheet';
+      link.href = CSS_URL;
+      link.integrity = CSS_SRI;
+      link.crossOrigin = '';
+      document.head.appendChild(link);
+    }
+
+    if (!document.getElementById('leaflet-js')) {
+      var script = document.createElement('script');
+      script.id = 'leaflet-js';
+      script.src = JS_URL;
+      script.integrity = JS_SRI;
+      script.crossOrigin = '';
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+
+    // Leaflet is deferred; wait for it rather than racing it. ~10s, then give
+    // up quietly — a map that never arrives must not take the page with it.
+    window.mapReady = function (fn) {
+      if (window.L) return fn(window.L);
+      var tries = 0;
+      var t = setInterval(function () {
+        if (window.L) { clearInterval(t); fn(window.L); }
+        else if (++tries > 100) clearInterval(t);
+      }, 100);
+    };
+
+    // Every map on the site suppresses motion the same way.
+    window.mapReduceMotion = function () {
+      return !!(window.matchMedia
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    };
+  })();
+</script>
+
+<style is:global>
+  /* The tint sits on the tile pane only, so routes, pins and pointers stay true
+     brand colour on top of a map that has been pulled toward the masthead. */
+  .route-map .leaflet-tile-pane {
+    filter: saturate(0.55) contrast(0.95) brightness(1.02) hue-rotate(-8deg);
+  }
+  :root.dark .route-map .leaflet-tile-pane {
+    filter: invert(0.92) hue-rotate(180deg) saturate(0.5) brightness(0.92) contrast(0.95);
+  }
+
+  .route-map .leaflet-container {
+    background: var(--color-bg-page);
+    font-family: var(--font-sans);
+  }
+  :root.dark .route-map .leaflet-container { background: var(--color-brand-dark); }
+
+  .route-map .leaflet-control-attribution {
+    background: rgba(255, 255, 255, 0.78);
+    font-size: 10px;
+  }
+  :root.dark .route-map .leaflet-control-attribution {
+    background: rgba(11, 46, 93, 0.75);
+    color: var(--color-ivory);
+  }
+  :root.dark .route-map .leaflet-control-attribution a { color: var(--color-azure-light); }
+
+  /* ── Pins ───────────────────────────────────────────────────────────────── */
+  .route-pin__dot {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: var(--color-bg-card);
+    border: 2px solid var(--color-rule);
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  }
+  /* A glyph in the dot reads at a larger size than the numeral the dot was
+     built for, and must not inherit the tabular figures set for numbers. */
+  .route-pin__dot .ti {
+    font-size: 14px;
+    line-height: 1;
+    font-variant-numeric: normal;
+  }
+
+  .route-pin.is-reached .route-pin__dot {
+    background: var(--color-nav-bg);
+    border-color: var(--color-nav-bg);
+    color: #fff;
+  }
+  .route-pin.is-current .route-pin__dot {
+    background: var(--color-accent-red);
+    border-color: var(--color-accent-red);
+    transform: scale(1.15);
+  }
+
+  .route-tip {
+    background: var(--color-nav-bg);
+    border: 0;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 7px;
+    box-shadow: none;
+  }
+  .route-tip::before { border-top-color: var(--color-nav-bg); }
+
+  /* ── The travelling pointer ─────────────────────────────────────────────── */
+  .route-pointer span {
+    display: block;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--color-accent-red);
+    box-shadow: 0 0 0 4px rgba(167, 38, 38, 0.22), 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .route-pointer span { animation: heartbeat 1.9s ease-in-out infinite; }
+  }
+</style>

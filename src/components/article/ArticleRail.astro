@@ -1,0 +1,25 @@
+---
+// PATTERN · ArticleRail — the wireframe's right column: what to read next, the
+// sponsor unit, a video, and a rectangle. Sticky on desktop so it travels with
+// a long story instead of being a reward for finishing it.
+import AdSlot from '../AdSlot.astro';
+import ReadMoreList from './ReadMoreList.astro';
+import SponsoredCard from './SponsoredCard.astro';
+import VideoBlock from './VideoBlock.astro';
+import type { ArticleDoc } from '../../lib/article-data';
+
+export interface Props {
+  doc: ArticleDoc;
+  sticky?: boolean;
+  class?: string;
+}
+const { doc, sticky = true, class: className = '' } = Astro.props;
+---
+<aside class:list={['mc', className]} aria-label="More from MediaOne">
+  <div class:list={['flex flex-col gap-8', sticky && 'lg:sticky lg:top-20']}>
+    <ReadMoreList items={doc.readMore} variant="text" limit={3} />
+    <SponsoredCard item={doc.sponsored} orientation="vertical" />
+    <VideoBlock title={doc.video.title} src={doc.video.image} duration={doc.video.duration} />
+    <AdSlot slot="story-rail" format="rectangle" tone="gray" lazy={true} />
+  </div>
+</aside>

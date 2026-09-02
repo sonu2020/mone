@@ -1,0 +1,18 @@
+---
+export interface Props {
+  label?: string;
+  text?: string;
+  class?: string;
+}
+
+const {
+  label = 'BREAKING',
+  text = 'കോഴിക്കോട് മുട്ടായി മഴ; ജില്ലയിൽ സന്തോഷം',
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={['mc', `bg-accent-red px-4 py-2.5 sm:px-6 md:px-8 flex items-center gap-3 overflow-hidden ${className}`]}>
+  <span class="breaking-badge text-white shrink-0">{label}</span>
+  <span class="text-sm sm:text-base font-semibold text-white truncate">{text}</span>
+</div>

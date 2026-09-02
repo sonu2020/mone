@@ -1,0 +1,20 @@
+---
+// Universal image placeholder. Renders a real <img> when src is provided,
+// otherwise falls back to a flat on-brand tinted block with a faint glyph.
+interface Props {
+  class?: string;
+  src?: string;
+  alt?: string;
+}
+const { class: className = '', src, alt = '' } = Astro.props;
+---
+
+{src ? (
+  <div class:list={['mc', `overflow-hidden ${className}`]}>
+    <img src={src} alt={alt} loading="lazy" decoding="async" class="w-full h-full object-cover" />
+  </div>
+) : (
+  <div class:list={['mc', `bg-placeholder dark:bg-brand-elevated flex items-center justify-center overflow-hidden ${className}`]}>
+    <i class="ti ti-photo text-[32px] text-ink/12 dark:text-ivory/25" aria-hidden="true"></i>
+  </div>
+)}

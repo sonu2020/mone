@@ -1,0 +1,620 @@
+---
+// HEADER · HeaderBar — everything on one line.
+// Light mode: white header with MediaOne blue navigation.
+// Dark mode: original navy header with white navigation.
+//
+// Layout: logo, section links, Watch Live and search in one header row.
+// Trending topics and the date sit in a separate row below.
+//
+// The third masthead variant. Header.astro keeps the mega panels; HeaderFlat
+// stacks a tall masthead over its own section bar; this one collapses both into
+// a single 64px rail — the logo sized to the bar rather than the bar sized to
+// the logo.
+//
+// Because the whole header is now one short bar, it is the floating menu: it
+// sticks and hides on the way down / returns on the way up, so there is no
+// second cloned bar to keep in step. The trending band sits outside the sticky
+// element and scrolls away with the page, which is what keeps the sticky part
+// worth its height.
+//
+// Swappable with the other two: same props, same OnAirNow integration, so a
+// page changes one import. `date` moves to the trending band here — a single
+// row has no centre column to give it.
+import Logo from '../Logo.astro';
+import Pulse from '../ui/Pulse.astro';
+import OnAirNow from '../home4/OnAirNow.astro';
+import MegaPanel from './MegaPanel.astro';
+import SearchOverlay from './SearchOverlay.astro';
+import { navItems, trendingTopics } from '../../lib/mega-nav';
+import { LIVE_CHANNEL } from '../../lib/live-tv';
+
+export interface Props {
+  isBreaking?: boolean;
+  date?: string;
+  showTopics?: boolean;
+  /** Promote the Live link to the full Watch Live control (lg and up). */
+  liveUnit?: boolean;
+}
+
+const {
+  isBreaking = false,
+  date,
+  showTopics = true,
+  liveUnit = false,
+} = Astro.props;
+
+const today =
+  date ??
+  new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+const topicsVisible = showTopics && !isBreaking;
+
+// A panel can't hang out of a horizontally scrolling row, so the rail only
+// takes overflow-x when no desk carries one.
+const hasPanel = navItems.some(
+  (item) => item.panel === 'mini' && item.columns
+);
+
+// Light mode keeps the new blue navigation.
+// Dark mode restores the original white navigation and hover treatment.
+const deskLink =
+  'flex items-center whitespace-nowrap ' +
+  'text-[#0B2E5D] hover:bg-[#0B2E5D]/5 ' +
+  'dark:text-white/90 dark:hover:text-white dark:hover:bg-white/10 ' +
+  'focus-visible:outline focus-visible:outline-2 ' +
+  'focus-visible:-outline-offset-2 focus-visible:outline-[#0B2E5D] ' +
+  'dark:focus-visible:outline-azure-light transition-colors';
+---
+
+<header
+  id="site-header"
+  class:list={[
+    'mc',
+    'sticky top-0 z-40',
+    'bg-white text-[#0B2E5D] dark:bg-nav-bg dark:text-white',
+    'border-b border-[#0B2E5D]/15 dark:border-black/25',
+    'transition-transform duration-200 ease-out',
+  ]}
+>
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-3 lg:gap-5 h-14 lg:h-16">
+      <!-- Logo -->
+      <a
+        href="/"
+        class="shrink-0 text-[#0B2E5D] dark:text-white"
+        aria-label="MediaOne — home"
+      >
+        <Logo
+          class="h-12 lg:h-12 w-auto text-[#0B2E5D] dark:text-white"
+        />
+      </a>
+
+      <!-- Desktop navigation -->
+      <!-- The rail is plain links with one exception: a desk that declares
+           `panel: 'mini'` gets a drop-down. Only More does, because it is the
+           only desk with no section page of its own to surface its children
+           once you arrive. The panel needs the row to stop clipping it, so
+           overflow only scrolls when nothing in the rail has one. -->
+      <nav
+        class="hidden lg:block min-w-0 flex-1"
+        aria-label="Sections"
+      >
+        <ul
+          class:list={[
+            'flex items-stretch',
+            hasPanel
+              ? 'flex-wrap'
+              : 'overflow-x-auto scrollbar-none',
+          ]}
+        >
+          {
+            navItems.map((item) => {
+              const panelId =
+                `hb-${item.label.toLowerCase().replace(/[^a-z]+/g, '-')}`;
+
+              if (item.panel !== 'mini' || !item.columns) {
+                return (
+                  <li class="shrink-0">
+                    <a
+                      href={item.href}
+                      class:list={[
+                        deskLink,
+                        'h-16 px-3 nav-text text-[1.0625rem] lg:text-[1.125rem]',
+                      ]}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                );
+              }
+
+              // A desk with a page keeps a link you can follow; one without —
+              // More — is a button, because a menu label that navigates nowhere
+              // should not pretend to be a destination.
+              const Trigger = item.href ? 'a' : 'button';
+
+              return (
+                <li class="shrink-0 relative" data-hb-item>
+                  <Trigger
+                    href={item.href}
+                    type={item.href ? undefined : 'button'}
+                    data-hb-trigger={panelId}
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    aria-controls={panelId}
+                    class:list={[
+                      deskLink,
+                      'h-16 px-3 gap-1 nav-text text-[1.0625rem] lg:text-[1.125rem]',
+                    ]}
+                  >
+                    {item.label}
+                    <i
+                      class="ti ti-chevron-down text-xs opacity-60"
+                      aria-hidden="true"
+                    ></i>
+                  </Trigger>
+
+                  <MegaPanel
+                    item={item}
+                    id={panelId}
+                    align="end"
+                    size="mini"
+                  />
+                </li>
+              );
+            })
+          }
+        </ul>
+      </nav>
+
+      <!-- Live, search and mobile menu -->
+      <!-- Watch Live. The header keeps it — this is the one place on the page
+           where "is MediaOne on air right now" is worth answering, and the
+           OnAirNow unit answers it with the current programme on hover rather
+           than just linking away. The secondary copies that used to sit in the
+           desk rail and the home lead package stay removed; one live control
+           per page is the point. -->
+      <div
+        class="ml-auto lg:ml-0 flex items-center gap-2 sm:gap-3 shrink-0"
+      >
+        {liveUnit && <OnAirNow class="hidden lg:block" />}
+
+        <!-- Below lg the live control is the same control, not a link away:
+             `data-video-open` hands the tap to the shared VideoModal, which is
+             where desktop's Watch Live already goes. The href stays as the
+             fallback — a page without the modal, or a reader without JS, still
+             lands on /live. Drawn as the red pill rather than the bare word so
+             the two sizes read as one thing. -->
+        <a
+          href={LIVE_CHANNEL.href}
+          data-video-open={LIVE_CHANNEL.id}
+          class:list={[
+            'inline-flex h-9 items-center gap-2 rounded-xs px-3',
+            'bg-accent-red text-white hover:brightness-110',
+            'focus-visible:outline focus-visible:outline-2',
+            'focus-visible:outline-offset-2 focus-visible:outline-[#0B2E5D]',
+            'dark:focus-visible:outline-white',
+            'transition-[filter]',
+            liveUnit && 'lg:hidden',
+          ]}
+          aria-label={`Watch ${LIVE_CHANNEL.title}`}
+        >
+          <Pulse tone="white" beat />
+          <span
+            class="eyebrow text-[0.8125rem] leading-none tracking-[0.06em]"
+          >
+            Live
+          </span>
+        </a>
+
+        <button
+          type="button"
+          data-search-open
+          class="inline-flex size-11 lg:size-9 items-center justify-center text-[#0B2E5D] hover:bg-[#0B2E5D]/5 dark:text-white/80 dark:hover:text-white dark:hover:bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0B2E5D] dark:focus-visible:outline-azure-light transition-colors"
+          aria-label="Search"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="site-search"
+        >
+          <i class="ti ti-search text-xl" aria-hidden="true"></i>
+        </button>
+
+        <button
+          type="button"
+          data-drawer-open
+          class="lg:hidden -mr-2 inline-flex size-11 items-center justify-center text-[#0B2E5D] hover:bg-[#0B2E5D]/5 dark:text-white dark:hover:bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0B2E5D] dark:focus-visible:outline-azure-light transition-colors"
+          aria-label="Open menu"
+          aria-controls="hb-drawer"
+          aria-expanded="false"
+        >
+          <i class="ti ti-menu-2 text-2xl" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No desk band below lg. The scrolling row of tabs that used to sit here
+       cost a permanent 40px of a phone screen to show four of eleven desks,
+       and swiping it fought the page's own vertical scroll. Below lg the header
+       is one bar — mark, live, search, menu — and the desks live in the drawer,
+       which shows all of them at once. -->
+</header>
+
+<!-- ══ TRENDING — outside the sticky bar, so it scrolls away with the page ══ -->
+<!-- Trending strip: retains its existing light/dark theme -->
+{
+  topicsVisible && (
+    <div class="bg-bg-card dark:bg-brand-elevated border-b border-rule dark:border-ivory/10">
+      <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-1">
+        <!-- font-sans, stated on the row: the topics are Latin, and `body-small`
+             (the obvious utility for type this size) carries the Malayalam-alt
+             family, which set the whole band in Noto. The links take `meta-text`
+             — the same 12→13px at the same weight, with no family of its own —
+             so label and links both inherit Anek Latin here. -->
+        <div class="font-sans flex items-center gap-3 h-8 overflow-x-auto scrollbar-none">
+          <span class="inline-flex items-center gap-1.5 shrink-0 eyebrow leading-none text-accent-red">
+            <i
+              class="ti ti-trending-up text-sm"
+              aria-hidden="true"
+            ></i>
+          </span>
+
+          <ul class="flex items-center gap-3 shrink-0">
+            {trendingTopics.map((topic, i) => (
+              <li class="flex items-center gap-3">
+                {i > 0 && (
+                  <span
+                    class="text-rule dark:text-ivory/20 leading-none"
+                    aria-hidden="true"
+                  ></span>
+                )}
+
+                <a
+                  href={topic.href}
+                  class="meta-text text-base leading-none text-text-secondary dark:text-ivory/70 hover:text-azure dark:hover:text-azure-light transition-colors whitespace-nowrap"
+                >
+                  {topic.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <p class="hidden lg:block ml-auto shrink-0 caption-text tabular-nums text-text-muted dark:text-ivory/45">
+            {today}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<!-- ══ MOBILE DRAWER ══ -->
+<!-- Mobile drawer -->
+<div
+  id="hb-drawer"
+  class="lg:hidden fixed inset-0 z-50 hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Menu"
+>
+  <div
+    class="absolute inset-0 bg-black/50"
+    data-drawer-close
+  ></div>
+
+  <div
+    class="absolute inset-y-0 right-0 w-[min(20rem,90vw)] bg-white text-[#0B2E5D] dark:bg-nav-bg dark:text-white overflow-y-auto overscroll-contain"
+  >
+    <div
+      class="sticky top-0 flex items-center justify-between h-14 px-4 bg-white dark:bg-nav-bg border-b border-[#0B2E5D]/15 dark:border-nav-rule/60"
+    >
+      <Logo class="h-7 w-auto text-[#0B2E5D] dark:text-white" />
+
+      <button
+        type="button"
+        class="size-9 inline-flex items-center justify-center text-[#0B2E5D] hover:bg-[#0B2E5D]/5 dark:text-white dark:hover:bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0B2E5D] dark:focus-visible:outline-azure-light transition-colors"
+        aria-label="Close menu"
+        data-drawer-close
+      >
+        <i class="ti ti-x text-2xl" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <ul class="divide-y divide-[#0B2E5D]/10 dark:divide-white/10">
+      {
+        navItems.map((item) => (
+          <li>
+            {item.href ? (
+              <a
+                href={item.href}
+                class="block px-4 py-3 nav-text text-[#0B2E5D] hover:bg-[#0B2E5D]/5 active:bg-[#0B2E5D]/10 dark:text-white dark:hover:bg-transparent dark:active:bg-white/10 transition-colors"
+              >
+                {item.label}
+              </a>
+            ) : (
+              /* No page to link to, so the label heads its own children —
+                 otherwise More's desks would be unreachable on a phone. */
+              <div class="px-4 py-3">
+                <p class="eyebrow text-[#0B2E5D]/70 dark:text-white/45">
+                  {item.label}
+                </p>
+
+                <ul class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1.5">
+                  {(item.columns ?? [])
+                    .flatMap((column) => column.links)
+                    .map((link) => (
+                      <li>
+                        <a
+                          href={link.href}
+                          class="block py-1 body-small text-[#0B2E5D] hover:underline dark:text-white/75 dark:hover:text-white dark:hover:no-underline transition-colors"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="font-sans p-4 border-t border-[#0B2E5D]/10 dark:border-white/10">
+      <p class="eyebrow text-[#0B2E5D]/70 dark:text-white/45 mb-2">
+        Trending
+      </p>
+
+      <ul class="flex flex-wrap gap-x-3 gap-y-2">
+        {
+          trendingTopics.map((topic) => (
+            <li>
+              <a
+                href={topic.href}
+                class="meta-text text-[#0B2E5D] hover:underline dark:text-white/70 dark:hover:text-white dark:hover:no-underline transition-colors"
+              >
+                {topic.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEARCH — the sheet the bar's search button opens, on every size ══ -->
+<!-- Existing search overlay -->
+<SearchOverlay />
+
+<script is:inline>
+  (function () {
+    var header = document.getElementById('site-header');
+    var drawer = document.getElementById('hb-drawer');
+
+    var openers = Array.prototype.slice.call(
+      document.querySelectorAll('[data-drawer-open]')
+    );
+
+    // ── Mini panel: hover opens, focus opens, Escape closes ───────────────
+    // Same contract as the mega panels on Header.astro, so a reader who knows
+    // one header knows the other.
+    // Mini panels: hover and focus open; Escape closes.
+    var panelItems = Array.prototype.slice.call(
+      document.querySelectorAll('[data-hb-item]')
+    );
+
+    var openItem = null;
+
+    function showPanel(li) {
+      if (openItem && openItem !== li) hidePanel(openItem);
+
+      var panel = li.querySelector('[data-panel]');
+      var trigger = li.querySelector('[data-hb-trigger]');
+
+      if (!panel) return;
+
+      panel.classList.remove('invisible', 'opacity-0');
+
+      if (trigger) {
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+
+      openItem = li;
+    }
+
+    function hidePanel(li) {
+      var panel = li.querySelector('[data-panel]');
+      var trigger = li.querySelector('[data-hb-trigger]');
+
+      if (panel) {
+        panel.classList.add('invisible', 'opacity-0');
+      }
+
+      if (trigger) {
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+
+      if (openItem === li) openItem = null;
+    }
+
+    panelItems.forEach(function (li) {
+      if (!li.querySelector('[data-panel]')) return;
+
+      li.addEventListener('mouseenter', function () {
+        showPanel(li);
+      });
+
+      li.addEventListener('mouseleave', function () {
+        hidePanel(li);
+      });
+
+      li.addEventListener('focusin', function () {
+        showPanel(li);
+      });
+
+      li.addEventListener('focusout', function (e) {
+        if (!li.contains(e.relatedTarget)) hidePanel(li);
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || !openItem) return;
+
+      var trigger = openItem.querySelector('[data-hb-trigger]');
+      hidePanel(openItem);
+
+      if (trigger) trigger.focus();
+    });
+
+    // ── Drawer ────────────────────────────────────────────────────────────
+    // Mobile drawer.
+    var lastFocused = null;
+
+    function focusable() {
+      return Array.prototype.slice.call(
+        drawer.querySelectorAll('a[href], button:not([disabled])')
+      ).filter(function (el) {
+        return el.offsetParent !== null;
+      });
+    }
+
+    function setDrawer(isOpen) {
+      if (!drawer) return;
+      if (isOpen === !drawer.classList.contains('hidden')) return;
+
+      drawer.classList.toggle('hidden', !isOpen);
+
+      openers.forEach(function (button) {
+        button.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      document.documentElement.style.overflow =
+        isOpen ? 'hidden' : '';
+
+      if (isOpen) {
+        lastFocused = document.activeElement;
+
+        var elements = focusable();
+        if (elements.length) elements[0].focus();
+      } else if (lastFocused && lastFocused.focus) {
+        lastFocused.focus();
+      }
+    }
+
+    openers.forEach(function (button) {
+      button.addEventListener('click', function () {
+        setDrawer(true);
+      });
+    });
+
+    if (drawer) {
+      drawer.addEventListener('click', function (e) {
+        if (e.target.closest('[data-drawer-close]')) {
+          setDrawer(false);
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (drawer.classList.contains('hidden')) return;
+
+        if (e.key === 'Escape') {
+          setDrawer(false);
+          return;
+        }
+
+        if (e.key !== 'Tab') return;
+
+        var elements = focusable();
+        if (!elements.length) return;
+
+        var first = elements[0];
+        var last = elements[elements.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      });
+
+      window.addEventListener('pageshow', function () {
+        setDrawer(false);
+      });
+
+      if (window.matchMedia) {
+        var wide = window.matchMedia('(min-width: 1024px)');
+
+        var onWide = function (e) {
+          if (e.matches) setDrawer(false);
+        };
+
+        if (wide.addEventListener) {
+          wide.addEventListener('change', onWide);
+        } else if (wide.addListener) {
+          wide.addListener(onWide);
+        }
+      }
+    }
+
+    // ── The bar is the floating menu ──────────────────────────────────────
+    // Sticky already, so hiding is one transform. No cloned bar to keep in step.
+    // Sticky header: hide on downward scroll, show on upward scroll.
+    if (!header) return;
+
+    var lastY = window.scrollY;
+    var hidden = false;
+    var ticking = false;
+    var DELTA = 4;   // absorbs trackpad jitter and rubber-band bounce
+    var FLOOR = 120; // never hide while the reader is still near the top
+
+    function conceal(on) {
+      if (on === hidden) return;
+
+      hidden = on;
+      header.classList.toggle('-translate-y-full', on);
+    }
+
+    function update() {
+      ticking = false;
+
+      var y = window.scrollY;
+      if (y < 0) y = 0;
+
+      var delta = y - lastY;
+
+      if (y <= FLOOR) {
+        conceal(false);
+      } else if (Math.abs(delta) > DELTA) {
+        conceal(delta > 0);
+      }
+
+      lastY = y;
+    }
+
+    window.addEventListener(
+      'scroll',
+      function () {
+        if (ticking) return;
+
+        ticking = true;
+        requestAnimationFrame(update);
+      },
+      { passive: true }
+    );
+
+    // A hidden bar must not swallow focus when tabbing back up the page.
+    header.addEventListener('focusin', function () {
+      conceal(false);
+    });
+
+    update();
+  })();
+</script>

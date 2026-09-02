@@ -1,0 +1,27 @@
+---
+// ATOM · ArticleBreadcrumb — Home › News › Kerala. Meta type, hairline chevrons,
+// the last crumb is the current page and so is not a link.
+export interface Props {
+  section: string;
+  sectionHref: string;
+  class?: string;
+}
+const { section, sectionHref, class: className = '' } = Astro.props;
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'News', href: '/latest-news' },
+  { label: section, href: sectionHref },
+];
+---
+<nav class:list={['mc', 'flex items-center gap-2 meta-text text-text-muted', className]} aria-label="Breadcrumb">
+  {crumbs.map((c, i) => (
+    <>
+      {i > 0 && <span class="text-text-muted/50" aria-hidden="true">›</span>}
+      {i === crumbs.length - 1 ? (
+        <span aria-current="page" class="text-text-secondary">{c.label}</span>
+      ) : (
+        <a href={c.href} class="hover:text-azure transition-colors">{c.label}</a>
+      )}
+    </>
+  ))}
+</nav>

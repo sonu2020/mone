@@ -1,0 +1,85 @@
+---
+interface Post {
+  title: string;
+  link: string;
+}
+
+export interface Props {
+  mustRead: Post[];
+  relatedPosts: Post[];
+}
+
+const { mustRead, relatedPosts } = Astro.props;
+
+const trendingVideos = [
+  { title: 'പെരുന്നാൾ നിലാവ് 2026', link: '#' },
+  { title: 'മീഡിയവൺ ഷെൽഫ്: പുത്തൻ വിശേഷങ്ങൾ', link: '#' },
+  { title: 'സ്പെഷ്യൽ എഡിഷൻ: പുതിയ രാഷ്ട്രീയ ചർച്ചകൾ', link: '#' },
+];
+---
+
+<aside class="space-y-12">
+  <!-- Trending Videos -->
+  <section>
+    <h2 class="eyebrow text-azure dark:text-azure-light pb-3 border-b border-ink/15 dark:border-ivory/15">
+      Trending Videos
+    </h2>
+    <div class="mt-5 space-y-5">
+      {trendingVideos.map((video) => (
+        <a href={video.link} class="group block">
+          <div class="aspect-video w-full bg-ivory-dark dark:bg-brand-elevated relative flex items-center justify-center overflow-hidden">
+            <i class="ti ti-player-play text-4xl text-ink/30 group-hover:text-azure dark:text-ivory/40 dark:group-hover:text-azure-light transition-colors" aria-hidden="true"></i>
+          </div>
+          <p class="mt-2.5 text-headline text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+            {video.title}
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Must Read -->
+  <section>
+    <div class="flex items-baseline justify-between pb-3 border-b border-ink/15 dark:border-ivory/15">
+      <h2 class="eyebrow text-azure dark:text-azure-light">Must Read</h2>
+      <a href="/latest-news" class="text-caption text-ink-muted hover:text-azure dark:text-ivory/50 dark:hover:text-azure-light transition-colors">
+        View all
+      </a>
+    </div>
+    <ol class="mt-2">
+      {mustRead.map((post, idx) => (
+        <li class="flex gap-4 py-4 border-b border-rule dark:border-ivory/10 last:border-0">
+          <span class="text-xl font-bold text-azure/35 dark:text-azure-light/40 tabular-nums leading-none pt-0.5">
+            {String(idx + 1).padStart(2, '0')}
+          </span>
+          <a href={post.link} class="group block">
+            <p class="text-headline text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+              {post.title}
+            </p>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Similar Posts -->
+  <section>
+    <div class="flex items-baseline justify-between pb-3 border-b border-ink/15 dark:border-ivory/15">
+      <h2 class="eyebrow text-azure dark:text-azure-light">Similar Posts</h2>
+      <a href="/kerala" class="text-caption text-ink-muted hover:text-azure dark:text-ivory/50 dark:hover:text-azure-light transition-colors">
+        View all
+      </a>
+    </div>
+    <ul class="mt-2">
+      {relatedPosts.map((post) => (
+        <li class="py-4 border-b border-rule dark:border-ivory/10 last:border-0">
+          <a href={post.link} class="group block">
+            <p class="text-headline text-ink dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors">
+              {post.title}
+            </p>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</aside>

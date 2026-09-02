@@ -1,0 +1,70 @@
+---
+// /magazine — MediaOne Magazine
+// Long-form features, analysis and opinion, pulled from the live /magazine page.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+import SectionSubNav from '../components/nav/SectionSubNav.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+
+import { magazineArticles } from '../lib/magazine';
+import { magazine } from '../lib/home4-data';
+---
+
+<Layout
+  title="Magazine — MediaOne"
+  description="Long-form features, analysis and opinion from MediaOne Magazine."
+>
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <SectionHeader
+        title="Magazine"
+        description="Reporting that takes its time — interviews, argument, criticism and the lives behind the news."
+        class="mb-10"
+      />
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
+        {magazine.map((story) => (
+          <a href={story.href} class="group block">
+            <div class="relative aspect-[16/10] overflow-hidden bg-placeholder border border-rule dark:border-ivory/10">
+              <img
+                src={story.image}
+                alt={story.title}
+                loading="lazy"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+            <div class="mt-4">
+              <span class="eyebrow text-azure dark:text-azure-light text-[10px] font-bold">
+                {story.category}
+              </span>
+              <h3 class="mt-2 article-title text-text-primary group-hover:text-azure dark:group-hover:text-azure-light transition-colors line-clamp-3 leading-snug">
+                {story.title}
+              </h3>
+              {story.date && (
+                <p class="mt-2 text-caption text-text-muted tabular-nums">{story.date}</p>
+              )}
+              {story.excerpt && (
+                <p class="mt-2 text-body text-text-secondary line-clamp-2 text-pretty">
+                  {story.excerpt}
+                </p>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div class="mt-16 pt-8 border-t border-rule dark:border-ivory/10">
+        <p class="caption-text text-text-muted">
+          Magazine listings captured from mediaoneonline.com on 7 Aug 2026.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

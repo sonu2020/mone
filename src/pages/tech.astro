@@ -1,0 +1,162 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/nav/HeaderBar.astro';
+import Footer from '../components/Footer.astro';
+
+const techCategories = [
+  {
+    title: 'Core Framework & Engine',
+    description: 'High-performance web architecture focused on static-first rendering, rapid page delivery, and optimal Core Web Vitals.',
+    items: [
+      {
+        name: 'Astro 6',
+        version: 'v6.4.6',
+        purpose: 'Static Site Generator & Core Framework',
+        details: 'Generates zero-JavaScript static HTML by default. Pre-renders pages at build time for instant page loads and maximum edge cacheability on CDN networks.'
+      },
+      {
+        name: 'Vite 6',
+        version: 'v6.0.0',
+        purpose: 'Frontend Build Tool & Dev Server',
+        details: 'Next-generation frontend tooling offering lightning-fast HMR during development and optimized asset bundling for production.'
+      }
+    ]
+  },
+  {
+    title: 'Styling & Design System',
+    description: 'An editorial design system with strict typography scaling, custom color tokens, and responsive layout primitives.',
+    items: [
+      {
+        name: 'Tailwind CSS v4',
+        version: 'v4.0.0',
+        purpose: 'Utility-First CSS Engine',
+        details: 'Configured with a central @theme block in app.css as the single source of truth for color tokens, typography scales, and layout dimensions.'
+      },
+      {
+        name: '@tailwindcss/vite',
+        version: 'v4.0.0',
+        purpose: 'CSS Compiler Integration',
+        details: 'Native Vite plugin for compile-time Tailwind v4 transformations and fast style evaluation.'
+      }
+    ]
+  },
+  {
+    title: 'Typography & Iconography',
+    description: 'Superfamily font pairing supporting bi-directional, multi-script rendering across Latin and Malayalam scripts.',
+    items: [
+      {
+        name: 'Anek Latin & Anek Malayalam',
+        version: 'Variable Webfonts',
+        purpose: 'Primary Brand Typography',
+        details: 'A metrically matched superfamily ensuring seamless font metric fallback between Malayalam text and Latin numerals/eyebrows.'
+      },
+      {
+        name: 'Tabler Icons',
+        version: 'v3.44.0',
+        purpose: 'UI Vector System',
+        details: 'Clean, modern vector icons for media playback controls, section navigation, and interactive UI feedback.'
+      }
+    ]
+  },
+  {
+    title: 'Media & Interactive Components',
+    description: 'Optimized media streaming and video playback integrations tailored for high-volume news streaming.',
+    items: [
+      {
+        name: 'Video.js',
+        version: 'v10.0.0-beta.25',
+        purpose: 'HTML5 Video Engine',
+        details: 'Robust player framework for live streaming broadcasts and video-on-demand news clips.'
+      }
+    ]
+  },
+  {
+    title: 'Infrastructure & Deployment',
+    description: 'Global distribution pipeline hosted on Cloudflare edge network.',
+    items: [
+      {
+        name: 'Cloudflare Pages',
+        version: 'Edge Platform',
+        purpose: 'Global Hosting & CDN',
+        details: 'Deploys static dist/ output globally with low-latency edge delivery, DDoS protection, and SSL termination.'
+      },
+      {
+        name: 'Wrangler',
+        version: 'v4.100.0',
+        purpose: 'Cloudflare CLI Tooling',
+        details: 'Automated deployment workflow and environment configuration management for Cloudflare Workers & Pages.'
+      }
+    ]
+  }
+];
+
+const architectureStats = [
+  { label: 'Architecture', value: 'Static (SSG)' },
+  { label: 'Primary Language', value: 'Astro / TypeScript' },
+  { label: 'Styling System', value: 'Tailwind CSS v4' },
+  { label: 'Deployment Edge', value: 'Cloudflare Pages' }
+];
+---
+
+<Layout
+  title="Technology Stack — MediaOne"
+  description="Detailed overview of the technology, frameworks, fonts, and infrastructure powering the MediaOne news portal."
+>
+  <Header />
+
+  <main class="flex-1">
+    <!-- Header / Intro Banner -->
+    <section class="border-b border-rule dark:border-ivory/10 bg-ivory dark:bg-brand-dark">
+      <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+        <p class="eyebrow text-azure dark:text-azure-light">Under the Hood</p>
+        <h1 class="mt-3 text-hero-mobile md:text-hero text-ink dark:text-ivory max-w-3xl">
+          Technology Stack
+        </h1>
+        <p class="mt-5 text-lead text-ink-light dark:text-ivory/70 max-w-2xl">
+          An overview of the software engineering, typography, design tokens, and edge infrastructure powering the MediaOne digital newsroom.
+        </p>
+
+        <!-- Quick Stats Grid -->
+        <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 border-t border-rule dark:border-ivory/10">
+          {architectureStats.map(stat => (
+            <div>
+              <p class="text-caption text-ink-muted dark:text-ivory/50 uppercase tracking-wider font-semibold">{stat.label}</p>
+              <p class="mt-1 text-headline text-ink dark:text-ivory font-bold">{stat.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Stack Categories Section -->
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="space-y-16">
+        {techCategories.map((category) => (
+          <section class="border-b border-rule dark:border-ivory/10 pb-12 last:border-b-0">
+            <div class="max-w-3xl mb-8">
+              <h2 class="text-title text-ink dark:text-ivory font-bold">{category.title}</h2>
+              <p class="mt-2 text-body text-ink-light dark:text-ivory/70">{category.description}</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {category.items.map((item) => (
+                <div class="p-6 bg-ivory-dark/40 dark:bg-brand-elevated/40 border border-rule dark:border-ivory/10 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-baseline justify-between gap-4">
+                      <h3 class="text-section text-ink dark:text-ivory font-semibold">{item.name}</h3>
+                      <span class="text-caption font-mono text-azure dark:text-azure-light bg-azure/10 px-2 py-0.5 rounded-xs">{item.version}</span>
+                    </div>
+                    <p class="mt-1 text-nav text-azure dark:text-azure-light font-medium">{item.purpose}</p>
+                    <p class="mt-3 text-body text-ink-light dark:text-ivory/80 text-pretty">{item.details}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

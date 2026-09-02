@@ -1,0 +1,160 @@
+---
+// ── /shelf · MediaOne Shelf ──────────────────────────────────────────────────
+// The in-depth collection. Rebuilt from a five-across featured strip over five
+// identical three-column grids (kept at /old-shelf) into something that reads
+// like a magazine's contents rather than a feed.
+//
+// Three things drive it.
+//
+// ITS OWN NAV. ShelfNav replaces the site's HeaderBar here rather than sitting
+// under it — Shelf is the calm, well-edited section of the site (PRODUCT.md),
+// and the fast-moving rail (Watch Live, breaking, trending) belongs to that
+// other pace. Shelf's own taxonomy is the primary nav a reader sees.
+//
+// DENSITY. Kept compact rather than the airy first pass: rhythm still varies
+// by hierarchy (uniform padding everywhere is monotony either way), but the
+// scale throughout is tighter, closer to a printed contents page than a
+// full-bleed hero spread. Every Shelf image is still 500×300, which caps how
+// large any picture can go before it falls apart — so the images stay small
+// regardless of how compact the type around them gets.
+//
+// DISTINCTNESS. Each collection gets the layout its material wants, not a
+// shared grid:
+//
+//   01 Analysis        one lead, then the argument continues as an index —
+//                      analysis is read for the writer's case, not the photo.
+//   02 Interview       portraits three across, the subject's name as the
+//                      headline, because an interview is a person.
+//   03 Column          no pictures at all. Two columns of pure type. A column
+//                      is a voice; a 500px thumbnail says nothing a name doesn't.
+//   04 Art & Literature two plates to a row, the largest images on the page,
+//                      minimal type. The visual collection gets the visuals.
+//   05 Life Story      full-width spreads, alternating side to side, one after
+//                      another — a sequence, read as a sequence.
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+import ShelfNav from '../../components/shelf/ShelfNav.astro';
+import ShelfMasthead from '../../components/shelf/ShelfMasthead.astro';
+import ShelfSectionHead from '../../components/shelf/ShelfSectionHead.astro';
+import ShelfIndexRow from '../../components/shelf/ShelfIndexRow.astro';
+import ShelfFigure from '../../components/shelf/ShelfFigure.astro';
+import ShelfCollection from '../../components/shelf/ShelfCollection.astro';
+import {
+  shelfFeatured,
+  shelfSections,
+  SHELF_COLLECTION_ORDER,
+  SHELF_COLLECTION_NOTES,
+} from '../../lib/shelf';
+
+const storyCount =
+  shelfFeatured.length + shelfSections.reduce((acc, s) => acc + s.articles.length, 0);
+
+// The opening piece stands alone; the rest of the featured set becomes the
+// index beneath it. Five equal cards was the packed version of this.
+const [opener, ...alsoFeatured] = shelfFeatured;
+
+// Collections are addressed by id so a layout is bound to its material rather
+// than to a position in the array — reordering the data must not reshuffle the
+// layouts. A collection with no layout of its own yet still renders, as an
+// index, appended after the five so new material never vanishes.
+const byId = new Map(shelfSections.map((s) => [s.id, s]));
+const orderedSections = [
+  ...SHELF_COLLECTION_ORDER.map((id) => byId.get(id)).filter(Boolean),
+  ...shelfSections.filter((s) => !SHELF_COLLECTION_ORDER.includes(s.id as (typeof SHELF_COLLECTION_ORDER)[number])),
+] as typeof shelfSections;
+
+// A collection's bottom margin scales to its own weight rather than a single
+// value repeated down the page — a page of Column's bare type needs less air
+// before the next head than Life Story's stacked full-width spreads do. Same
+// padding everywhere is the monotony the per-collection layouts above already
+// argue against; the rhythm should carry through to the space between them too.
+const SECTION_PAD: Record<string, string> = {
+  column: 'pb-8 sm:pb-10 lg:pb-12',
+  interview: 'pb-10 sm:pb-12 lg:pb-14',
+  'art-and-literature': 'pb-12 sm:pb-14 lg:pb-18',
+  'life-story': 'pb-12 sm:pb-14 lg:pb-18',
+};
+const sectionPad = (id: string) => SECTION_PAD[id] ?? 'pb-10 sm:pb-12 lg:pb-16';
+---
+
+<Layout title="Shelf — MediaOne" description="In-depth stories, interviews, analysis and features from MediaOne Shelf.">
+  <ShelfNav />
+
+  <main class="flex-1 bg-bg-page">
+    <ShelfMasthead
+      title="Shelf"
+      standfirst="Reporting that takes its time — interviews, argument, criticism and the lives behind the news."
+      meta={`${storyCount} pieces · ${orderedSections.length} collections`}
+    />
+
+    <!-- ══ In this issue ═══════════════════════════════════════════════════════
+         A real contents line, not a repeat of the sub-nav above: those links
+         leave for a collection's own page, these jump straight down this one.
+         A page this long needs the wayfinding; a magazine's own contents page
+         is exactly where a reader expects to find it. -->
+    <nav aria-label="In this issue" class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 border-b border-rule">
+      <ol class="py-4 sm:py-5 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+        {orderedSections.map((section, i) => (
+          <li>
+            <a
+              href={`#${section.id}`}
+              class="group flex items-baseline gap-2.5 eyebrow text-text-secondary hover:text-azure dark:hover:text-azure-light transition-colors"
+            >
+              <span class="tabular-nums text-azure dark:text-azure-light">{String(i + 1).padStart(2, '0')}</span>
+              {section.title}
+              <span class="text-text-muted">{section.articles.length}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- ══ The opener ══════════════════════════════════════════════════════
+           One piece, given the width of the page and nothing to compete with.
+           The other featured picks sit under it as an index rather than as four
+           more cards of the same weight. -->
+      {opener && (
+        <section class="py-8 sm:py-10 lg:py-12">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            <div class="lg:col-span-7">
+              <ShelfFigure article={opener} scale="lead" />
+            </div>
+
+            {alsoFeatured.length > 0 && (
+              <div class="lg:col-span-4 lg:col-start-9 self-end">
+                <p class="eyebrow text-text-muted pb-2 border-b border-ink dark:border-ivory/30">
+                  Also featured
+                </p>
+                {alsoFeatured.map((article) => (
+                  <ShelfIndexRow article={article} showCategory />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      <!-- ══ The collections ═════════════════════════════════════════════════
+           Five and then whatever the data grows beyond them — one loop, one
+           index, so a new collection joins the spine without a second branch. -->
+      {orderedSections.map((section, i) => (
+        <section id={section.id} class={sectionPad(section.id)}>
+          <ShelfSectionHead
+            index={i + 1}
+            title={section.title}
+            count={section.articles.length}
+            href={section.href}
+            note={SHELF_COLLECTION_NOTES[section.id]}
+          />
+          <div class="mt-6 lg:mt-8">
+            <ShelfCollection section={section} />
+          </div>
+        </section>
+      ))}
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

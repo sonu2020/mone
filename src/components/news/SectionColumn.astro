@@ -1,0 +1,19 @@
+---
+// BLOCK · SectionColumn — one section as a column: heading + lead StoryCard +
+// a short StoryList. Two of these side by side make the homepage's duo rows.
+import SectionHeading from '../ui/SectionHeading.astro';
+import StoryCard from './StoryCard.astro';
+import StoryList from './StoryList.astro';
+import type { SectionCluster } from '../../lib/home-data';
+export interface Props {
+  cluster: SectionCluster;
+  leadSize?: 'base' | 'lg';   // 'base' for narrow columns (3-up rows)
+  class?: string;
+}
+const { cluster, leadSize = 'lg', class: className = '' } = Astro.props;
+---
+<div class:list={['mc', '', className]}>
+  <SectionHeading title={cluster.name} titleEn={cluster.nameEn} href={cluster.href} viewAllHref={cluster.href} />
+  <StoryCard story={cluster.lead} ratio="16/9" size={leadSize} class="pb-5 mb-1 border-b border-rule" />
+  <StoryList items={cluster.items.slice(0, 3)} />
+</div>

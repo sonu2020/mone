@@ -1,0 +1,356 @@
+{
+  "slug": "out-of-focus",
+  "title": "Out Of Focus",
+  "titleML": "ഔട്ട് ഓഫ് ഫോക്കസ്",
+  "category": "digital",
+  "source": {
+    "program": "https://www.mediaoneonline.com/programs/out-of-focus",
+    "channel": "MediaoneTV Live",
+    "channelId": "UC-f7r46JhYv78q5pGrO6ivA",
+    "channelUrl": "https://www.youtube.com/channel/UC-f7r46JhYv78q5pGrO6ivA",
+    "capturedAt": "2026-08-06",
+    "note": "Scraped from the live programs listing; duration, view count and publish time read from each YouTube watch page at capture time."
+  },
+  "episodes": [
+    {
+      "slug": "abdul-el-sayed-wins-democratic-senate-primary-in-michigan-out-of-focus-332598",
+      "articleId": "332598",
+      "youtubeId": "wXUshwEf0PE",
+      "title": "ജയിച്ചുകയറി അൽ സഈദ് | Abdul El-Sayed wins Democratic Senate primary in Michigan | Out Of Focus",
+      "titleML": "ജയിച്ചുകയറി അൽ സഈദ്",
+      "titleEn": "Abdul El-Sayed wins Democratic Senate primary in Michigan",
+      "publishedAt": "2026-08-05T14:26:33Z",
+      "durationSeconds": 845,
+      "viewCount": 59745,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_wXUshwEf0PE.jpg",
+        "small": "https://i.ytimg.com/vi/wXUshwEf0PE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/wXUshwEf0PE/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/abdul-el-sayed-wins-democratic-senate-primary-in-michigan-out-of-focus-332598"
+    },
+    {
+      "slug": "meta-apologises-over-pm-modi-post-removal-out-of-focus-332599",
+      "articleId": "332599",
+      "youtubeId": "4Uaq9B1CN44",
+      "title": "മെറ്റയെ വിരട്ടി വിശ്വഗുരു | Meta apologises over PM Modi post removal | Out Of Focus",
+      "titleML": "മെറ്റയെ വിരട്ടി വിശ്വഗുരു",
+      "titleEn": "Meta apologises over PM Modi post removal",
+      "publishedAt": "2026-08-05T14:22:31Z",
+      "durationSeconds": 936,
+      "viewCount": 25804,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_4Uaq9B1CN44.jpg",
+        "small": "https://i.ytimg.com/vi/4Uaq9B1CN44/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/4Uaq9B1CN44/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/meta-apologises-over-pm-modi-post-removal-out-of-focus-332599"
+    },
+    {
+      "slug": "upi-payments-above-2000-may-soon-attract-fee-out-of-focus-332600",
+      "articleId": "332600",
+      "youtubeId": "rlctvq2BaMw",
+      "title": "യുപിഐ ഇനി ഫ്രീയല്ല | UPI payments above ₹2,000 may soon attract fee | Out Of Focus",
+      "titleML": "യുപിഐ ഇനി ഫ്രീയല്ല",
+      "titleEn": "UPI payments above ₹2,000 may soon attract fee",
+      "publishedAt": "2026-08-05T14:04:33Z",
+      "durationSeconds": 1008,
+      "viewCount": 26081,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_rlctvq2BaMw.jpg",
+        "small": "https://i.ytimg.com/vi/rlctvq2BaMw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/rlctvq2BaMw/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/upi-payments-above-2000-may-soon-attract-fee-out-of-focus-332600"
+    },
+    {
+      "slug": "communal-violence-between-hindus-and-muslims-grips-nepal-out-of-focus-332485",
+      "articleId": "332485",
+      "youtubeId": "8F9HqGRzeLE",
+      "title": "നേപ്പാളിൽ സംഭവിക്കുന്നത് | Communal violence between Hindus and Muslims grips Nepal | Out Of Focus",
+      "titleML": "നേപ്പാളിൽ സംഭവിക്കുന്നത്",
+      "titleEn": "Communal violence between Hindus and Muslims grips Nepal",
+      "publishedAt": "2026-08-04T14:39:14Z",
+      "durationSeconds": 977,
+      "viewCount": 45841,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_8F9HqGRzeLE.jpg",
+        "small": "https://i.ytimg.com/vi/8F9HqGRzeLE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/8F9HqGRzeLE/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/communal-violence-between-hindus-and-muslims-grips-nepal-out-of-focus-332485"
+    },
+    {
+      "slug": "sunny-wayne-facing-cyberattack-over-ethanol-formula-post-out-of-focus-332486",
+      "articleId": "332486",
+      "youtubeId": "qJFReoWSqhk",
+      "title": "സണ്ണിക്ക് പിന്നാലെ സംഘം | Sunny Wayne facing cyberattack over Ethanol formula post | Out Of Focus",
+      "titleML": "സണ്ണിക്ക് പിന്നാലെ സംഘം",
+      "titleEn": "Sunny Wayne facing cyberattack over Ethanol formula post",
+      "publishedAt": "2026-08-04T14:32:37Z",
+      "durationSeconds": 847,
+      "viewCount": 46258,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_qJFReoWSqhk.jpg",
+        "small": "https://i.ytimg.com/vi/qJFReoWSqhk/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/qJFReoWSqhk/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/sunny-wayne-facing-cyberattack-over-ethanol-formula-post-out-of-focus-332486"
+    },
+    {
+      "slug": "udhayanidhi-stalin-arrested-over-remarks-on-actor-trisha-out-of-focus-332487",
+      "articleId": "332487",
+      "youtubeId": "Ll5pTxcSmMo",
+      "title": "ഉദയനിധി അർഹിച്ചത്? | Udhayanidhi Stalin arrested over remarks on actor Trisha | Out Of Focus",
+      "titleML": "ഉദയനിധി അർഹിച്ചത്?",
+      "titleEn": "Udhayanidhi Stalin arrested over remarks on actor Trisha",
+      "publishedAt": "2026-08-04T14:18:43Z",
+      "durationSeconds": 671,
+      "viewCount": 35828,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_Ll5pTxcSmMo.jpg",
+        "small": "https://i.ytimg.com/vi/Ll5pTxcSmMo/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/Ll5pTxcSmMo/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/udhayanidhi-stalin-arrested-over-remarks-on-actor-trisha-out-of-focus-332487"
+    },
+    {
+      "slug": "migrants-enter-spanish-enclave-of-ceuta-from-morocco-out-of-focus-332378",
+      "articleId": "332378",
+      "youtubeId": "CSn3H9ExHi4",
+      "title": "കുടിയേറ്റ സ്‌പെയിൻ? | Migrants enter Spanish enclave of Ceuta from Morocco | Out Of Focus",
+      "titleML": "കുടിയേറ്റ സ്‌പെയിൻ?",
+      "titleEn": "Migrants enter Spanish enclave of Ceuta from Morocco",
+      "publishedAt": "2026-08-03T15:12:24Z",
+      "durationSeconds": 1343,
+      "viewCount": 48755,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_CSn3H9ExHi4.jpg",
+        "small": "https://i.ytimg.com/vi/CSn3H9ExHi4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/CSn3H9ExHi4/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/migrants-enter-spanish-enclave-of-ceuta-from-morocco-out-of-focus-332378"
+    },
+    {
+      "slug": "prashant-kishor-ends-bjps-31-year-reign-in-bihar-out-of-focus-332377",
+      "articleId": "332377",
+      "youtubeId": "8SQknnGTHv8",
+      "title": "ബിഹാറിൽ പ്രശാന്ത് | Prashant Kishor ends BJP's 31-year reign in Bihar | Out Of Focus",
+      "titleML": "ബിഹാറിൽ പ്രശാന്ത്",
+      "titleEn": "Prashant Kishor ends BJP's 31-year reign in Bihar",
+      "publishedAt": "2026-08-03T14:55:50Z",
+      "durationSeconds": 732,
+      "viewCount": 69504,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_8SQknnGTHv8.jpg",
+        "small": "https://i.ytimg.com/vi/8SQknnGTHv8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/8SQknnGTHv8/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/prashant-kishor-ends-bjps-31-year-reign-in-bihar-out-of-focus-332377"
+    },
+    {
+      "slug": "cm-vd-satheesan-criticised-for-attending-events-during-rain-disaster-out-of-focus-332376",
+      "articleId": "332376",
+      "youtubeId": "dFjPY46gTGE",
+      "title": "വിമർശന 'മഴ' | CM VD Satheesan criticised for attending events during rain disaster | Out Of Focus",
+      "titleML": "വിമർശന 'മഴ'",
+      "titleEn": "CM VD Satheesan criticised for attending events during rain disaster",
+      "publishedAt": "2026-08-03T14:39:31Z",
+      "durationSeconds": 1425,
+      "viewCount": 26174,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_dFjPY46gTGE.jpg",
+        "small": "https://i.ytimg.com/vi/dFjPY46gTGE/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/dFjPY46gTGE/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/cm-vd-satheesan-criticised-for-attending-events-during-rain-disaster-out-of-focus-332376"
+    },
+    {
+      "slug": "hockey-india-president-questions-saffron-jersey-change-out-of-focus-332165",
+      "articleId": "332165",
+      "youtubeId": "nZlqcVm_AVI",
+      "title": "കാവിയണിഞ്ഞ ഇന്ത്യൻ ഹോക്കി | Hockey India president questions saffron jersey change | Out Of Focus",
+      "titleML": "കാവിയണിഞ്ഞ ഇന്ത്യൻ ഹോക്കി",
+      "titleEn": "Hockey India president questions saffron jersey change",
+      "publishedAt": "2026-08-01T14:07:15Z",
+      "durationSeconds": 834,
+      "viewCount": 7873,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_nZlqcVm_AVI.jpg",
+        "small": "https://i.ytimg.com/vi/nZlqcVm_AVI/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/nZlqcVm_AVI/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/hockey-india-president-questions-saffron-jersey-change-out-of-focus-332165"
+    },
+    {
+      "slug": "dmk-refuses-walkout-goes-solo-on-key-bills-out-of-focus-332164",
+      "articleId": "332164",
+      "youtubeId": "VHpwEf_BqO4",
+      "title": "ഡിഎംകെ വലത്തേക്ക്? | DMK refuses walkout, goes solo on key bills | Out Of Focus",
+      "titleML": "ഡിഎംകെ വലത്തേക്ക്?",
+      "titleEn": "DMK refuses walkout, goes solo on key bills",
+      "publishedAt": "2026-08-01T14:01:40Z",
+      "durationSeconds": 921,
+      "viewCount": 52723,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_VHpwEf_BqO4.jpg",
+        "small": "https://i.ytimg.com/vi/VHpwEf_BqO4/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/VHpwEf_BqO4/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/dmk-refuses-walkout-goes-solo-on-key-bills-out-of-focus-332164"
+    },
+    {
+      "slug": "pm-modis-late-night-instagram-reel-on-delhi-protest-out-of-focus-332163",
+      "articleId": "332163",
+      "youtubeId": "gH-WUXmNve8",
+      "title": "മോദിയുടെ റീലാട്ടം | PM Modi's late night instagram reel on Delhi protest | Out Of Focus",
+      "titleML": "മോദിയുടെ റീലാട്ടം",
+      "titleEn": "PM Modi's late night instagram reel on Delhi protest",
+      "publishedAt": "2026-08-01T13:49:04Z",
+      "durationSeconds": 1005,
+      "viewCount": 50709,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_gH-WUXmNve8.jpg",
+        "small": "https://i.ytimg.com/vi/gH-WUXmNve8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/gH-WUXmNve8/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/pm-modis-late-night-instagram-reel-on-delhi-protest-out-of-focus-332163"
+    },
+    {
+      "slug": "the-muthanga-land-agitation-and-the-2026-verdict-out-of-focus-332091",
+      "articleId": "332091",
+      "youtubeId": "t-YE2WWQnrw",
+      "title": "മുത്തങ്ങയും ഗീതാനന്ദനും | The Muthanga land agitation and the 2026 verdict | Out Of Focus",
+      "titleML": "മുത്തങ്ങയും ഗീതാനന്ദനും",
+      "titleEn": "The Muthanga land agitation and the 2026 verdict",
+      "publishedAt": "2026-07-31T15:02:34Z",
+      "durationSeconds": 953,
+      "viewCount": 5388,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_t-YE2WWQnrw.jpg",
+        "small": "https://i.ytimg.com/vi/t-YE2WWQnrw/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/t-YE2WWQnrw/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/the-muthanga-land-agitation-and-the-2026-verdict-out-of-focus-332091"
+    },
+    {
+      "slug": "celebrities-rally-behind-kerala-psc-recruitment-irregularities-out-of-focus-332090",
+      "articleId": "332090",
+      "youtubeId": "t2GVPOxIkTo",
+      "title": "ചുവന്ന പിഎസ്.സി | Celebrities rally behind Kerala PSC recruitment irregularities | Out Of Focus",
+      "titleML": "ചുവന്ന പിഎസ്.സി",
+      "titleEn": "Celebrities rally behind Kerala PSC recruitment irregularities",
+      "publishedAt": "2026-07-31T14:49:34Z",
+      "durationSeconds": 1127,
+      "viewCount": 16511,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_t2GVPOxIkTo.jpg",
+        "small": "https://i.ytimg.com/vi/t2GVPOxIkTo/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/t2GVPOxIkTo/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/celebrities-rally-behind-kerala-psc-recruitment-irregularities-out-of-focus-332090"
+    },
+    {
+      "slug": "udf-reverses-stand-govt-to-go-ahead-with-pm-shri-scheme-out-of-focus-332089",
+      "articleId": "332089",
+      "youtubeId": "ThfvY3b7JWI",
+      "title": "പുതിയ പിഎം ശ്രീ? | UDF reverses Stand, govt to go ahead with PM Shri scheme | Out Of Focus",
+      "titleML": "പുതിയ പിഎം ശ്രീ?",
+      "titleEn": "UDF reverses Stand, govt to go ahead with PM Shri scheme",
+      "publishedAt": "2026-07-31T14:30:55Z",
+      "durationSeconds": 1260,
+      "viewCount": 38999,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_ThfvY3b7JWI.jpg",
+        "small": "https://i.ytimg.com/vi/ThfvY3b7JWI/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/ThfvY3b7JWI/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/udf-reverses-stand-govt-to-go-ahead-with-pm-shri-scheme-out-of-focus-332089"
+    },
+    {
+      "slug": "us-strikes-iran-again-out-of-focus-331965",
+      "articleId": "331965",
+      "youtubeId": "OPQ0qDGADaA",
+      "title": "വീണ്ടും യുദ്ധ കൊതി | US strikes Iran again | Out Of Focus",
+      "titleML": "വീണ്ടും യുദ്ധ കൊതി",
+      "titleEn": "US strikes Iran again",
+      "publishedAt": "2026-07-30T14:20:28Z",
+      "durationSeconds": 848,
+      "viewCount": 114696,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_OPQ0qDGADaA.jpg",
+        "small": "https://i.ytimg.com/vi/OPQ0qDGADaA/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/OPQ0qDGADaA/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/us-strikes-iran-again-out-of-focus-331965"
+    },
+    {
+      "slug": "bus-driver-siyaad-dies-after-police-assault-in-custody-out-of-focus-331966",
+      "articleId": "331966",
+      "youtubeId": "YQJUrdJpBtQ",
+      "title": "കുണ്ടറയിലെ കസ്റ്റഡിമരണം | Bus driver Siyad dies after police assault in custody | Out Of Focus",
+      "titleML": "കുണ്ടറയിലെ കസ്റ്റഡിമരണം",
+      "titleEn": "Bus driver Siyad dies after police assault in custody",
+      "publishedAt": "2026-07-30T14:11:32Z",
+      "durationSeconds": 900,
+      "viewCount": 11367,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_YQJUrdJpBtQ.jpg",
+        "small": "https://i.ytimg.com/vi/YQJUrdJpBtQ/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/YQJUrdJpBtQ/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/bus-driver-siyaad-dies-after-police-assault-in-custody-out-of-focus-331966"
+    },
+    {
+      "slug": "rahul-gandhi-calls-for-sacking-of-amit-shah-over-protests-out-of-focus-331967",
+      "articleId": "331967",
+      "youtubeId": "YeNrXpRYKoM",
+      "title": "അമിത് ഷാ എവിടെ? | Rahul Gandhi calls for sacking of Amit Shah over protests | Out Of Focus",
+      "titleML": "അമിത് ഷാ എവിടെ?",
+      "titleEn": "Rahul Gandhi calls for sacking of Amit Shah over protests",
+      "publishedAt": "2026-07-30T14:05:37Z",
+      "durationSeconds": 1062,
+      "viewCount": 73870,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_YeNrXpRYKoM.jpg",
+        "small": "https://i.ytimg.com/vi/YeNrXpRYKoM/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/YeNrXpRYKoM/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/rahul-gandhi-calls-for-sacking-of-amit-shah-over-protests-out-of-focus-331967"
+    },
+    {
+      "slug": "after-cjp-reservation-hatao-andolan-goes-viral-now-out-of-focus-331880",
+      "articleId": "331880",
+      "youtubeId": "qsVGD9V2rb8",
+      "title": "ഇളകിയ വലതുപക്ഷം | After CJP, ‘Reservation Hatao Andolan’ goes viral now | Out Of Focus",
+      "titleML": "ഇളകിയ വലതുപക്ഷം",
+      "titleEn": "After CJP, ‘Reservation Hatao Andolan’ goes viral now",
+      "publishedAt": "2026-07-29T14:39:02Z",
+      "durationSeconds": 1523,
+      "viewCount": 53088,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_qsVGD9V2rb8.jpg",
+        "small": "https://i.ytimg.com/vi/qsVGD9V2rb8/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/qsVGD9V2rb8/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/after-cjp-reservation-hatao-andolan-goes-viral-now-out-of-focus-331880"
+    },
+    {
+      "slug": "pearle-maaney-clarifies-stance-on-neet-protest-out-of-focus-331881",
+      "articleId": "331881",
+      "youtubeId": "tKSIUqpuJ_0",
+      "title": "പേളിക്ക് പാളി? | Pearle Maaney clarifies stance on NEET protest | Out Of Focus",
+      "titleML": "പേളിക്ക് പാളി?",
+      "titleEn": "Pearle Maaney clarifies stance on NEET protest",
+      "publishedAt": "2026-07-29T14:19:13Z",
+      "durationSeconds": 639,
+      "viewCount": 140359,
+      "thumbnail": {
+        "site": "https://www.mediaoneonline.com/h-upload/videothumb/yt_tKSIUqpuJ_0.jpg",
+        "small": "https://i.ytimg.com/vi/tKSIUqpuJ_0/mqdefault.jpg",
+        "large": "https://i.ytimg.com/vi/tKSIUqpuJ_0/maxresdefault.jpg"
+      },
+      "href": "https://www.mediaoneonline.com/programs/out-of-focus/pearle-maaney-clarifies-stance-on-neet-protest-out-of-focus-331881"
+    }
+  ]
+}

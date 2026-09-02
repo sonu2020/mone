@@ -1,0 +1,199 @@
+---
+// BLOCK · PinMap — many pins, driven from outside.
+//
+// RouteMap tells one story along one line. This is the other kind of map: a set
+// of places, most of them hidden at any moment, with the page deciding which
+// ones are showing. So the page drives it, not the component.
+//
+// It talks over DOM events rather than exported functions, because the filter
+// logic lives in the page's own inline script and there is no client framework
+// here to hold a shared reference to a component instance.
+//
+//   page → map   map:pins   { ids, fit }   show these, hide the rest
+//   page → map   map:focus  { id | null }  highlight one, or clear
+//   map → page   map:select { id }         a pin was clicked
+//
+// It knows about pins and ids. It does not know about dishes, restaurants or
+// districts — the next page that needs a map of things mounts the same file.
+import MapBase from './MapBase.astro';
+
+export interface MapPin {
+  id: string;
+  label: string;
+  labelML: string;
+  coords: [number, number];
+  /** Tabler glyph class drawn inside the pin, e.g. 'ti-fish'. */
+  icon?: string;
+}
+
+export interface Props {
+  id?: string;
+  pins: MapPin[];
+  center: [number, number];
+  zoom: number;
+  /** Accessible description of what the map shows. */
+  label: string;
+  class?: string;
+}
+
+const {
+  id = 'pin-map',
+  pins,
+  center,
+  zoom,
+  label,
+  class: className = '',
+} = Astro.props;
+
+const payload = { pins, center, zoom };
+---
+
+<MapBase />
+
+<div
+  id={id}
+  data-pin-map
+  class:list={[
+    'mc',
+    'route-map w-full bg-bg-page dark:bg-brand-dark border border-rule dark:border-ivory/15',
+    className,
+  ]}
+  role="img"
+  aria-label={label}
+></div>
+
+<script
+  type="application/json"
+  data-pin-map-data={id}
+  set:html={JSON.stringify(payload).replace(/</g, '\\u003c')}
+></script>
+
+<script is:inline define:vars={{ mapId: id }}>
+  (function () {
+    var el = document.getElementById(mapId);
+    var dataEl = document.querySelector('[data-pin-map-data="' + mapId + '"]');
+    if (!el || !dataEl) return;
+
+    var data = JSON.parse(dataEl.textContent || '{}');
+    var pins = data.pins || [];
+
+    // The map is an enhancement. If Leaflet never lands, collapse the box
+    // rather than leaving a broken grey panel on the page.
+    el.style.display = 'none';
+
+    window.mapReady(function (L) {
+      el.style.display = '';
+
+      var reduce = window.mapReduceMotion();
+
+      var map = L.map(el, {
+        zoomControl: false,
+        scrollWheelZoom: false,   // the page owns the wheel
+        attributionControl: true,
+      }).setView(data.center, data.zoom);
+
+      L.control.zoom({ position: 'topright' }).addTo(map);
+
+      // Unlabelled basemap — the names are in the list beside it.
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 19,
+      }).addTo(map);
+
+      var layer = L.layerGroup().addTo(map);
+      var markers = {};
+      var ownIcon = {};   // each pin's own glyph, to restore after an override
+
+      pins.forEach(function (p) {
+        ownIcon[p.id] = p.icon || 'ti-map-pin';
+        var marker = L.marker(p.coords, {
+          icon: L.divIcon({
+            className: 'route-pin is-reached',
+            html: '<span class="route-pin__dot"><i class="ti ' + ownIcon[p.id] + '"></i></span>',
+            iconSize: [26, 26],
+            iconAnchor: [13, 13],
+          }),
+          title: p.label,
+        });
+
+        marker.bindTooltip(p.labelML || p.label, {
+          direction: 'top',
+          offset: [0, -14],
+          className: 'route-tip',
+        });
+
+        marker.on('click', function () {
+          el.dispatchEvent(new CustomEvent('map:select', {
+            detail: { id: p.id },
+            bubbles: true,
+          }));
+        });
+
+        markers[p.id] = marker;
+      });
+
+      // Everything shows until the page says otherwise.
+      var visible = pins.map(function (p) { return p.id; });
+
+      /**
+       * @param icon  Optional glyph to draw on every shown pin instead of its
+       *              own — used when one dish is selected, so the whole map
+       *              reads as "these are the places for this dish".
+       */
+      function render(ids, fit, icon) {
+        layer.clearLayers();
+        var shown = [];
+        ids.forEach(function (id) {
+          var m = markers[id];
+          if (!m) return;
+          layer.addLayer(m);
+          // The element only exists once the marker is on the map, and
+          // clearLayers throws it away, so the glyph is set on every pass.
+          var node = m.getElement();
+          var glyph = node && node.querySelector('i');
+          if (glyph) glyph.className = 'ti ' + (icon || ownIcon[id]);
+          shown.push(m.getLatLng());
+        });
+        visible = ids;
+
+        if (!fit || !shown.length) return;
+
+        if (shown.length === 1) {
+          map.setView(shown[0], Math.max(data.zoom, 11), { animate: !reduce });
+          return;
+        }
+        map.fitBounds(L.latLngBounds(shown), {
+          padding: [36, 36],
+          maxZoom: 12,
+          animate: !reduce,
+        });
+      }
+
+      render(visible, false);
+
+      el.addEventListener('map:pins', function (e) {
+        render(
+          (e.detail && e.detail.ids) || [],
+          !!(e.detail && e.detail.fit),
+          e.detail && e.detail.icon,
+        );
+      });
+
+      el.addEventListener('map:focus', function (e) {
+        var id = e.detail && e.detail.id;
+        Object.keys(markers).forEach(function (key) {
+          var node = markers[key].getElement();
+          if (node) node.classList.toggle('is-current', key === id);
+        });
+        if (!id) return;
+        var m = markers[id];
+        if (m && visible.indexOf(id) !== -1) m.openTooltip();
+      });
+
+      // Leaflet sizes itself on creation; a sticky column or a stacked mobile
+      // layout can settle after that.
+      setTimeout(function () { map.invalidateSize(); }, 200);
+      window.addEventListener('resize', function () { map.invalidateSize(); }, { passive: true });
+    });
+  })();
+</script>

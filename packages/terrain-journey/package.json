@@ -1,0 +1,37 @@
+{
+  "name": "terrain-journey",
+  "version": "0.1.0",
+  "description": "Scroll-driven 3D journeys over real terrain — a road, a river or a trek, rendered low-poly from open DEM tiles, with an overview and a first-person view.",
+  "keywords": [
+    "three",
+    "terrain",
+    "dem",
+    "scrollytelling",
+    "maps",
+    "geojson",
+    "low-poly"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./style.css": "./src/style.css"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "three": ">=0.160.0"
+  },
+  "devDependencies": {
+    "three": "^0.185.1",
+    "typescript": "^5.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,22 @@
+---
+// BLOCK · FeaturedBand — a full-width section: heading + a lead StoryCard (7)
+// alongside a StoryList (5). The primary section lockup on the homepage.
+import SectionHeading from '../ui/SectionHeading.astro';
+import StoryCard from './StoryCard.astro';
+import StoryList from './StoryList.astro';
+import type { SectionCluster } from '../../lib/home-data';
+export interface Props {
+  cluster: SectionCluster;
+  class?: string;
+}
+const { cluster, class: className = '' } = Astro.props;
+---
+<section class:list={['mc', 'py-7 lg:py-10', className]}>
+  <SectionHeading title={cluster.name} titleEn={cluster.nameEn} href={cluster.href} viewAllHref={cluster.href} />
+  <div class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
+    <div class="lg:col-span-7 lg:border-r border-rule lg:pr-8">
+      <StoryCard story={cluster.lead} ratio="16/9" size="lg" showExcerpt />
+    </div>
+    <StoryList items={cluster.items.slice(0, 4)} class="lg:col-span-5 mt-6 lg:mt-0" />
+  </div>
+</section>

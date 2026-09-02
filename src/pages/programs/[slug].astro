@@ -1,0 +1,86 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/nav/HeaderBar.astro';
+import Footer from '../../components/Footer.astro';
+import SectionSubNav from '../../components/nav/SectionSubNav.astro';
+import ShowViewer from '../../components/ShowViewer.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import ProgramCard from '../../components/programs/ProgramCard.astro';
+import StickyFooterAd from '../../components/ads/StickyFooterAd.astro';
+import { programs, getProgramBySlug, getProgramEpisodes, getProgramHost } from '../../lib/programs';
+import {
+  catalogueProgram,
+  catalogueProgams,
+  freshnessLabel,
+  isActive,
+} from '../../lib/program-catalogue';
+
+export function getStaticPaths() {
+  return programs.map((program) => ({
+    params: { slug: program.slug },
+    props: { program },
+  }));
+}
+
+const { program } = Astro.props;
+const categoryLabel = program.category === 'tv' ? 'TV Show' : 'Digital Show';
+const host = getProgramHost(program);
+const episodes = getProgramEpisodes(program);
+const entry = catalogueProgram(program.slug);
+
+// Sibling programmes, freshest first — the catalogue is already ranked, so the
+// four offered are the ones most likely to still be publishing.
+const morePrograms = catalogueProgams.filter((p) => p.slug !== program.slug).slice(0, 4);
+---
+
+<Layout title={`${program.title} — MediaOne`} description={program.description}>
+  <Header isBreaking={false} showTopics={false} liveUnit />
+  <SectionSubNav />
+
+  <main class="flex-1 bg-bg-page">
+    <div class="w-full lg:max-w-site lg:mx-auto px-4 sm:px-6 md:px-8 py-6 lg:py-8">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 meta-text text-text-muted mb-5" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-azure transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="/programs" class="hover:text-azure transition-colors">Programs</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-azure">{program.title}</span>
+      </nav>
+
+      <ShowViewer
+        title={program.title}
+        titleML={program.titleML}
+        kicker={categoryLabel}
+        description={program.description}
+        schedule={program.schedule}
+        host={host}
+        episodes={episodes}
+        facts={entry ? [
+          { label: 'Last published', value: freshnessLabel(entry),
+            caption: isActive(entry) ? 'Still running' : 'No recent episodes' },
+          { label: 'Episodes', value: `${entry.listingEpisodes} on the listing` },
+        ] : []}
+      />
+
+      <!-- More programmes — the same card the directory uses, so a reader
+           meets one card shape across /programs and every programme page. -->
+      <section class="mt-12">
+        <SectionHeader title="More Programmes" href="/programs" viewAllHref="/programs" sticky={false} />
+        <div class="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-9">
+          {morePrograms.map((p) => (
+            <ProgramCard
+              program={p}
+              description={getProgramBySlug(p.slug)?.description}
+              freshness={freshnessLabel(p)}
+              active={isActive(p)}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+  <StickyFooterAd />
+</Layout>

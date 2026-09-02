@@ -1,0 +1,178 @@
+---
+// ── MediaOne /blah ────────────────────────────────────────────────────────────
+// 3-Column Editorial Grid reproducing the exact layout geometry from design reference:
+// - Left Column (~3 cols): 2 image-top stories with real headlines, excerpts & dates
+// - Center Column (~6 cols): Prominent Hero story with 16:9 featured media & lead text
+// - Right Column (~3 cols): Vertical list of text-only stories separated by hairline rules
+// Refined against Baseline UI & MediaOne editorial guidelines.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/OldHeader.astro';
+import Footer from '../components/Footer.astro';
+import Media from '../components/ui/Media.astro';
+import Headline from '../components/ui/Headline.astro';
+import Kicker from '../components/ui/Kicker.astro';
+
+const leftStories = [
+  {
+    title: 'കെപിസിസി പ്രസിഡന്റ് സ്ഥാനം ലക്ഷ്യമിട്ട് ജോസഫ് വാഴക്കൻ; ഹൈക്കമാൻഡുമായി കൂടിക്കാഴ്ച',
+    excerpt: 'പൂർണ്ണമായും പാർട്ടിക്ക് വേണ്ടി പ്രവർത്തിക്കാൻ കഴിയുന്ന ഒരു സമയമാണിത്. മറ്റ് ചുമതലകളൊന്നുമില്ലെന്നും ഡൽഹിയിലെത്തിയ ജോസഫ് വാഴക്കൻ മാധ്യമങ്ങളോട് പ്രതികരിച്ചു.',
+    date: '1 hr ago',
+    category: 'Kerala',
+    href: '/kerala',
+    src: 'https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557623-untitled-1-recovered.webp',
+  },
+  {
+    title: 'ഖത്തറിൽ പുതിയ തൊഴിൽ നയം പ്രഖ്യാപിച്ചു; പ്രവാസി തൊഴിലാളികൾക്ക് വലിയ ആശ്വാസം',
+    excerpt: 'തൊഴിൽ വിപണി സുതാര്യമാക്കുന്നതിനും തൊഴിലാളികളുടെ അവകാശങ്ങൾ സംരക്ഷിക്കുന്നതിനുമായി പുതിയ നയരേഖ ഖത്തർ ഭരണകൂടം ഔദ്യോഗികമായി പുറത്തിറക്കി.',
+    date: '3 hrs ago',
+    category: 'Gulf',
+    href: '/story/qatar-labour-law',
+    src: 'https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557675-text-thumb.webp',
+  },
+];
+
+const centerHeroStory = {
+  title: 'മോദിയുടെ റെക്കോഡിലുമുണ്ട് ഒരു മറുവശം; അമേരിക്കൻ മണ്ണിൽ വിദേശനയത്തിന്റെ പുതിയ വഴിത്തിരിവുകൾ',
+  excerpt: '2011 നവംബറിൽ ടൈം മാഗസിൻ ആഗോള രംഗത്ത് വരാനിരിക്കുന്ന അതിശക്തരെപ്പറ്റി ചെയ്ത കവർ സ്റ്റോറി ഇന്ത്യയെ ചിത്രീകരിച്ചത് ചൈനക്കൊപ്പം ആഗോള സാമ്പത്തിക ശക്തിയാകാൻ പോകുന്ന രാജ്യമെന്ന നിലയ്ക്കായിരുന്നു. എന്നാൽ വർത്തമാനകാലത്ത് ഭൗമരാഷ്ട്രീയത്തിലും സാമ്പത്തിക മേഖലയിലും വൻ മാറ്റങ്ങളാണ് ഉണ്ടാകുന്നത്.',
+  date: '15 mins ago',
+  category: 'Analysis',
+  href: '/shelf/analysis',
+  src: 'https://www.mediaoneonline.com/h-upload/2026/06/24/500x300_1557609-trump-1.webp',
+};
+
+const rightStories = [
+  {
+    title: 'കേരളത്തിൽ കനത്ത മഴ തുടരുന്നു; 4 ജില്ലകളിൽ ഓറഞ്ച് അലർട്ട് പ്രഖ്യാപിച്ചു',
+    excerpt: 'അടുത്ത 24 മണിക്കൂറിൽ ഇടിയോടു കൂടിയ ശക്തമായ മഴയ്ക്കും വീശിയടിക്കുന്ന കാറ്റിനും സാധ്യതയുണ്ടെന്ന് കേന്ദ്ര കാലാവസ്ഥാ നിരീക്ഷണ കേന്ദ്രം മുന്നറിയിപ്പ് നൽകി.',
+    date: '22 mins ago',
+    category: 'Kerala',
+    href: '/story/rain-alert',
+  },
+  {
+    title: 'സ്വർണ്ണവില റെക്കോർഡ് ഉയരത്തിൽ; പവൻ 75,000 രൂപ കടന്നു',
+    excerpt: 'ആഗോള വിപണിയിലെ മാറ്റങ്ങളും ഭൗമരാഷ്ട്രീയ അനിശ്ചിതത്വങ്ങളും കാരണം സുരക്ഷിത നിക്ഷേപമെന്ന നിലയിലുള്ള സ്വര്‍ണവില വീണ്ടും ചരിത്ര കുതിപ്പ് നടത്തുന്നു.',
+    date: '1 hr ago',
+    category: 'Business',
+    href: '/story/gold-price-record',
+  },
+  {
+    title: 'തിയറ്ററുകളിലെ പോപ്കോണിന്റെ വില കുറച്ചാൽ സാധാരണക്കാർക്ക് ഉപകാരപ്പെടും: രാം ചരൺ',
+    excerpt: 'സുഹൃത്തുക്കൾക്കും കുടുംബങ്ങൾക്കും ഒരുമിച്ച് ആസ്വദിക്കാൻ പറ്റിയ ഏറ്റവും ചെലവ് കുറഞ്ഞ വിനോദ മാർഗ്ഗം ഇപ്പോഴും സിനിമാ തിയറ്ററുകൾ തന്നെയെന്ന് നടൻ വ്യക്തമാക്കുന്നു.',
+    date: '2 hrs ago',
+    category: 'Entertainment',
+    href: '/story/mammootty-film',
+  },
+  {
+    title: 'വിനീഷ്യസ് ജൂനിയർ: വെറുക്കപ്പെട്ടവനിൽ നിന്നും പ്രിയപ്പെട്ടവനിലേക്കുള്ള ഫുട്ബോൾ ദൂരം',
+    excerpt: 'വംശീയ അധിക്ഷേപങ്ങളെ പോരാട്ടവീര്യം കൊണ്ട് നേരിട്ട് റയൽ മാഡ്രിഡിന്റെയും ബ്രസീലിന്റെയും സുപ്രധാന താരമായി മാറിയ വിനീഷ്യസിന്റെ കഥ.',
+    date: '4 hrs ago',
+    category: 'Sports',
+    href: '/shelf/vincius-jnior-life-story-327688',
+  },
+];
+---
+
+<Layout title="MediaOne Online | മലയാളം വാർത്തകൾ" description="The most authoritative source for news in Malayalam. Real-time updates from MediaOne.">
+  <Header isBreaking={false} />
+
+  <main class="flex-1 bg-bg-page py-6">
+    <div class="w-full max-w-site mx-auto bg-bg-card p-4 sm:p-6 lg:p-8 border-x border-rule dark:border-ivory/10">
+
+      <!-- Editorial Section Header -->
+      <div class="border-b border-rule dark:border-ivory/10 pb-4 mb-6 flex items-center justify-between">
+        <div class="flex items-baseline gap-3">
+          <h1 class="section-header font-bold text-ink dark:text-ivory uppercase">
+            പ്രധാന വാർത്തകൾ
+          </h1>
+          <span class="eyebrow text-azure dark:text-azure-light">Top Stories</span>
+        </div>
+        <span class="caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+          MediaOne Live Feed
+        </span>
+      </div>
+
+      <!-- 3-Column Grid matching reference layout exactly -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        
+        <!-- LEFT COLUMN: ~3 cols (lg:col-span-3) -->
+        <!-- Stack of 2 stories with media on top -->
+        <div class="lg:col-span-3 flex flex-col gap-6 lg:border-r lg:border-rule lg:dark:border-ivory/10 lg:pr-6">
+          
+          <!-- Left Story 1 -->
+          <a href={leftStories[0].href} class="group block border-b border-rule dark:border-ivory/10 pb-6 lg:border-b-0 lg:pb-0">
+            <Media src={leftStories[0].src} ratio="4/3" class="mb-3" zoom />
+            <Kicker text={leftStories[0].category} class="mb-1.5 block" />
+            <Headline as="h3" size="base" text={leftStories[0].title} class="mb-2" />
+            <p class="body-small text-text-secondary dark:text-ivory/70 line-clamp-3 mb-2">
+              {leftStories[0].excerpt}
+            </p>
+            <p class="caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+              {leftStories[0].date}
+            </p>
+          </a>
+
+          <!-- Horizontal rule separator on desktop -->
+          <div class="hidden lg:block border-t border-rule dark:border-ivory/10"></div>
+
+          <!-- Left Story 2 -->
+          <a href={leftStories[1].href} class="group block">
+            <Media src={leftStories[1].src} ratio="4/3" class="mb-3" zoom />
+            <Kicker text={leftStories[1].category} class="mb-1.5 block" />
+            <Headline as="h3" size="base" text={leftStories[1].title} class="mb-2" />
+            <p class="body-small text-text-secondary dark:text-ivory/70 line-clamp-3 mb-2">
+              {leftStories[1].excerpt}
+            </p>
+            <p class="caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+              {leftStories[1].date}
+            </p>
+          </a>
+
+        </div>
+
+        <!-- CENTER COLUMN: ~6 cols (lg:col-span-6) -->
+        <!-- Prominent Hero Story with 16:9 media & lead text -->
+        <div class="lg:col-span-6 flex flex-col lg:border-r lg:border-rule lg:dark:border-ivory/10 lg:px-2 border-b border-rule dark:border-ivory/10 pb-6 lg:border-b-0 lg:pb-0">
+          <a href={centerHeroStory.href} class="group block">
+            <Media src={centerHeroStory.src} ratio="16/9" class="w-full mb-4" zoom />
+            
+            <Headline as="h2" size="lg" text={centerHeroStory.title} class="mb-3" />
+            
+            <p class="lead-text text-text-secondary dark:text-ivory/70 mb-4">
+              {centerHeroStory.excerpt}
+            </p>
+            
+            <div class="flex items-center gap-2 caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+              <span>{centerHeroStory.date}</span>
+              <span>|</span>
+              <Kicker text={centerHeroStory.category} tone="azure" />
+            </div>
+          </a>
+        </div>
+
+        <!-- RIGHT COLUMN: ~3 cols (lg:col-span-3) -->
+        <!-- Vertical stack of text-only stories separated by hairline dividers -->
+        <div class="lg:col-span-3 flex flex-col divide-y divide-rule dark:divide-ivory/10 lg:pl-2">
+          {rightStories.map((story, index) => (
+            <div class:list={[index === 0 ? 'pb-5' : 'py-5']}>
+              <a href={story.href} class="group block">
+                <Headline as="h3" size="base" text={story.title} clamp={3} class="mb-2" />
+                <p class="body-small text-text-secondary dark:text-ivory/70 line-clamp-3 mb-2.5">
+                  {story.excerpt}
+                </p>
+                <div class="flex items-center gap-2 caption-text text-text-muted dark:text-ivory/40 tabular-nums">
+                  <span>{story.date}</span>
+                  <span>|</span>
+                  <Kicker text={story.category} tone="azure" />
+                </div>
+              </a>
+            </div>
+          ))}
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

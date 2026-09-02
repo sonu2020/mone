@@ -1,0 +1,97 @@
+---
+// ── Live (Sky News homage) ─────────────────────────────────────────────────
+// Breaking-led and urgent. A LIVE strip, a hero with a pulsing live badge, and
+// a timestamp-driven "live updates" timeline rail. Time is the dominant signal.
+import DummyImage from '../DummyImage.astro';
+import { hero, topStories, latest, mostRead, cluster } from '../../lib/home-data';
+
+const kerala = cluster('kerala');
+const india = cluster('india');
+// Build a live-feed timeline (newest first) from the available stories.
+const feed = [
+  { time: '21:14', ...topStories[0] },
+  { time: '20:58', ...latest[1] },
+  { time: '20:40', ...topStories[1] },
+  { time: '20:12', ...kerala.items[0] },
+  { time: '19:47', ...india.items[0] },
+  { time: '19:20', ...topStories[2] },
+  { time: '18:55', ...latest[4] },
+];
+const topGrid = [latest[0], india.lead, kerala.items[1], latest[3]];
+---
+
+<div class:list={['mc', 'bg-bg-page']}>
+  <!-- LIVE breaking bar -->
+  <div class="bg-accent-red text-white">
+    <div class="w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3 h-10">
+      <span class="flex items-center gap-1.5 shrink-0">
+        <span class="size-2 rounded-full bg-white animate-pulse"></span>
+        <span class="eyebrow tracking-[0.15em]">Live</span>
+      </span>
+      <span class="h-3.5 w-px bg-white/40 shrink-0"></span>
+      <a href={topStories[0].href} class="nav-text font-semibold truncate hover:underline">{topStories[0].title}</a>
+    </div>
+  </div>
+
+  <div class="w-full max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-7">
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+
+      <!-- Hero + top grid -->
+      <div class="lg:col-span-8">
+        <a href={hero.href} class="group relative block aspect-[16/9] overflow-hidden">
+          <DummyImage class="w-full h-full" w={1280} h={720} seed="sky-hero" />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-transparent"></div>
+          <div class="absolute top-3 left-3">
+            <span class="inline-flex items-center gap-1.5 bg-accent-red text-white eyebrow px-2 py-1">
+              <span class="size-1.5 rounded-full bg-white animate-pulse"></span> Live
+            </span>
+          </div>
+          <div class="absolute inset-x-0 bottom-0 p-4 sm:p-6 lg:p-7">
+            <span class="eyebrow text-azure-light mb-2 block">{hero.category}</span>
+            <h1 class="text-hero font-extrabold text-white text-balance leading-[1.06] group-hover:text-azure-light transition-colors">{hero.title}</h1>
+            <p class="mt-2 caption-text text-white/60 tabular-nums">Updated {hero.date}</p>
+          </div>
+        </a>
+
+        <!-- Top stories grid with prominent timestamps -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-6 mt-6 pt-6 border-t border-rule">
+          {topGrid.map((s, i) => (
+            <a href={s.href} class="group block">
+              <div class="relative aspect-[16/9] overflow-hidden">
+                <DummyImage class="w-full h-full" w={420} h={236} seed={s.href + 'sky'} />
+              </div>
+              <div class="mt-2 flex items-center gap-1.5">
+                <i class="ti ti-clock text-[13px] text-accent-red" aria-hidden="true"></i>
+                <span class="caption-text text-accent-red font-semibold tabular-nums">{['1h', '2h', '3h', '4h'][i]} ago</span>
+              </div>
+              <h3 class="article-title font-bold text-text-primary group-hover:text-azure transition-colors leading-snug mt-1">{s.title}</h3>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Live updates timeline rail -->
+      <aside class="lg:col-span-4 lg:border-l border-rule lg:pl-8">
+        <div class="flex items-center gap-2 pb-3 mb-1 border-b-2 border-accent-red">
+          <span class="size-2 rounded-full bg-accent-red animate-pulse"></span>
+          <h2 class="section-header text-ink">തത്സമയം</h2>
+          <span class="eyebrow text-text-muted">Live updates</span>
+        </div>
+        <ol class="relative">
+          {feed.map((s, i) => (
+            <li class="relative pl-6 pb-5 last:pb-0">
+              <!-- timeline spine + node -->
+              {i < feed.length - 1 && <span class="absolute left-[3px] top-2 bottom-0 w-px bg-rule"></span>}
+              <span class="absolute left-0 top-1.5 size-[7px] rounded-full bg-azure ring-2 ring-bg-page"></span>
+              <a href={s.href} class="group block">
+                <time class="caption-text font-bold text-accent-red tabular-nums">{s.time}</time>
+                <h3 class="article-title text-text-primary group-hover:text-azure transition-colors leading-snug mt-0.5">{s.title}</h3>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <a href="/breaking" class="mt-2 inline-flex items-center gap-1 eyebrow text-azure hover:text-azure-dark transition-colors">All updates →</a>
+      </aside>
+    </section>
+  </div>
+</div>

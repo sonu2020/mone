@@ -1,0 +1,134 @@
+---
+import DummyImage from './DummyImage.astro';
+
+export interface ShelfItem {
+  title: string;
+  excerpt?: string;
+  category?: string;
+  href: string;
+  date?: string;
+}
+
+export interface Props {
+  title?: string;
+  eyebrow?: string;
+  href?: string;
+  items?: ShelfItem[];
+  class?: string;
+}
+
+const {
+  title = 'SHELF',
+  eyebrow = 'In Depth',
+  href = '/shelf',
+  class: className = '',
+} = Astro.props;
+
+// Demo content — override via `items` prop in production
+const defaultItems: ShelfItem[] = [
+  {
+    title: 'കേരളത്തിലെ വനിതാ സംരംഭകർ: വിജയകഥകൾ പങ്കുവെക്കുന്നു',
+    excerpt: 'സംസ്ഥാനത്ത് മുൻപന്തിയിൽ നിൽക്കുന്ന വനിതാ സംരംഭകരുടെ പ്രചോദനാത്മക കഥകൾ...',
+    category: 'Business',
+    href: '/story/women-entrepreneurs-kerala',
+    date: '25 Jun 2026',
+  },
+  {
+    title: 'ഭൂമിയുടെ താപനില ഉയരുന്നു: കേരളത്തിലെ കാലാവസ്ഥാ മാറ്റം',
+    category: 'Environment',
+    href: '/story/climate-change-kerala',
+    date: '24 Jun 2026',
+  },
+  {
+    title: 'ഡിജിറ്റൽ ഇന്ത്യ: ഗ്രാമീണ മേഖലകളിലെ മാറ്റം',
+    category: 'Technology',
+    href: '/story/digital-india-rural',
+    date: '23 Jun 2026',
+  },
+  {
+    title: 'ആരോഗ്യരംഗത്തെ പുതിയ നേട്ടങ്ങൾ: മലയാളികൾക്ക് എന്തൊക്കെ?',
+    category: 'Health',
+    href: '/story/health-milestones-2026',
+    date: '22 Jun 2026',
+  },
+  {
+    title: 'കേരളത്തിന്റെ സാംസ്കാരിക പൈതൃകം: നഷ്ടപ്പെട്ട കലാരൂപങ്ങൾ',
+    category: 'Culture',
+    href: '/story/kerala-cultural-heritage',
+    date: '21 Jun 2026',
+  },
+];
+
+const items = Astro.props.items ?? defaultItems;
+const hero = items[0];
+const list = items.slice(1);
+---
+
+<section class:list={['border-t-2 border-azure bg-ivory-dark dark:bg-brand-elevated', className]}>
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+    <!-- Branded header -->
+    <div class="flex items-baseline justify-between mb-6 md:mb-8">
+      <div class="flex items-center gap-3">
+        <span class="eyebrow text-azure dark:text-azure-light">{eyebrow}</span>
+        <h2 class="section-header text-ink dark:text-ivory">{title}</h2>
+      </div>
+      <a
+        href={href}
+        class="eyebrow text-ink-muted hover:text-azure dark:text-ivory/50 dark:hover:text-azure-light transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure focus-visible:outline-offset-2 rounded"
+      >
+        View all →
+      </a>
+    </div>
+
+    <!-- Mixed layout: hero (3 cols) + list (2 cols) -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
+      <!-- Hero item -->
+      {hero && (
+        <div class="lg:col-span-3">
+          <a href={hero.href} class="group block">
+            <div class="relative aspect-[16/10] overflow-hidden rounded-sm bg-placeholder">
+              <DummyImage class="w-full h-full" w={1280} h={800} />
+            </div>
+            <div class="mt-4 md:mt-5">
+              <div class="flex items-center gap-2 meta-text text-text-muted">
+                {hero.category && <span class="eyebrow text-azure">{hero.category}</span>}
+                {hero.category && hero.date && <span>·</span>}
+                {hero.date && <span class="tabular-nums">{hero.date}</span>}
+              </div>
+              <h3 class="mt-2 text-section font-semibold text-text-primary group-hover:text-azure transition-colors text-balance">
+                {hero.title}
+              </h3>
+              {hero.excerpt && (
+                <p class="mt-3 body-small text-text-secondary max-w-prose line-clamp-2">{hero.excerpt}</p>
+              )}
+            </div>
+          </a>
+        </div>
+      )}
+
+      <!-- List items -->
+      <div class="lg:col-span-2 flex flex-col gap-0">
+        {list.map((item) => (
+          <article class="border-b border-rule last:border-0">
+            <a href={item.href} class="group flex gap-3 py-4 sm:gap-4">
+              <div class="shrink-0">
+                <DummyImage class="w-20 h-16 rounded-sm sm:w-24 sm:h-20" w={192} h={160} />
+              </div>
+              <div class="flex-1 min-w-0 flex flex-col justify-center">
+                {item.category && (
+                  <span class="eyebrow text-azure text-[10px]">{item.category}</span>
+                )}
+                <h4 class="article-title text-text-primary group-hover:text-azure transition-colors line-clamp-2 mt-0.5">
+                  {item.title}
+                </h4>
+                {item.date && (
+                  <p class="mt-1 caption-text text-text-muted tabular-nums">{item.date}</p>
+                )}
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

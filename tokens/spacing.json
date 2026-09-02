@@ -1,0 +1,14 @@
+{
+  "spacing": {
+    "$type": "fluidSize",
+    "xxs": { "$value": { "min": "1px", "mid": "0.5px + 0.13vw", "max": "2px" } },
+    "xs": { "$value": { "min": "2px", "mid": "1px + 0.26vw", "max": "4px" } },
+    "sm": { "$value": { "min": "4px", "mid": "2px + 0.52vw", "max": "8px" } },
+    "md": { "$value": { "min": "6px", "mid": "3px + 0.78vw", "max": "12px" } },
+    "lg": { "$value": { "min": "8px", "mid": "4px + 1.04vw", "max": "16px" } },
+    "xl": { "$value": { "min": "10px", "mid": "5px + 1.3vw", "max": "20px" } },
+    "2xl": { "$value": { "min": "12px", "mid": "6px + 1.56vw", "max": "24px" } },
+    "3xl": { "$value": { "min": "16px", "mid": "8px + 2.08vw", "max": "32px" } },
+    "4xl": { "$value": { "min": "24px", "mid": "12px + 3.12vw", "max": "48px" } }
+  }
+}

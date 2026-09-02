@@ -1,0 +1,315 @@
+---
+// ── /guided/home · the homepage, toured ──────────────────────────────────────
+// A guided walkthrough of the homepage's main aspects, one section at a time
+// with next/prev navigation (see src/lib/tour.ts for the controller). This is
+// iteration one: the first three sections — Lead, Shelf, Video — rendered
+// exactly as the homepage renders them, same components, same data, same
+// wrapper classes. Later iterations add the remaining bands as further steps.
+//
+// The tour swaps whole sections with `hidden`; nothing here re-implements a
+// band. If a band changes on the homepage, this page changes by updating its
+// props to match, not by re-styling.
+import Layout from '../../layouts/Layout.astro';
+import VideoModal from '../../components/VideoModal.astro';
+import ScheduleList from '../../components/live/ScheduleList.astro';
+import TypeScaleSwitch from '../../components/ui/TypeScaleSwitch.astro';
+
+import LeadPackage from '../../components/home4/LeadPackage.astro';
+import ShelfBand from '../../components/home4/ShelfBand.astro';
+import VideoBand from '../../components/home4/VideoBand.astro';
+
+import { leadStories, latest, shelf, feed } from '../../lib/home4-data';
+import { allVideos, todaysVideos } from '../../lib/videos';
+import { toModalVideos, modalShows, featuredFromPrograms, type ModalVideo } from '../../lib/video-modal';
+import { trendingTopics } from '../../lib/mega-nav';
+import { LIVE_CHANNEL } from '../../lib/live-tv';
+import { TYPE_SCALE_IDS, scaleValues, SCALE_LABELS } from '../../lib/type-scales';
+
+// Step 1 compares the three type scales side by side (class-scoped overrides).
+// The fixed toolbar above switches the live scale at runtime: steps 2–4 render
+// inside a [data-scale-root] that the switcher script toggles the class on.
+const scaleSteps = TYPE_SCALE_IDS.map((id) => ({
+  id,
+  label: SCALE_LABELS[id],
+  values: scaleValues(id),
+}));
+
+// Same wiring as the homepage (/), so the sections render identically:
+// the masthead carries the topics strip and the on-air unit there.
+const LIVE_IN_HEADER = true;
+const TOPICS_IN_HEADER = true;
+
+const [hero, ...heroRest] = leadStories;
+
+const bandVideos = allVideos.slice(0, 8).map((v) => ({
+  title: v.title,
+  href: '/videos',
+  category: v.category,
+  duration: v.duration,
+  views: v.views,
+  date: v.publishDate,
+  seed: v.thumbnail,
+  imageUrl: v.thumbnailUrl,
+  modalId: v.slug,
+}));
+
+const videoTabs = [
+  { label: 'Latest', href: '/videos', current: true },
+  { label: 'Live', href: '/live' },
+  { label: 'Explainers', href: '/shelf' },
+  { label: 'Programmes', href: '/programs' },
+];
+
+// The video modal doubles as a browser; the tour needs it so the video band's
+// tiles still open a player.
+const modalToday = todaysVideos().map((v) => ({
+  id: v.slug,
+  title: v.title,
+  time: v.publishTime,
+  poster: v.thumbnailUrl || '',
+}));
+const shows = await modalShows();
+const bandPicks = await featuredFromPrograms(2, 6);
+
+const liveModalVideo: ModalVideo = {
+  id: LIVE_CHANNEL.id,
+  title: `${LIVE_CHANNEL.titleML} | ${LIVE_CHANNEL.title}`,
+  category: 'Live TV',
+  meta: 'Streaming now · 24×7',
+  poster: LIVE_CHANNEL.poster,
+  src: '',
+  embedUrl: LIVE_CHANNEL.embedUrl,
+  isLive: true,
+};
+---
+
+<Layout
+  title="MediaOne Homepage — guided tour | MediaOne"
+  description="A guided walkthrough of the MediaOne homepage — the lead package, the shelf and the video band, one section at a time."
+  topAd={false}
+  noindex
+>
+  <div class="min-h-dvh bg-bg-page" data-tour data-tour-exit="/">
+    <!-- ══ TOUR BAR ═══════════════════════════════════════════════════════ -->
+    <div class="sticky top-0 z-40 border-b border-rule bg-bg-card dark:bg-brand-dark">
+      <div class="mx-auto flex max-w-site items-center gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
+        <a
+          href="/"
+          class="flex shrink-0 items-center gap-1.5 text-caption font-semibold text-ink transition-colors hover:text-azure dark:text-ivory dark:hover:text-azure-light"
+          aria-label="Exit tour, go to the homepage"
+        >
+          <i class="ti ti-arrow-left text-base" aria-hidden="true"></i>
+          <span class="hidden sm:inline">MediaOne</span>
+        </a>
+
+        <div class="min-w-0 flex-1 text-center">
+          <p class="eyebrow text-azure dark:text-azure-light">HOMEPAGE · TOUR</p>
+          <p class="truncate text-body font-semibold text-ink dark:text-ivory">
+            <span data-tour-label-ml>ലീഡ് പാക്കേജ്</span>
+            <span class="text-ink-muted dark:text-ivory/60">
+              · <span data-tour-label>Lead package</span>
+            </span>
+          </p>
+        </div>
+
+        <div class="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            data-tour-prev
+            aria-label="Previous step"
+            class="border border-rule px-2 py-1.5 text-ink transition-colors hover:border-ink aria-disabled:opacity-40 aria-disabled:hover:border-rule dark:text-ivory dark:hover:border-ivory dark:aria-disabled:hover:border-rule"
+          >
+            <i class="ti ti-chevron-left text-sm" aria-hidden="true"></i>
+          </button>
+          <span data-tour-counter class="caption-text tabular-nums text-ink-muted dark:text-ivory/60">1 / 3</span>
+          <button
+            type="button"
+            data-tour-next
+            aria-label="Next step"
+            class="border border-rule px-2 py-1.5 text-ink transition-colors hover:border-ink aria-disabled:opacity-40 aria-disabled:hover:border-rule dark:text-ivory dark:hover:border-ivory dark:aria-disabled:hover:border-rule"
+          >
+            <i class="ti ti-chevron-right text-sm" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="border-t border-rule-light bg-light-gray/70 dark:border-white/10 dark:bg-brand-elevated/70">
+        <div class="mx-auto flex max-w-site items-center gap-4 px-4 py-2 sm:px-6 lg:px-8">
+          <div data-tour-dots class="flex shrink-0 gap-1.5" role="list" aria-label="Tour steps"></div>
+          <p data-tour-blurb class="min-w-0 flex-1 truncate text-caption text-ink-muted dark:text-ivory/60">
+            The day's top story, the headline stack and the live wire feed.
+          </p>
+
+          <!-- Type-scale switch — live toggle, no rebuild. Scoped to the
+               steps' root so the compare step above stays immune. -->
+          <TypeScaleSwitch
+            scope="[data-scale-root]"
+            class="ml-auto border border-rule dark:border-ivory/15 bg-bg-card dark:bg-brand-dark"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEPS — exact copies of the homepage's first three sections ═════ -->
+    <main class="flex-1">
+      <section
+        data-tour-step
+        data-tour-label="Type scales"
+        data-tour-label-ml="ടൈപ്പ് സ്കെയിലുകൾ"
+        data-tour-blurb="Three type scales on the same specimen — switch with the toolbar above."
+      >
+        <div class="w-full max-w-site mx-auto bg-bg-card dark:bg-brand-dark">
+          <div class="px-4 py-8 sm:px-6 lg:px-8">
+            <p class="mb-5 eyebrow text-azure dark:text-azure-light">
+              Same specimen, three scales
+              <span class="text-ink-muted dark:text-ivory/40"> — the toolbar above switches the tour live; the active column is ringed</span>
+            </p>
+            <div class="grid gap-px bg-rule dark:bg-ivory/10 border border-rule dark:border-ivory/10 sm:grid-cols-3">
+              {scaleSteps.map((s) => (
+                <div data-scale-column={s.id} aria-current={s.id === 'current' ? 'true' : 'false'} class="bg-ivory dark:bg-brand-dark p-5 sm:p-6">
+                  <p class="eyebrow text-azure dark:text-azure-light flex items-baseline justify-between gap-2">
+                    {s.label}
+                    <span data-scale-active class="hidden eyebrow text-ink-muted dark:text-ivory/40">active</span>
+                  </p>
+                  <!-- Same classes, different token values — the swap is the scope -->
+                  <div class:list={[s.id !== 'current' && `type-scale-${s.id}`]}>
+                    <p class="mt-5 eyebrow text-ink-muted dark:text-ivory/40">Kerala · 5 mnt ago</p>
+                    <h3 class="mt-2 text-lead-story font-bold text-ink dark:text-ivory text-balance">വാർത്ത ലോകത്തെ മാറ്റുന്നു</h3>
+                    <p class="mt-3 text-body text-ink-light dark:text-ivory/70">The long read, collected. മലയാളം വാർത്തകൾ.</p>
+                  </div>
+                  <dl class="mt-5 space-y-1 border-t border-rule dark:border-ivory/10 pt-3 font-mono text-caption text-ink-muted dark:text-ivory/40">
+                    {['lead-story', 'body', 'nav', 'eyebrow'].map((k) => (
+                      <div class="flex justify-between gap-4">
+                        <dt>--text-{k}</dt>
+                        <dd class="tabular-nums">{s.values[k]}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Steps 2–4 render the homepage's bands in the LIVE scale: the switcher
+           script toggles .type-scale-{id} on this root. The compare step above
+           stays outside it, so each column always shows its own scale. -->
+      <div data-scale-root>
+
+      <section
+        data-tour-step
+        data-tour-label="Lead package"
+        data-tour-label-ml="ലീഡ് പാക്കേജ്"
+        data-tour-blurb="The day's top story, the headline stack and the live wire feed."
+      >
+        <div data-inspection-app data-inspection-component="LeadPackage">
+          <div
+            class="w-full max-w-site mx-auto bg-bg-card dark:bg-brand-dark"
+            data-inspection-fixture="lead-package"
+          >
+          <div class="px-4 sm:px-6 lg:px-8">
+            <!-- 1 · LEAD — as on / -->
+            <LeadPackage
+              lead={hero}
+              rows={[...heroRest, ...latest].slice(0, 4)}
+              feed={feed}
+              topics={TOPICS_IN_HEADER ? [] : trendingTopics}
+              onAir={!LIVE_IN_HEADER}
+              flushTop
+            />
+          </div>
+        </div>
+      </section>
+
+      <section
+        data-tour-step
+        data-tour-label="The Shelf"
+        data-tour-label-ml="ഷെൽഫ്"
+        data-tour-blurb="Long-reads and explainers — an editorial lead, three promo cards and a rail."
+        hidden
+      >
+        <div class="w-full max-w-site mx-auto bg-bg-card dark:bg-brand-dark">
+          <div class="px-4 sm:px-6 lg:px-8">
+            <!-- 2 · SHELF — as on / -->
+            <ShelfBand
+              label="Shelf"
+              href="/shelf"
+              viewAllHref="/shelf"
+              lead={shelf[0]}
+              cards={shelf.slice(1, 4)}
+              rail={shelf.slice(4, 7)}
+              adSlot="home4-shelf-rail"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section
+        data-tour-step
+        data-tour-label="Video band"
+        data-tour-label-ml="വീഡിയോ"
+        data-tour-blurb="The day's video shelf and the flagship programmes, in one navy band."
+        hidden
+      >
+        <!-- 3 · VIDEO — full-bleed, as on / -->
+        <VideoBand
+          title="വീഡിയോ"
+          titleEn="Videos"
+          viewAllHref="/videos"
+          videos={bandVideos}
+          tabs={videoTabs}
+          picks={bandPicks}
+        />
+      </section>
+      </div>
+    </main>
+  </div>
+
+  <VideoModal videos={[liveModalVideo, ...toModalVideos(allVideos)]} today={modalToday} programs={shows}>
+    <ScheduleList slot="live-panel" tone="dark" />
+  </VideoModal>
+</Layout>
+
+<style>
+  /* The active step fades in; transform/opacity only, off under reduced motion. */
+  [data-tour-step] {
+    transition: opacity 160ms ease-out;
+  }
+  [data-tour-step][hidden] {
+    display: none;
+  }
+  [data-tour-step]:focus {
+    outline: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-tour-step] {
+      transition: none;
+    }
+  }
+
+  /* Compare columns — the ring and the "active" chip ride on aria-current,
+     flipped by the TypeScaleSwitch script. */
+  [data-scale-column][aria-current='true'] {
+    box-shadow: inset 0 0 0 1px var(--color-azure);
+  }
+  [data-scale-column][aria-current='true'] [data-scale-active] {
+    display: inline;
+  }
+</style>
+
+<script>
+  import { initTour } from '../../lib/tour';
+  import { initLeadPackageInspection } from '../../lib/inspection/inspection-page';
+
+  const root = document.querySelector<HTMLElement>('[data-tour]');
+  if (root) initTour(root);
+  document.addEventListener('astro:page-load', () => {
+    const el = document.querySelector<HTMLElement>('[data-tour]');
+    if (el && el !== root) initTour(el);
+  });
+
+  // The LeadPackage step doubles as an inspection fixture in outline mode.
+  initLeadPackageInspection();
+  document.addEventListener('astro:page-load', initLeadPackageInspection);
+</script>

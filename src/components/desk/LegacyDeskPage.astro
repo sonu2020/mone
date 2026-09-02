@@ -1,0 +1,152 @@
+---
+// BLOCK · LegacyDeskPage — the desk layout every section used before the
+// standard one. Extracted verbatim from src/pages/[section].astro so that route
+// could become a thin router between this and DeskPage.
+//
+// Frozen: desks move off it by being added to PORTED_DESKS, not by being
+// edited here. It is also what /old-section/<id> renders, so the two designs
+// stay comparable.
+import SectionHeader from '../SectionHeader.astro';
+import SectionBlock from '../SectionBlock.astro';
+import ArticleCard from '../ArticleCard.astro';
+import ArticleList from '../ArticleList.astro';
+import CardGrid from '../CardGrid.astro';
+import type { SectionConfig } from '../../lib/sections';
+
+export interface Props {
+  section: SectionConfig;
+}
+const { section } = Astro.props;
+
+const articles = section.articles;
+const hero = articles.slice(0, 1)[0];
+const grid = articles.slice(1, 7);
+const rest = articles.slice(7);
+const sidebarArticles = articles.slice(0, 5);
+
+const gridItems = grid.map((a) => ({
+  title: a.title, category: section.name, href: a.href,
+  date: a.date, excerpt: a.excerpt, image: a.image,
+}));
+
+const restItems = rest.map((a) => ({
+  title: a.title, category: section.name, href: a.href,
+  date: a.date, image: a.image,
+}));
+
+const trendingItems = sidebarArticles.map((a) => ({
+  title: a.title, href: a.href, date: a.date,
+}));
+
+const moreStoriesItems = articles.slice(3, 6).map((a) => ({
+  title: a.title, category: section.name, href: a.href,
+  date: a.date, image: a.image,
+}));
+---
+
+<main class:list={['mc', 'flex-1 bg-bg-page']}>
+    <!-- Section Header Banner -->
+    <SectionHeader
+      variant="gradient"
+      title={section.nameML}
+      titleEn={section.name}
+      href={`/${section.id}`}
+      viewAllHref={`/${section.id}`}
+      sticky={false}
+    />
+
+    <div class="w-full lg:max-w-site lg:mx-auto">
+      <!-- Section description -->
+      <div class="px-4 pt-5 pb-6 sm:px-6 md:px-8 bg-bg-card">
+        <p class="lead-text text-text-secondary max-w-prose text-pretty">{section.description}</p>
+        <p class="mt-4 eyebrow text-azure tabular-nums">{articles.length} Articles</p>
+      </div>
+
+      <!-- 12-col grid: 8 + 4 -->
+      <div class="lg:grid lg:grid-cols-12">
+
+        <!-- MAIN COLUMN -->
+        <div class="lg:col-span-8 lg:pr-6">
+
+          <!-- Hero article using ArticleCard lead variant -->
+          {hero && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <ArticleCard
+                variant="lead"
+                title={hero.title}
+                excerpt={hero.excerpt}
+                category={section.name}
+                href={hero.href}
+                date={hero.date}
+                image={hero.image}
+              />
+            </div>
+          )}
+
+          <!-- Grid section using CardGrid -->
+          {grid.length > 0 && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <SectionBlock title="കൂടുതൽ" titleEn="More Stories" href={`/${section.id}`} viewAllHref={`/${section.id}`}>
+                <CardGrid items={gridItems} cols={2} />
+              </SectionBlock>
+            </div>
+          )}
+
+          <!-- Rest as ArticleList -->
+          {rest.length > 0 && (
+            <div class="px-4 py-6 sm:px-6 md:px-8 bg-bg-card">
+              <SectionBlock title="പഴയ വാർത്തകൾ" titleEn="Earlier" href={`/${section.id}`}>
+                <ArticleList items={restItems} />
+              </SectionBlock>
+            </div>
+          )}
+
+          <!-- Empty state -->
+          {articles.length === 0 && (
+            <div class="px-4 py-20 sm:px-6 md:px-8 text-center bg-bg-card">
+              <p class="section-header text-text-primary">No articles yet</p>
+              <p class="mt-2 meta-text text-text-muted">Check back soon, or browse the latest across all sections.</p>
+              <a href="/latest-news" class="mt-5 inline-block px-4 py-2 bg-azure text-ivory eyebrow hover:bg-azure-dark transition-colors">
+                Latest News
+              </a>
+            </div>
+          )}
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="hidden lg:block lg:col-span-4 lg:border-l lg:border-rule lg:bg-bg-card">
+          <div class="p-6 xl:p-8 space-y-10">
+
+            <SectionBlock title="ജനപ്രിയം" titleEn="Trending" href={`/${section.id}`}>
+              <ol class="space-y-4">
+                {trendingItems.slice(0, 5).map((a, i) => (
+                  <li class="flex gap-3">
+                    <span class="text-2xl font-bold text-azure/30 tabular-nums leading-none pt-0.5">{String(i + 1).padStart(2, '0')}</span>
+                    <a href={a.href} class="group">
+                      <p class="article-title text-text-primary group-hover:text-azure transition-colors">{a.title}</p>
+                      <p class="mt-1 caption-text text-text-muted">{a.date}</p>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </SectionBlock>
+
+            <SectionBlock title="കൂടുതൽ" titleEn="More Stories">
+              <div class="space-y-4">
+                {moreStoriesItems.map((a) => (
+                  <ArticleCard
+                    variant="standard"
+                    title={a.title}
+                    category={a.category}
+                    href={a.href}
+                    date={a.date}
+                    image={a.image}
+                  />
+                ))}
+              </div>
+            </SectionBlock>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>

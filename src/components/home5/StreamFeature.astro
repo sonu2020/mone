@@ -1,0 +1,38 @@
+---
+// BLOCK · StreamFeature — the same feed item, run wide. Every sixth block in
+// the stream takes this shape: artwork across the column, headline beneath.
+//
+// It is a rhythm device, not a promotion. Nothing about the story is more
+// important than its neighbours — a run of forty identical rows stops being
+// scannable somewhere around the tenth, and a change of shape every few
+// screens gives the eye a place to land without breaking the sequence.
+import Art from '../home4/Art.astro';
+import Kicker from '../ui/Kicker.astro';
+import { blurbFor } from '../../lib/dummy-text';
+import type { StreamStory } from '../../lib/home5-stream';
+
+export interface Props {
+  story: StreamStory;
+  class?: string;
+}
+const { story, class: className = '' } = Astro.props;
+---
+
+<a href={story.href} class:list={['mc', 'group block py-5 sm:py-6', className]}>
+  <Art story={story} ratio="2/1" w={1040} class="rounded-md" zoom loading="lazy" />
+
+  <div class="pt-3.5 flex flex-col gap-1.5">
+    <p class="flex items-baseline gap-2.5">
+      {story.category && <Kicker text={story.category} />}
+      <span class="row-meta text-text-light dark:text-ivory/40 tabular-nums">{story.time}</span>
+    </p>
+
+    <h2 class="headline-feature text-text-navy-deep dark:text-ivory group-hover:text-azure dark:group-hover:text-azure-light transition-colors text-balance">
+      {story.title}
+    </h2>
+
+    <p class="body-small text-text-secondary dark:text-ivory/65 line-clamp-2 pt-0.5">
+      {blurbFor(story)}
+    </p>
+  </div>
+</a>

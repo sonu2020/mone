@@ -1,0 +1,32 @@
+/* ============================================================================
+   MediaOne skin for Video.js v10 (@videojs/html).
+
+   The v10 default skin ships its own CSS inside the JS (shadow DOM +
+   adoptedStyleSheets). We only need to re-tint it — and CSS custom properties
+   pierce the shadow boundary, so setting these --media-* vars on the light-DOM
+   .mediaone-skin wrapper is enough. No skin CSS import required.
+
+   All values are brand tokens from @theme in app.css (azure / brand-dark /
+   ivory) so the player matches the rest of the newsroom. Video wants dark, so
+   the surface stays dark in both themes.
+   ============================================================================ */
+.mediaone-skin {
+  /* Icons / text inherit currentColor inside the skin → ivory. */
+  color: var(--color-ivory);
+
+  /* Accent: progress fill + focus glow = MediaOne azure. */
+  --media-progress-fill: var(--color-azure);
+  --media-current-shadow-color: color-mix(in oklab, var(--color-azure) 60%, transparent);
+  --media-current-shadow-color-subtle: color-mix(in oklab, var(--color-azure) 28%, transparent);
+
+  /* Control-bar / menu / tooltip surfaces: translucent brand-dark. */
+  --media-surface-background-color: color-mix(in oklab, var(--color-brand-dark) 82%, transparent);
+  --media-surface-outer-border-color: rgb(255 255 255 / 0.12);
+  --media-surface-inner-border-color: rgb(255 255 255 / 0.06);
+  --media-surface-shadow-color: rgb(0 0 0 / 0.5);
+
+  /* Hairlines + geometry to match the editorial system (square framing). */
+  --media-border-color: rgb(255 255 255 / 0.15);
+  --media-border-radius: 0.25rem;
+  --media-video-border-radius: 0;
+}

@@ -1,0 +1,455 @@
+---
+// ── /design/tokens ────────────────────────────────────────────────────────────
+// The token browser: every token in the @theme block (plus the fluid spacing
+// vars and the @utility set) derived straight from src/styles/app.css at build
+// time. Swatches, specimens and copy chips. Filter by category or search across
+// name / var / value / class — the page renders fully without JS; the filter
+// and clipboard wiring are progressive enhancements.
+import DesignShell from '../../components/design/DesignShell.astro';
+import CopyChip from '../../components/design/CopyChip.astro';
+import { tokenSections, tokenTotal } from '../../lib/tokens';
+import type { Token } from '../../lib/tokens';
+
+const searchable = (t: Token) =>
+  [t.name, t.varName, t.value, t.hex, ...t.classes].filter(Boolean).join(' ').toLowerCase();
+
+// Breakpoint track: 0 → 1600px scale.
+const SCALE_MAX = 1600;
+const bpPct = (value: string) => {
+  const px = Number.parseFloat(value);
+  return Number.isFinite(px) ? `${(px / SCALE_MAX) * 100}%` : '0%';
+};
+
+const specimen = 'വാർത്ത ലോകത്തെ മാറ്റുന്നു';
+const fontSpecimen = 'Aa ഒരു വരി The news 0123';
+---
+
+<DesignShell
+  title="Token Browser — MediaOne Design System"
+  description="Every design token in one place: colors, type scale, spacing, radius, containers and utilities, with click-to-copy chips."
+  eyebrow="Tokens"
+  heading="Token Browser"
+  lede={`${tokenTotal} tokens across 9 categories, parsed from the @theme block in src/styles/app.css at build time — the browser can't drift from the source. Click any chip to copy; the value chips carry the raw CSS, the azure chips the utility classes.`}
+  active="tokens"
+  noindex
+>
+
+  <section aria-label="Token filters" class="border border-rule dark:border-ivory/10 bg-bg-card">
+    <!-- Filter bar — revealed by the browser script, inert without JS -->
+    <div id="token-filter" class="hidden border-b border-rule dark:border-ivory/10 p-3 sm:p-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <label for="token-search" class="sr-only">Filter tokens</label>
+        <div class="relative grow">
+          <i class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-base text-ink-muted dark:text-ivory/40" aria-hidden="true"></i>
+          <input
+            id="token-search"
+            type="search"
+            placeholder="Search tokens — name, class, value…"
+            class="w-full border border-rule dark:border-ivory/15 bg-ivory dark:bg-brand-dark py-2 pl-9 pr-3 text-meta text-ink dark:text-ivory placeholder:text-ink-muted dark:placeholder:text-ivory/35 focus:outline-none focus:border-azure"
+          />
+        </div>
+        <p id="token-count" class="shrink-0 font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums" aria-live="polite"></p>
+      </div>
+      <div class="mt-3 flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter by category">
+        <button type="button" data-filter="" class="token-chip is-active">All</button>
+        {tokenSections.map((s) => (
+          <button type="button" data-filter={s.id} class="token-chip">{s.label}</button>
+        ))}
+        <span class="mx-1 h-4 w-px bg-rule dark:bg-ivory/15" aria-hidden="true"></span>
+        <span class="flex items-center gap-1" role="group" aria-label="Switch view">
+          <button type="button" data-view="visual" aria-pressed="true" class="token-chip is-active">Visual</button>
+          <button type="button" data-view="tabular" aria-pressed="false" class="token-chip">Tabular</button>
+        </span>
+      </div>
+    </div>
+
+    <!-- Visual view: swatches, specimens, bars — one section per category -->
+    <div id="view-visual">
+    {tokenSections.map((s) => (
+      <section data-token-section={s.id} aria-labelledby={`tokens-${s.id}`} class="border-b border-rule dark:border-ivory/10 last:border-b-0">
+        <header class="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 pt-6 pb-4 sm:px-6">
+          <h2 id={`tokens-${s.id}`} class="text-section font-semibold text-ink dark:text-ivory">{s.label}</h2>
+          <span class="font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums">{s.tokens.length} tokens</span>
+        </header>
+
+        <div class="px-4 pb-6 sm:px-6">
+          {s.tokens[0]?.category === 'color' && (
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {s.tokens.map((t) => (
+                <article data-token data-cat="color" data-search={searchable(t)} class="border border-rule dark:border-ivory/10 bg-ivory dark:bg-brand-dark p-3">
+                  <div
+                    class="h-12 cursor-pointer border border-rule dark:border-ivory/15"
+                    style={`background: var(${t.varName})`}
+                    data-copy={t.value}
+                    title={`Copy ${t.value}`}
+                  ></div>
+                  <div class="mt-2.5 flex items-baseline justify-between gap-2">
+                    <h3 class="font-mono text-meta font-semibold text-ink dark:text-ivory">{t.name}</h3>
+                    {t.hex && (
+                      <span class="font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums">{t.hex}</span>
+                    )}
+                  </div>
+                  <p class="font-mono text-caption text-ink-muted/70 dark:text-ivory/30">{t.varName}</p>
+                  {t.note && <p class="mt-1.5 line-clamp-2 text-caption text-ink-muted dark:text-ivory/40">{t.note}</p>}
+                  <div class="mt-2.5 flex flex-wrap gap-1">
+                    <CopyChip copy={t.value} />
+                    {t.hex && <CopyChip copy={t.hex} label={t.hex} />}
+                  </div>
+                  <div class="mt-1.5 flex flex-wrap gap-1">
+                    {t.classes.map((c) => (
+                      <CopyChip copy={c} kind="class" />
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {s.tokens[0]?.category === 'type' && (
+            <div>
+              {s.tokens.map((t) => (
+                <div data-token data-cat="type" data-search={searchable(t)} class="grid grid-cols-1 gap-2 border-b border-rule dark:border-ivory/10 py-5 last:border-b-0 sm:grid-cols-12 sm:gap-6 sm:items-baseline">
+                  <p class={`min-w-0 text-balance text-ink dark:text-ivory sm:col-span-7 text-${t.name}`}>{specimen}</p>
+                  <div class="sm:col-span-5">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <h3 class="font-mono text-meta font-semibold text-ink dark:text-ivory">text-{t.name}</h3>
+                      <CopyChip copy={`text-${t.name}`} kind="class" />
+                      <CopyChip copy={t.value} />
+                    </div>
+                    <p class="mt-1.5 font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums">
+                      {t.varName} · lh {t.typeSpec?.lineHeight ?? '—'} · wght {t.typeSpec?.weight ?? '—'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {s.tokens[0]?.category === 'font' && (
+            <div>
+              {s.tokens.map((t) => (
+                <div data-token data-cat="font" data-search={searchable(t)} class="grid grid-cols-1 gap-2 border-b border-rule dark:border-ivory/10 py-5 last:border-b-0 sm:grid-cols-12 sm:gap-6 sm:items-baseline">
+                  <p class={`min-w-0 text-title text-ink dark:text-ivory sm:col-span-7 font-${t.name}`}>{fontSpecimen}</p>
+                  <div class="sm:col-span-5">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <h3 class="font-mono text-meta font-semibold text-ink dark:text-ivory">{t.name}</h3>
+                      <CopyChip copy={`font-${t.name}`} kind="class" />
+                      <CopyChip copy={t.value} label={t.varName} />
+                    </div>
+                    <p class="mt-1.5 font-mono text-caption text-ink-muted dark:text-ivory/40">{t.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {s.tokens[0]?.category === 'spacing' && (
+            <div>
+              {s.tokens.map((t) => (
+                <div data-token data-cat="spacing" data-search={searchable(t)} class="flex flex-wrap items-center gap-3 border-b border-rule dark:border-ivory/10 py-3.5 last:border-b-0">
+                  <h3 class="w-16 font-mono text-meta font-semibold text-ink dark:text-ivory">{t.name}</h3>
+                  <span class="block h-4 border border-azure/40 bg-azure/60" style={`width: var(${t.varName})`}></span>
+                  <span class="ml-auto font-mono text-caption text-ink-muted dark:text-ivory/40">{t.varName}</span>
+                  <CopyChip copy={t.value} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {s.tokens[0]?.category === 'radius' && (
+            <div>
+              {s.tokens.map((t) => (
+                <div data-token data-cat="radius" data-search={searchable(t)} class="flex flex-wrap items-center gap-4 border-b border-rule dark:border-ivory/10 py-3.5 last:border-b-0">
+                  <span class="block size-12 shrink-0 border border-rule dark:border-ivory/15 bg-ivory-dark dark:bg-brand-elevated" style={`border-radius: var(${t.varName})`}></span>
+                  <h3 class="font-mono text-meta font-semibold text-ink dark:text-ivory">{t.name}</h3>
+                  <span class="font-mono text-caption text-ink-muted dark:text-ivory/40">{t.varName}</span>
+                  <span class="ml-auto flex flex-wrap items-center gap-1.5">
+                    {t.classes.map((c) => (
+                      <CopyChip copy={c} kind="class" />
+                    ))}
+                    <CopyChip copy={t.value} />
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {(s.tokens[0]?.category === 'width' || s.tokens[0]?.category === 'container') && (
+            <div>
+              {s.tokens.map((t) => (
+                <div data-token data-cat={t.category} data-search={searchable(t)} class="flex flex-wrap items-center gap-4 border-b border-rule dark:border-ivory/10 py-3.5 last:border-b-0">
+                  <h3 class="w-20 font-mono text-meta font-semibold text-ink dark:text-ivory">{t.name}</h3>
+                  <span class="h-2.5 bg-azure/70" style={`width: min(var(${t.varName}), 100%)`}></span>
+                  <span class="ml-auto font-mono text-caption text-ink-muted dark:text-ivory/40">{t.varName}</span>
+                  <span class="flex flex-wrap items-center gap-1.5">
+                    {t.classes.map((c) => (
+                      <CopyChip copy={c} kind="class" />
+                    ))}
+                    <CopyChip copy={t.value} />
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {s.tokens[0]?.category === 'breakpoint' && (
+            <div>
+              <!-- Scale: each marker sits at its px value on a 0–1600px track -->
+              <div class="relative h-24 border-b border-rule dark:border-ivory/15" aria-hidden="true">
+                {s.tokens.map((t) => (
+                  <span class="absolute inset-y-0 w-8 -translate-x-1/2 flex flex-col items-center" style={`left: ${bpPct(t.value)}`}>
+                    <span class="mt-1 font-mono text-caption font-semibold text-ink dark:text-ivory">{t.name}</span>
+                    <span class="font-mono text-caption text-ink-muted dark:text-ivory/40 tabular-nums">{t.value}</span>
+                    <span class="mt-1 w-px grow bg-azure/50"></span>
+                    <span class="block size-1.5 shrink-0 bg-azure"></span>
+                  </span>
+                ))}
+                <span class="absolute -bottom-4 left-0 font-mono text-caption text-ink-muted/60 dark:text-ivory/25 tabular-nums">0</span>
+                <span class="absolute -bottom-4 right-0 font-mono text-caption text-ink-muted/60 dark:text-ivory/25 tabular-nums">1600px</span>
+              </div>
+              <div class="mt-6 flex flex-wrap gap-3">
+                {s.tokens.map((t) => (
+                  <div data-token data-cat="breakpoint" data-search={searchable(t)} class="flex items-center gap-1.5">
+                    <h3 class="font-mono text-meta font-semibold text-ink dark:text-ivory">{t.name}</h3>
+                    {t.classes.map((c) => (
+                      <CopyChip copy={c} kind="class" />
+                    ))}
+                    <CopyChip copy={t.value} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {s.tokens[0]?.category === 'utility' && (
+            <div>
+              {s.tokens.map((t) => (
+                <div data-token data-cat="utility" data-search={searchable(t)} class="grid grid-cols-1 gap-2 border-b border-rule dark:border-ivory/10 py-5 last:border-b-0 sm:grid-cols-12 sm:gap-6 sm:items-baseline">
+                  <p class={`min-w-0 text-ink dark:text-ivory sm:col-span-7 ${t.name}`}>{specimen}</p>
+                  <div class="sm:col-span-5">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <h3 class="font-mono text-meta font-semibold text-ink dark:text-ivory">{t.name}</h3>
+                      <CopyChip copy={t.name} kind="class" />
+                    </div>
+                    <p class="mt-1.5 font-mono text-caption text-ink-muted dark:text-ivory/40">{t.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    ))}
+    </div>
+
+    <!-- Tabular view: every token in one table, grouped by category column -->
+    <div id="view-table" class="hidden overflow-x-auto">
+      <table class="w-full min-w-160 border-collapse text-left">
+        <thead>
+          <tr class="border-b border-rule dark:border-ivory/10">
+            <th scope="col" class="py-2.5 pr-3 eyebrow text-ink-muted dark:text-ivory/40">Category</th>
+            <th scope="col" class="py-2.5 pr-3 eyebrow text-ink-muted dark:text-ivory/40">Token</th>
+            <th scope="col" class="py-2.5 pr-3 eyebrow text-ink-muted dark:text-ivory/40">CSS variable</th>
+            <th scope="col" class="py-2.5 pr-3 eyebrow text-ink-muted dark:text-ivory/40">Value</th>
+            <th scope="col" class="py-2.5 eyebrow text-ink-muted dark:text-ivory/40">Classes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tokenSections.map((s) =>
+            s.tokens.map((t) => (
+              <tr data-token data-cat={t.category} data-search={searchable(t)} class="border-b border-rule dark:border-ivory/10 hover:bg-ivory-dark/40 dark:hover:bg-brand-elevated/40">
+                <td class="py-2.5 pr-3 whitespace-nowrap caption-text text-ink-muted dark:text-ivory/40">{s.label}</td>
+                <td class="py-2.5 pr-3">
+                  <span class="inline-flex items-center gap-1.5 font-mono text-meta font-semibold text-ink dark:text-ivory">
+                    {t.category === 'color' && (
+                      <span class="inline-block size-3.5 shrink-0 border border-rule dark:border-ivory/20" style={`background: var(${t.varName})`}></span>
+                    )}
+                    {t.name}
+                  </span>
+                </td>
+                <td class="py-2.5 pr-3 whitespace-nowrap font-mono text-caption text-ink-muted dark:text-ivory/40">{t.varName}</td>
+                <td class="py-2.5 pr-3">
+                  <span class="flex flex-wrap items-center gap-1">
+                    {t.category === 'utility'
+                      ? <span class="caption-text text-ink-muted dark:text-ivory/40">{t.value}</span>
+                      : <CopyChip copy={t.value} />
+                    }
+                    {t.hex && <CopyChip copy={t.hex} label={t.hex} />}
+                  </span>
+                </td>
+                <td class="py-2.5">
+                  <span class="flex flex-wrap items-center gap-1">
+                    {t.classes.length
+                      ? t.classes.map((c) => <CopyChip copy={c} kind="class" />)
+                      : <span class="caption-text text-ink-muted/60 dark:text-ivory/25">—</span>
+                    }
+                  </span>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    <p id="token-empty" class="hidden p-8 text-center body-small text-text-muted">
+      Nothing matches that filter.
+    </p>
+  </section>
+
+  <!-- Token browser: category chips + search + click-to-copy. Progressive —
+       the filter reveals itself only once this runs, and chips copy only when
+       the handler is attached. -->
+  <script is:inline>
+    (function () {
+      var visualRows = Array.prototype.slice.call(document.querySelectorAll('#view-visual [data-token]'));
+      var tableRows = Array.prototype.slice.call(document.querySelectorAll('#view-table [data-token]'));
+      var sections = Array.prototype.slice.call(document.querySelectorAll('#view-visual [data-token-section]'));
+      var chips = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+      var viewBtns = Array.prototype.slice.call(document.querySelectorAll('[data-view]'));
+      var wrap = document.getElementById('token-filter');
+      var input = document.getElementById('token-search');
+      var count = document.getElementById('token-count');
+      var empty = document.getElementById('token-empty');
+      var visualView = document.getElementById('view-visual');
+      var tableView = document.getElementById('view-table');
+      if (!visualRows.length || !tableRows.length || !wrap || !input || !count) return;
+
+      wrap.classList.remove('hidden');
+      var activeCat = null;
+      var activeView = 'visual';
+      var rows = visualRows;
+
+      function apply() {
+        var q = (input.value || '').trim().toLowerCase();
+        var shown = 0;
+        rows.forEach(function (el) {
+          var hit = (!activeCat || el.getAttribute('data-cat') === activeCat) &&
+            (!q || (el.getAttribute('data-search') || '').indexOf(q) !== -1);
+          el.hidden = !hit;
+          if (hit) shown++;
+        });
+        // Section headings are visual-view only — the table has one flat body.
+        if (activeView === 'visual') {
+          sections.forEach(function (sec) {
+            var any = sec.querySelector('[data-token]:not([hidden])');
+            sec.hidden = !any;
+          });
+        }
+        if (empty) empty.classList.toggle('hidden', shown !== 0);
+        count.textContent = q || activeCat
+          ? shown + ' of ' + rows.length + ' tokens'
+          : rows.length + ' tokens';
+      }
+
+      viewBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activeView = btn.getAttribute('data-view');
+          rows = activeView === 'tabular' ? tableRows : visualRows;
+          visualView.classList.toggle('hidden', activeView !== 'visual');
+          tableView.classList.toggle('hidden', activeView !== 'tabular');
+          viewBtns.forEach(function (b) {
+            var on = b === btn;
+            b.classList.toggle('is-active', on);
+            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+          apply();
+        });
+      });
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var cat = chip.getAttribute('data-filter');
+          activeCat = activeCat === cat ? null : cat;
+          chips.forEach(function (c) {
+            c.classList.toggle('is-active', c === chip && activeCat !== null);
+          });
+          apply();
+        });
+      });
+      input.addEventListener('input', apply);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { input.value = ''; apply(''); }
+      });
+
+      // Click-to-copy with a transient "Copied ✓" label swap. Confirmation only
+      // fires when a write actually succeeded — fall back to execCommand when
+      // the async Clipboard API is unavailable or permission is denied.
+      function legacyCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        document.body.removeChild(ta);
+        return ok;
+      }
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text).then(
+            function () { return true; },
+            function () { return legacyCopy(text); }
+          );
+        }
+        return Promise.resolve(legacyCopy(text));
+      }
+      document.addEventListener('click', function (e) {
+        var el = e.target.closest('[data-copy]');
+        if (!el) return;
+        var label = el.querySelector('.copy-label');
+        var original = label ? label.textContent : el.textContent;
+        copyText(el.getAttribute('data-copy')).then(function (ok) {
+          if (!ok) return;
+          if (label) label.textContent = 'Copied ✓';
+          el.classList.add('is-copied');
+          setTimeout(function () {
+            if (label) label.textContent = original;
+            el.classList.remove('is-copied');
+          }, 1200);
+        });
+      });
+
+      apply('');
+    })();
+  </script>
+
+  <style is:global>
+    /* Copy chips — the token browser's one bespoke control. */
+    .token-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      border: 1px solid var(--color-rule);
+      background: var(--color-bg-card);
+      padding: 0.125rem 0.375rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      line-height: 1.4;
+      color: var(--color-ink-muted);
+      cursor: pointer;
+      transition: color 0.15s ease-out, border-color 0.15s ease-out, background-color 0.15s ease-out;
+    }
+    .dark .token-chip {
+      border-color: var(--color-ivory);
+      border-color: color-mix(in oklab, var(--color-ivory) 18%, transparent);
+      background: var(--color-brand-elevated);
+      color: var(--color-ivory);
+    }
+    .token-chip:hover { border-color: var(--color-azure); color: var(--color-azure); }
+    .token-chip.class-chip {
+      border-color: color-mix(in oklab, var(--color-azure) 40%, transparent);
+      background: color-mix(in oklab, var(--color-azure) 6%, transparent);
+      color: var(--color-azure);
+    }
+    .token-chip.class-chip:hover { border-color: var(--color-azure); }
+    .token-chip.is-active {
+      border-color: var(--color-azure);
+      background: color-mix(in oklab, var(--color-azure) 10%, transparent);
+      color: var(--color-azure);
+    }
+    .token-chip.is-copied { border-color: var(--color-azure); color: var(--color-azure); }
+  </style>
+</DesignShell>

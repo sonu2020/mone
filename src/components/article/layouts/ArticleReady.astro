@@ -1,0 +1,110 @@
+---
+// LAYOUT · Ready — Focus's reading column inside Classic's furniture.
+//
+// The opener and the measure are Focus's: one centred column, stacked byline,
+// light ad density, a progress bar for the sense of place. The frame around it
+// is Classic's: the masthead and below-hero leaderboards, the sticky tool rail
+// to the left of the prose, the sponsor rail to the right. The rails carry the
+// commerce so the paragraphs don't have to, which is the trade this variant
+// exists to test.
+//
+// The masthead leaderboard is not drawn here: `ready` asks Layout for `topAd`,
+// which puts the unit above the header the way the home page does.
+import Media from '../../ui/Media.astro';
+import ArticleBreadcrumb from '../ArticleBreadcrumb.astro';
+import ArticleHeadline from '../ArticleHeadline.astro';
+import ArticleByline from '../ArticleByline.astro';
+import ArticleBody from '../ArticleBody.astro';
+import ArticleToolRail from '../ArticleToolRail.astro';
+import ArticleRail from '../ArticleRail.astro';
+import ShareBar from '../ShareBar.astro';
+import TopicChips from '../TopicChips.astro';
+import ReadMoreList from '../ReadMoreList.astro';
+import AdDisclaimer from '../AdDisclaimer.astro';
+import { readingTime, type ArticleDoc } from '../../../lib/article-data';
+
+export interface Props { doc: ArticleDoc }
+const { doc } = Astro.props;
+const minutes = readingTime(doc);
+---
+<div class="mc bg-bg-card">
+  <div
+    id="read-progress"
+    class="fixed inset-x-0 top-0 z-50 h-0.5 bg-azure origin-left scale-x-0"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Opener: Focus's centred measure -->
+  <header class="max-w-3xl mx-auto px-4 sm:px-6 pt-10 lg:pt-14">
+    <ArticleBreadcrumb section={doc.section} sectionHref={doc.sectionHref} />
+    <ArticleHeadline
+      kicker={doc.section}
+      badge={doc.badge}
+      title={doc.title}
+      dek={doc.dek}
+      class="mt-5"
+    />
+    <ArticleByline
+      author={doc.author}
+      published={doc.published}
+      updated={doc.updated}
+      readingTime={minutes}
+      layout="stack"
+      class="mt-7"
+    />
+
+    <figure class="mt-8">
+      <Media src={doc.image} ratio="16/9" class="w-full" loading="eager" fetchpriority="high" />
+      <figcaption class="pt-2 caption-text text-text-muted">{doc.caption}</figcaption>
+    </figure>
+  </header>
+
+  <!-- Body: Classic's three columns, Focus's ad density -->
+  <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 xl:gap-x-10 pt-8">
+      <ArticleToolRail class="hidden lg:block lg:col-span-2" />
+
+      <article id="article-body" class="lg:col-span-7 min-w-0">
+        <ArticleBody blocks={doc.blocks} adDensity="light" />
+
+        <div class="mt-10 pt-6 border-t border-rule dark:border-ivory/10 flex flex-wrap items-center justify-between gap-4">
+          <TopicChips topics={doc.tags} />
+          <!-- Redundant with the tool rail on desktop; the only share affordance below lg -->
+          <ShareBar class="lg:hidden" />
+        </div>
+      </article>
+
+      <ArticleRail doc={doc} class="lg:col-span-3 min-w-0 mt-10 lg:mt-0" />
+    </div>
+
+    <ReadMoreList
+      items={doc.readMore}
+      title="Read More"
+      variant="grid"
+      limit={4}
+      class="mt-14 pt-10 border-t border-rule dark:border-ivory/10"
+    />
+
+    <AdDisclaimer text={doc.disclaimer} class="mt-14 pb-14" />
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var bar = document.getElementById('read-progress');
+    var article = document.getElementById('article-body');
+    if (!bar || !article) return;
+    var ticking = false;
+    function update() {
+      var rect = article.getBoundingClientRect();
+      var total = rect.height - window.innerHeight;
+      var progress = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
+      bar.style.transform = 'scaleX(' + progress + ')';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  })();
+</script>

@@ -1,0 +1,9 @@
+---
+// ATOM · Duration — a runtime chip for video stills. Bottom-right overlay.
+export interface Props {
+  value: string;
+  class?: string;
+}
+const { value, class: className = '' } = Astro.props;
+---
+<span class:list={['mc', 'inline-flex items-center bg-ink/85 text-white caption-text font-semibold tabular-nums px-1.5 py-0.5', className]}>{value}</span>

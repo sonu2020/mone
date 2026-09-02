@@ -1,0 +1,47 @@
+---
+// PATTERN · ArticleToolRail — the reader's tools in the left gutter: share,
+// "read articles on app", text size, and save. Sticky beside the prose, so the
+// controls are never something you scroll back up to find.
+import ShareBar from './ShareBar.astro';
+
+export interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+<aside class:list={['mc', className]} aria-label="Article tools">
+  <div class="lg:sticky lg:top-24 flex flex-col gap-6">
+    <ShareBar orientation="vertical" />
+
+    <div class="pt-5 border-t border-rule dark:border-ivory/10">
+      <p class="eyebrow text-text-muted">Read articles on app</p>
+      <div class="mt-2.5 flex gap-2">
+        <a
+          href="#"
+          aria-label="Get it on Google Play"
+          class="grid place-items-center size-9 border border-rule dark:border-ivory/20 text-text-muted hover:border-azure hover:text-azure transition-colors"
+        >
+          <i class="ti ti-brand-google-play text-icon" aria-hidden="true"></i>
+        </a>
+        <a
+          href="#"
+          aria-label="Download on the App Store"
+          class="grid place-items-center size-9 border border-rule dark:border-ivory/20 text-text-muted hover:border-azure hover:text-azure transition-colors"
+        >
+          <i class="ti ti-brand-apple text-icon" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="pt-5 border-t border-rule dark:border-ivory/10">
+      <p class="eyebrow text-text-muted">Save</p>
+      <a
+        href="#"
+        class="mt-2.5 inline-grid place-items-center size-9 border border-rule dark:border-ivory/20 text-text-muted hover:border-azure hover:text-azure transition-colors"
+        aria-label="Save this story"
+      >
+        <i class="ti ti-bookmark text-icon" aria-hidden="true"></i>
+      </a>
+    </div>
+  </div>
+</aside>
